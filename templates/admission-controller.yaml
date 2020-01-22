@@ -1,0 +1,151 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: trendmicro-admission-controller
+  namespace: {{ .Release.Namespace }}
+  labels:
+    service: trendmicro-admission-controller
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+{{- range $k, $v := (default (dict) .Values.extraLabels) }}
+    {{ $k }}: {{ quote $v }}
+{{- end }}
+spec:
+  ports:
+    - port: 443
+      targetPort: 8443
+      protocol: TCP
+  selector:
+    service: trendmicro-admission-controller
+    release: {{ .Release.Name }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ template "admission.controller.fullname" . }}-telemetry
+  labels:
+    app: {{ template "admission.controller.name" . }}
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+    {{- range $k, $v := (default (dict) .Values.extraLabels) }}
+    {{ $k }}: {{ quote $v }}
+    {{- end }}
+type: Opaque
+data:
+  apiKey: {{ default "" .Values.telemetry.apiKey | b64enc | quote }}
+  publicKey: {{ default "" .Values.telemetry.publicKey | b64enc | quote }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trendmicro-admission-controller
+  namespace: {{ .Release.Namespace }}
+  labels:
+    service: trendmicro-admission-controller
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    appVersion: {{ .Chart.AppVersion }}
+{{- range $k, $v := (default (dict) .Values.extraLabels) }}
+    {{ $k }}: {{ quote $v }}
+{{- end }}
+spec:
+  # We set revisionHistoryLimit to 0 because rollback should be done
+  # using `helm rollback` rather than with `kubectl rollout undo`, so
+  # we don't need to keep the old `ReplicaSet`s around.
+  # https://kubernetes.io/docs/concepts/workloads/controllers/deployment
+  revisionHistoryLimit: 0
+  replicas: {{ default 1 .Values.replicas.admissionController }}
+  selector:
+    matchLabels:
+      service: trendmicro-admission-controller
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        service: trendmicro-admission-controller
+        release: {{ .Release.Name }}
+        heritage: {{ .Release.Service }}
+        appVersion: {{ .Chart.AppVersion }}
+{{- range $k, $v := (default (dict) .Values.extraLabels) }}
+        {{ $k }}: {{ quote $v }}
+{{- end }}
+    spec:
+      automountServiceAccountToken: false
+{{- $securityContextEnabled := .Values.securityContext.enabled }}
+{{- $securityContext := default .Values.securityContext.default .Values.securityContext.admissionController }}
+{{- $podSecurityContext := default .Values.securityContext.default.pod $securityContext.pod }}
+{{- $containerSecurityContext := default .Values.securityContext.default.container $securityContext.container }}
+{{- if $securityContextEnabled }}
+      securityContext:
+{{ toYaml $podSecurityContext | indent 8 }}
+{{- end }}
+      {{- $imageDefaults := .Values.images.defaults }}
+      {{- with .Values.images.admissionController }}
+      {{- $secret := (default (default "" $imageDefaults.imagePullSecret) .imagePullSecret) }}
+      {{- if not (eq "" $secret) }}
+      imagePullSecrets:
+        - name: {{ $secret | quote }}
+      {{- end }}
+      containers:
+        - name: trendmicro-admission-controller
+{{- if $securityContextEnabled }}
+          securityContext:
+{{ toYaml $containerSecurityContext | indent 12 }}
+{{- end }}
+          {{- $project := (default (default "trendmicrocloudone" $imageDefaults.project) .project) }}
+          {{- $repository := printf "%s/%s" $project (required ".repository is required!" .repository) }}
+          {{- $tag := (default $imageDefaults.tag .tag) }}
+          image: {{ include "image.source" (dict "repository" $repository "registry" .registry "tag" $tag "imageDefaults" $imageDefaults "digest" .digest) }}
+          imagePullPolicy: {{ default (default "Always" $imageDefaults.pullPolicy) .pullPolicy }}
+          {{- end }}
+          ports:
+            - containerPort: 8443
+          volumeMounts:
+            - name: webhook-certs
+              mountPath: /etc/webhook/certs
+              readOnly: true
+            {{- if .Values.telemetry.publicKey }}
+            - name: telemetry-secret
+              mountPath: /telemetry
+            {{- end }}{{/* .Values.telemetry.publicKey */}}
+          args:
+            - --tlsCertFile=/etc/webhook/certs/cert.pem
+            - --tlsKeyFile=/etc/webhook/certs/key.pem
+            - --cloud-one-endpoint={{ required "A valid Cloud One endpoint is required" .Values.cloudOne.endpoint }}
+            - --cloud-one-api-key={{ required "A valid Cloud One api-key is required" .Values.cloudOne.apiKey }}
+            - --enableKubeSystem={{ required "enableKubeSystem is required" .Values.enableKubeSystem }}
+            - --application-version=$(APPLICATION_VERSION)
+            {{- if .Values.telemetry.enabled }}
+            - --telemetry-endpoint={{ .Values.telemetry.endpoint }}
+            - --telemetry-interval={{ .Values.telemetry.interval }}
+            - --telemetry-api-key={{ default "" .Values.telemetry.apiKey }}
+            {{- if .Values.telemetry.publicKey }}
+            - --telemetry-key-file=/telemetry/key.pem
+            {{- end }}{{/* .Values.telemetry.publicKey */}}
+            {{- end }}{{/* .Values.telemetry.enabled */}}
+            - 2>&1
+          env:
+            - name: APPLICATION_VERSION
+              value: {{ .Chart.Version | quote }}
+          resources:
+{{ toYaml (default .Values.resources.defaults .Values.resources.admissionController) | indent 12 }}
+      volumes:
+        - name: varrun
+          emptyDir:
+            sizeLimit: 1Mi
+        - name: webhook-certs
+          secret:
+            secretName: {{ template "admission.controller.fullname" . }}-tls-certificate
+        {{- if .Values.telemetry.publicKey }}
+        - name: telemetry-secret
+          secret:
+            secretName: {{ template "admission.controller.fullname" . }}-telemetry
+            items:
+            - key: publicKey
+              path: key.pem
+        {{- end }}{{/* .Values.telemetry.publicKey */}}
+      nodeSelector:
+{{ toYaml (default .Values.nodeSelector.defaults .Values.nodeSelector.admissionController) | indent 8 }}
+      tolerations:
+{{ toYaml (default .Values.tolerations.defaults .Values.tolerations.admissionController) | indent 8 }}
+      restartPolicy: Always

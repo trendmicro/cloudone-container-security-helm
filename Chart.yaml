@@ -1,0 +1,10 @@
+name: trendmicro-admission-controller
+description: Trend Micro Cloud One Container Security Admission Control
+appVersion: "0.0.0"
+version: "0.0.0"
+kubeVersion: ">=1.14.0-0"
+apiVersion: v1
+deprecated: false
+home: https://github.com/trendmicro/cloudone-admission-controller-helm
+maintainers:
+  - name: Trend Micro
