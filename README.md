@@ -78,7 +78,7 @@ To obtain an API key:
 2. Use `helm` to install Trend Micro Cloud One Admission Controller with your cluster-specific settings:
     ```sh
     helm install \
-      --values overrides.yaml
+      --values overrides.yaml \
       trendmicro \
       https://github.com/trendmicro/cloudone-admission-controller-helm/archive/master.tar.gz
     ```
@@ -130,7 +130,7 @@ To install the Admission Controller into an existing Kubernetes namespace that's
 ```sh
 helm install \
   --namespace {namespace} \
-  --values overrides.yaml
+  --values overrides.yaml \
   trendmicro \
   https://github.com/trendmicro/cloudone-admission-controller-helm/archive/master.tar.gz
 ```
@@ -143,7 +143,7 @@ As described above, you can override the defaults in this file by creating an `o
 
 ```sh
 helm install \
-  --values overrides.yaml
+  --values overrides.yaml \
   trendmicro \
   https://github.com/trendmicro/cloudone-admission-controller-helm/archive/master.tar.gz
 ```
