@@ -78,7 +78,7 @@ images:
     # imagePullSecret:
   admissionController:
     repository: admission-controller
-    digest:
+    digest: sha256:e44390ad186d7f392221ea55b5c7f21b176911c1e4d9e9d891dd3c6c6d9ea9e3
 
 replicas: {}
 
@@ -107,7 +107,6 @@ telemetry:
   ##
   ## Default value: (built-in)
   apiKey:
-    
 certificate:
   secret:
     ## name is the name of the existing secret that stores the service's certificate and private key.
