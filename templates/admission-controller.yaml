@@ -35,6 +35,8 @@ data:
   apiKey: {{ default "" .Values.telemetry.apiKey | b64enc | quote }}
   publicKey: {{ default "" .Values.telemetry.publicKey | b64enc | quote }}
 ---
+{{ include "admission.controller.auth.secret" . }}
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -61,6 +63,8 @@ spec:
       release: {{ .Release.Name }}
   template:
     metadata:
+      annotations:
+        checksum/auth: {{ include "admission.controller.auth.secret" . | sha256sum }}
       labels:
         service: trendmicro-admission-controller
         release: {{ .Release.Name }}
@@ -115,7 +119,7 @@ spec:
             - --tlsCertFile=/etc/webhook/certs/cert.pem
             - --tlsKeyFile=/etc/webhook/certs/key.pem
             - --cloud-one-endpoint={{ required "A valid Cloud One endpoint is required" .Values.cloudOne.endpoint }}
-            - --cloud-one-api-key={{ required "A valid Cloud One api-key is required" .Values.cloudOne.apiKey }}
+            - --cloud-one-api-key=$(API_KEY)
             - --enableKubeSystem={{ required "enableKubeSystem is required" .Values.enableKubeSystem }}
             - --application-version=$(APPLICATION_VERSION)
             {{- if .Values.telemetry.enabled }}
@@ -130,6 +134,11 @@ spec:
           env:
             - name: APPLICATION_VERSION
               value: {{ .Chart.Version | quote }}
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: apiKey
+                  name: {{ template "admission.controller.fullname" . }}-auth
           resources:
 {{ toYaml (default .Values.resources.defaults .Values.resources.admissionController) | indent 12 }}
       volumes:

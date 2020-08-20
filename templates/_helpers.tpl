@@ -57,3 +57,20 @@ Create an image source.
 {{- end -}}
 {{- end -}}
 {{- end -}}
+
+{{- define "admission.controller.auth.secret" -}}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ template "admission.controller.fullname" . }}-auth
+  labels:
+    app: {{ template "admission.controller.name" . }}
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+{{- range $k, $v := (default (dict) .Values.extraLabels) }}
+    {{ $k }}: {{ quote $v }}
+{{- end }}
+type: Opaque
+data:
+  apiKey: {{ required "A valid Cloud One api-key is required" .Values.cloudOne.apiKey | toString | b64enc | quote }}
+{{- end -}}{{/* define */}}
