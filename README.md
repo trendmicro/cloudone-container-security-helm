@@ -108,7 +108,7 @@ Use the `helm list` command to list installed releases.
 
 ## Documentation
 
-- [Trend Micro Cloud One Container Security Documentation] - Coming soon
+- [Trend Micro Cloud One Container Security Documentation](https://cloudone.trendmicro.com/docs/container-security)
 
 ## Advanced topics
 
