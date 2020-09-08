@@ -1,6 +1,6 @@
 {{- $cn := printf "%s.%s.svc" "trendmicro-admission-controller" .Release.Namespace }}
 {{- $ca := genCA (printf "%s-ca" "trendmicro-admission-controller") (default 3650 (int .Values.certificate.lifetime)) -}}
-{{- $cert := genSignedCert (default $cn .Values.certificate.commonName) (default nil .Values.certificate.ipAlternativeNames) (default nil .Values.certificate.dnsAlternativeNames) (default 3650 (int .Values.certificate.lifetime)) $ca -}}
+{{- $cert := genSignedCert (default $cn .Values.certificate.commonName) (default nil .Values.certificate.ipAlternativeNames) (default (list $cn) .Values.certificate.dnsAlternativeNames) (default 3650 (int .Values.certificate.lifetime)) $ca -}}
 
 apiVersion: v1
 kind: Secret
