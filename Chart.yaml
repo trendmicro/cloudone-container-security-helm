@@ -1,7 +1,7 @@
 name: trendmicro-admission-controller
 description: Trend Micro Cloud One Container Security Admission Control
-appVersion: "0.0.1"
-version: "0.0.1"
+appVersion: "0.0.2"
+version: "0.0.2"
 kubeVersion: ">=1.14.0-0"
 apiVersion: v1
 deprecated: false

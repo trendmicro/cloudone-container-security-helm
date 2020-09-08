@@ -114,13 +114,13 @@ Use the `helm list` command to list installed releases.
 
 ### Installing a specific version of the Admission Controller
 
-If you want to install a specific version of the Admission Controller, you can use the archive link for the tagged release. For example, to install Trend Micro Cloud One Admission Controller 0.0.1, you can run:
+If you want to install a specific version of the Admission Controller, you can use the archive link for the tagged release. For example, to install Trend Micro Cloud One Admission Controller 0.0.2, you can run:
 
 ```sh
 helm install \
   --values overrides.yaml \
   trendmicro \
-  https://github.com/trendmicro/cloudone-admission-controller-helm/archive/0.0.1.tar.gz
+  https://github.com/trendmicro/cloudone-admission-controller-helm/archive/0.0.2.tar.gz
 ```
 
 ### Using an alternate Kubernetes namespace
