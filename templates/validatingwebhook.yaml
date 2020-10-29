@@ -53,6 +53,7 @@ webhooks:
           - '*'
         resources:
           - "pods"
+          - "pods/ephemeralcontainers"
           - "replicasets"
           - "replicationcontrollers"
           - "deployments"
