@@ -2,16 +2,17 @@
 # This is a YAML-formatted file.
 
 cloudOne:
-  ## API key to be used with Trend Micro Cloud One Container Security
-  ##
-  ## Default value: (none)
-  apiKey:
+  admissionController:
+    ## API key to be used with Trend Micro Cloud One Container Security
+    ##
+    ## Default value: (none)
+    apiKey:
 
-  ## endpoint is the url of Trend Micro Cloud One Container Security service
-  ## Allows for full endpoint to be provided or the Cloud One region (ex: us-1).
-  ##
-  ## Default value: https://container.us-1.cloudone.trendmicro.com
-  endpoint: https://container.us-1.cloudone.trendmicro.com
+    ## endpoint is the url of Trend Micro Cloud One Container Security service
+    ## Allows for full endpoint to be provided or the Cloud One region (ex: us-1).
+    ##
+    ## Default value: https://container.us-1.cloudone.trendmicro.com
+    endpoint: https://container.us-1.cloudone.trendmicro.com
 
 ## extraLabels is a dictionary of additional labels that will be added to all resources
 ## created by this chart.

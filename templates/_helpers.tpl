@@ -72,5 +72,5 @@ metadata:
 {{- end }}
 type: Opaque
 data:
-  apiKey: {{ required "A valid Cloud One api-key is required" .Values.cloudOne.apiKey | toString | b64enc | quote }}
+  apiKey: {{ required "A valid Cloud One api-key is required" .Values.cloudOne.admissionController.apiKey | toString | b64enc | quote }}
 {{- end -}}{{/* define */}}
