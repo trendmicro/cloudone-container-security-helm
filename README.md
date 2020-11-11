@@ -68,12 +68,7 @@ To obtain an API key:
 
 ### Installing the Trend Micro Cloud One Container Security helm chart
 
-1. Create a file called overrides.yaml that will contain your cluster-specific settings.
-    ```yaml
-    cloudOne:
-      ## API key to be used with Trend Micro Cloud One Container Security
-      apiKey: YOUR-API-KEY-HERE
-    ```
+1. Create a file called overrides.yaml that will contain your cluster-specific settings. These values are provided to you in the Container Security console or Container Security API when creating a cluster. The [Values.yaml](values.yaml) file can be used as a reference when creating your overrides file.
 
 2. Use `helm` to install Trend Micro Cloud One Container Security components with your cluster-specific settings:
     ```sh
