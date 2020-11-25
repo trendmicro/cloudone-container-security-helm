@@ -3,7 +3,7 @@
 Expand the name of the chart.
 */}}
 {{- define "admission.controller.name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
+{{- default .Chart.Name .Values.admissionContollerNameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
@@ -11,33 +11,39 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
 {{- define "admission.controller.fullname" -}}
-{{- if .Values.fullnameOverride -}}
-{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- if .Values.admissionControllerFullnameOverride -}}
+{{- .Values.admissionControllerFullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
-{{- $name := default .Chart.Name .Values.nameOverride -}}
+{{- $name := default .Chart.Name .Values.admissionContollerNameOverride -}}
 {{- if contains $name .Release.Name -}}
-{{- .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- printf "%s-%s" "admission-controller" .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
-{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- printf "%s-%s-%s" "admission-controller" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 {{- end -}}
+{{- end -}}
+
+{{- define "runtimeSecurity.name" -}}
+{{- default .Chart.Name .Values.runtimeSecurityNameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
-Create name and version as used by the chart label.
+Create a default fully qualified app name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
-{{- define "admission.controller.chart" -}}
-{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
+{{- define "runtimeSecurity.fullname" -}}
+{{- if .Values.runtimeSecurityFullnameOverride -}}
+{{- .Values.runtimeSecurityFullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default .Chart.Name .Values.runtimeSecurityNameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- printf "%s-%s" "runtime-security" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s-%s" "runtime-security" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
 {{- end -}}
 
-{{/* Image and pull policy */}}
-{{- define "image" -}}
-{{- $project := (default (default "trendmicro" .defaults.project) .image.project) }}
-{{- $repository := printf "%s/%s" $project (required ".repository is required!" .image.repository) }}
-{{- $tag := (default .defaults.tag .image.tag) }}
-image: {{ include "image.source" (dict "repository" $repository "registry" .image.registry "tag" $tag "imageDefaults" .defaults "digest" .image.digest) }}
-imagePullPolicy: {{ default (default "Always" .defaults.pullPolicy) .image.pullPolicy }}
-{{- end -}}{{/* define image*/}}
 
 {{/*
 Create an image source.
@@ -73,4 +79,22 @@ metadata:
 type: Opaque
 data:
   apiKey: {{ required "A valid Cloud One api-key is required" .Values.cloudOne.admissionController.apiKey | toString | b64enc | quote }}
+{{- end -}}{{/* define */}}
+
+{{- define "runtimeSecurity.credentials.secret" -}}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ template "runtimeSecurity.fullname" . }}-credentials
+  labels:
+    app: {{ template "runtimeSecurity.name" . }}
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+{{- range $k, $v := (default (dict) .Values.extraLabels) }}
+    {{ $k }}: {{ quote $v }}
+{{- end }}
+type: Opaque
+data:
+  apiKey: {{ required "A valid runtime security api-key is required" .Values.cloudOne.runtimeSecurity.apiKey | toString | b64enc | quote }}
+  secret: {{ required "A valid runtime security secret is required" .Values.cloudOne.runtimeSecurity.secret | toString | b64enc | quote }}
 {{- end -}}{{/* define */}}

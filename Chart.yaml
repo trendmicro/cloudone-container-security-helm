@@ -1,5 +1,5 @@
-name: trendmicro-admission-controller
-description: Trend Micro Cloud One Container Security Admission Control
+name: trendmicro-container-security
+description: Trend Micro Cloud One Container Security
 appVersion: "0.0.4"
 version: "0.0.4"
 kubeVersion: ">=1.14.0-0"

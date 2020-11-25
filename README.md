@@ -148,11 +148,17 @@ _If you create a file to override the values, make sure to copy the structure fr
 ## Troubleshooting
 
 ### Basic issues
-Most issues can be investigated using the Admission Controller logs. The Admission Controller logs can be accessed using Kubectl with the following command:
+Most issues can be investigated using the Admission Controller logs. The Admission Controller logs can be accessed using kubectl with the following command:
+
+For the admission controller 
 ```sh
 kubectl logs deployment/trendmicro-admission-controller
 ```
 
+For Runtime Security
+```sh
+kubectl logs daemonset/trendmicro-runtime-security
+```
 ### Collecting support logs
 To help debug issues reported in support cases, a log collection script is provided for customer use.
 Use the following command to gather logs for support:

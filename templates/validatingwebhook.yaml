@@ -1,6 +1,7 @@
+{{- if eq true .Values.cloudOne.admissionController.enabled }}
 {{- $cn := printf "%s.%s.svc" "trendmicro-admission-controller" .Release.Namespace }}
-{{- $ca := genCA (printf "%s-ca" "trendmicro-admission-controller") (default 3650 (int .Values.certificate.lifetime)) -}}
-{{- $cert := genSignedCert (default $cn .Values.certificate.commonName) (default nil .Values.certificate.ipAlternativeNames) (default (list $cn) .Values.certificate.dnsAlternativeNames) (default 3650 (int .Values.certificate.lifetime)) $ca -}}
+{{- $ca := genCA (printf "%s-ca" "trendmicro-admission-controller") (default 3650 (int .Values.cloudOne.admissionController.certificate.lifetime)) -}}
+{{- $cert := genSignedCert (default $cn .Values.cloudOne.admissionController.certificate.commonName) (default nil .Values.cloudOne.admissionController.certificate.ipAlternativeNames) (default (list $cn) .Values.cloudOne.admissionController.certificate.dnsAlternativeNames) (default 3650 (int .Values.cloudOne.admissionController.certificate.lifetime)) $ca -}}
 
 apiVersion: v1
 kind: Secret
@@ -33,10 +34,10 @@ metadata:
     {{ $k }}: {{ quote $v }}
 {{- end }}
 webhooks:
-  - name: {{ default $cn .Values.certificate.commonName }}
+  - name: {{ default $cn .Values.cloudOne.admissionController.certificate.commonName }}
     namespaceSelector:
       matchExpressions:
-      {{- range $k, $v := (required "A namespaceSelector is required" .Values.validationNamespaceSelector) }}
+      {{- range $k, $v := (required "A namespaceSelector is required" .Values.cloudOne.admissionController.validationNamespaceSelector) }}
       {{- range $match := $v }}
       -
       {{- range $key, $op := $match }}
@@ -62,7 +63,7 @@ webhooks:
           - "jobs"
           - "cronjobs"
         scope: "Namespaced"
-    failurePolicy: {{ required "A valid failure policy is required!" .Values.failurePolicy }}
+    failurePolicy: {{ required "A valid failure policy is required!" .Values.cloudOne.admissionController.failurePolicy }}
     clientConfig:
       service:
         name: trendmicro-admission-controller
@@ -72,3 +73,4 @@ webhooks:
     admissionReviewVersions: ["v1", "v1beta1"]
     sideEffects: None
     timeoutSeconds: 30
+{{- end }}

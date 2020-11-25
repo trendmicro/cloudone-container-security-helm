@@ -1,8 +1,9 @@
-# Default values for Trend Micro Cloud One - Admission Controller.
+# Default values for Trend Micro Cloud One - Container Security.
 # This is a YAML-formatted file.
 
 cloudOne:
   admissionController:
+    enabled: true
     ## API key to be used with Trend Micro Cloud One Container Security
     ##
     ## Default value: (none)
@@ -14,36 +15,170 @@ cloudOne:
     ## Default value: https://container.us-1.cloudone.trendmicro.com
     endpoint: https://container.us-1.cloudone.trendmicro.com
 
+    ## validationNamespaceSelector is a namespace selector defined so that matching namespaces will
+    ## be subject to validation.
+    ##
+    ## For more information about namespace selectors, please see
+    ## https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+    ## https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-namespaceselector
+    validationNamespaceSelector:
+      matchExpressions:
+      - key: ignoreAdmissionControl
+        operator: DoesNotExist
+
+    ## enableKubeSystem will tell the admission controller to not ignore requests from the kube-system
+    ## namespace.
+    ##
+    ## Default value: false
+    ##
+    ## WARNING: Enabling this could lead to your cluster to be unresponsive, depending on the policy set.
+    ##          Only enable this with the greatest of care.
+    enableKubeSystem: false
+
+    ## failurePolicy defines the bahaviour if an unreconized error or timeout occurs. Enabling
+    ## this while not tagging kube-system to be ignored can easily cause the cluster to be
+    ## unresponsive.
+    ##
+    ## Default value: Ignore
+    failurePolicy: Ignore
+
+    certificate:
+      ## commonName is the common name to use in the default signed certificate.
+      ##
+      ## Default value:
+      commonName:
+
+      ## ipAlternativeNames is a list of IP addresses to include as alternate names.
+      ## in the default signed certificate.
+      ##
+      ## Default value: []
+      ipAlternativeNames: []
+
+      ## dnsAlternativeNames is a list of DNS names to include as alternate names
+      ## in the default signed certificate.
+      ##
+      ## Default value: []
+      dnsAlternativeNames: []
+
+      ## lifetime is the lifetime in days of the default signed certificate.
+      ##
+      ## Default value: 3650
+      lifetime: 3650
+
+
+  runtimeSecurity:
+    enabled: false
+
+    ## enableMasterNode will enable Runtime Security to run on master nodes as well
+    ##
+    ## Default value: false
+    enableMasterNode: false
+
+    ## API key to be used with Trend Micro Cloud One Runtime Security
+    ##
+    ## Default value: (none)
+    apiKey:
+
+    ## The API secret used to authenticate with Trend Micro Cloud One Runtime Security
+    ##
+    ## Default value: (none)
+    secret:
+
+    ## The helloURL for Trend Micro Cloud One Runtime Security
+    ##
+    ## Default value: https://agent-manager.app-protect.trendmicro.com
+    helloURL: https://agent-manager.app-protect.trendmicro.com
+
+    ## The level for Trend Micro Cloud One Runtime Security
+    ##
+    ## Default value: info
+    logLevel: info
+
+    ## The log location for Trend Micro Cloud One Runtime Security
+    ##
+    ## Default value: stdout
+    logFile: stdout
+ 
+telemetry:
+  ## enabled controls whether telemetry events will be sent.
+  ##
+  ## Default value: true
+  enabled: true
+
+  ## endpoint is the endpoint of the telemetry service.
+  ##
+  ## Default value: https://telemetry.deepsecurity.trendmicro.com
+  endpoint: https://telemetry.deepsecurity.trendmicro.com
+
+  ## interval controls the maximum interval between telemetry data reports
+  ##
+  ## Default value: 8h
+  interval: 8h
+
+  ## publicKey is the public key used when communicating with the telemetry service.
+  ##
+  ## Default value: (built-in)
+  publicKey:
+
+  ## apiKey is the API key used when communicating with the telemetry service.
+  ##
+  ## Default value: (built-in)
+  apiKey:
+
+## securityContext specifies the security contexts that we'll apply to the pods.
+##
+## NOTE: securityContext does not apply to runtime security, since it requires special privileges
+securityContext:
+  ## enabled is a global flag controlling whether security contexts are included at all in the manifest
+  ## Default value: true
+  enabled: true
+
+  ## default is the default security context that we'll apply at the pod and container level.
+  ## if `securityContext.enabled` is true, the `pod` value will be inserted into the `Deployment` manifest
+  ## as part of the pod template and the `container` value will be inserted at the container level.
+  default:
+    pod:
+      runAsNonRoot: true
+    container:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      # seLinuxOptions: "If unspecified, the container runtime will allocate a random SELinux context for each container": this seems appropriate.
+      runAsUser: 1
+
+resources:
+  defaults: {}
+    # If you want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #  cpu: 100m
+    #  memory: 128Mi
+    # requests:
+    #  cpu: 100m
+    #  memory: 128Mi
+
+## NOTE: nodeSelector does not apply to runtime security
+nodeSelector:
+  defaults: {}
+
+## NOTE: tolerations does not apply to runtime security
+tolerations:
+  defaults: []
+
+## NOTE: affinity does not apply to runtime security
+affinity:
+  defaults: {}
+
+## NOTE: replicas does not apply to runtime security
+replicas: {}
+
 ## extraLabels is a dictionary of additional labels that will be added to all resources
 ## created by this chart.
 extraLabels: {}
-
-## failurePolicy defines the bahaviour if an unreconized error or timeout occurs. Enabling
-## this while not tagging kube-system to be ignored can easily cause the cluster to be
-## unresponsive.
-##
-## Default value: Ignore
-failurePolicy: Ignore
-
-## enableKubeSystem will tell the admission controller to not ignore requests from the kube-system
-## namespace.
-##
-## Default value: false
-##
-## WARNING: Enabling this could lead to your cluster to be unresponsive, depending on the set policy.
-##          Only enable this with the greatest of care.
-enableKubeSystem: false
-
-## validationNamespaceSelector is a namespace selector defined so that matching namespaces will
-## be subject to validation.
-##
-## For more information about namespace selectors, please see
-## https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
-## https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-namespaceselector
-validationNamespaceSelector:
-  matchExpressions:
-  - key: ignoreAdmissionControl
-    operator: DoesNotExist
 
 images:
   defaults:
@@ -81,96 +216,6 @@ images:
     repository: admission-controller
     digest: sha256:b50a2bcb0d5765765cd5aba12b7cba39a21308fab500a04aefa2f8d861fe49b0
 
-replicas: {}
-
-telemetry:
-  ## enabled controls whether telemetry events will be sent.
-  ##
-  ## Default value: true
-  enabled: true
-
-  ## endpoint is the endpoint of the telemetry service.
-  ##
-  ## Default value: https://telemetry.deepsecurity.trendmicro.com
-  endpoint: https://telemetry.deepsecurity.trendmicro.com
-
-  ## interval controls the maximum interval between telemetry data reports
-  ##
-  ## Default value: 8h
-  interval: 8h
-
-  ## publicKey is the public key used when communicating with the telemetry service.
-  ##
-  ## Default value: (built-in)
-  publicKey:
-
-  ## apiKey is the API key used when communicating with the telemetry service.
-  ##
-  ## Default value: (built-in)
-  apiKey:
-
-certificate:
-  ## commonName is the common name to use in the default signed certificate.
-  ##
-  ## Default value:
-  commonName:
-
-  ## ipAlternativeNames is a list of IP addresses to include as alternate names.
-  ## in the default signed certificate.
-  ##
-  ## Default value: []
-  ipAlternativeNames: []
-
-  ## dnsAlternativeNames is a list of DNS names to include as alternate names
-  ## in the default signed certificate.
-  ##
-  ## Default value: []
-  dnsAlternativeNames: []
-
-  ## lifetime is the lifetime in days of the default signed certificate.
-  ##
-  ## Default value: 3650
-  lifetime: 3650
-
-# securityContext specifies the security contexts that we'll apply to the pods.
-securityContext:
-  ## enabled is a global flag controlling whether security contexts are included at all in the manifest
-  ## Default value: true
-  enabled: true
-
-  ## default is the default security context that we'll apply at the pod and container level.
-  ## if `securityContext.enabled` is true, the `pod` value will be inserted into the `Deployment` manifest
-  ## as part of the pod template and the `container` value will be inserted at the container level.
-  default:
-    pod:
-      runAsNonRoot: true
-    container:
-      allowPrivilegeEscalation: false
-      capabilities:
-        drop:
-        - ALL
-      privileged: false
-      readOnlyRootFilesystem: true
-      runAsNonRoot: true
-      # seLinuxOptions: "If unspecified, the container runtime will allocate a random SELinux context for each container": this seems appropriate.
-      runAsUser: 1
-
-resources:
-  defaults: {}
-    # If you want to specify resources, uncomment the following
-    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-    # limits:
-    #  cpu: 100m
-    #  memory: 128Mi
-    # requests:
-    #  cpu: 100m
-    #  memory: 128Mi
-
-nodeSelector:
-  defaults: {}
-
-tolerations:
-  defaults: []
-
-affinity:
-  defaults: {}
+  runtimeSecurity:
+    repository: runtime-security
+    digest:

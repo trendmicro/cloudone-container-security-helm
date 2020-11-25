@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# a helper script to fetch Kubernetes settings and Trend Micro Cloud One Admission Controller logs.
+# a helper script to fetch Kubernetes settings and Trend Micro Cloud One container security logs.
 #
 
 RELEASE=${RELEASE:-trendmicro}
@@ -31,7 +31,7 @@ NAMESPACE_PARAM="--namespace=$NAMESPACE"
 
 PODS=$($KUBECTL get pods "$NAMESPACE_PARAM" -o=jsonpath='{range .items[*]}{.metadata.name}{";"}{end}' -l release=$RELEASE)
 if [ -z "${PODS}" ]; then
-  echo "No admission controller pods are found in release '$RELEASE' in namespace '$NAMESPACE'.  You can use RELEASE and NAMESPACE environment variable to change its default settings."
+  echo "No container secuirty pods are found in release '$RELEASE' in namespace '$NAMESPACE'.  You can use RELEASE and NAMESPACE environment variable to change its default settings."
   exit 1
 fi
 
@@ -46,7 +46,7 @@ esac
 
 # prepare the output folder
 TIME=$(date +%s)
-RESULTS_DIR="${RESULTS_DIR:-/tmp/admission-controller-${TIME}}"
+RESULTS_DIR="${RESULTS_DIR:-/tmp/container-security-${TIME}}"
 MASTER_DIR="${RESULTS_DIR}/master"
 mkdir -p "$MASTER_DIR/apps"
 echo "Results folder will be: $RESULTS_DIR"
@@ -62,13 +62,14 @@ COMMANDS=( "version:$KUBECTL version"
            "helm-status:$HELM status $RELEASE"
            "nodes:$KUBECTL describe nodes"
            "podlist:$KUBECTL get pods --all-namespaces"
-           "admission-controller-get:$KUBECTL get all --all-namespaces -l release=$RELEASE"
-           "admission-controller-desc:$KUBECTL describe all --all-namespaces -l release=$RELEASE"
-           "admission-controller-desc-netpol:$KUBECTL describe networkpolicy --all-namespaces -l release=$RELEASE"
-           "admission-controller-secrets:$KUBECTL get secrets --all-namespaces -l release=$RELEASE"
-           "admission-controller-config:$KUBECTL describe configmap --all-namespaces -l release=$RELEASE"
-           "admission-controller-getvalidatewebhooks:$KUBECTL get ValidatingWebhookConfiguration --all-namespaces -l release=$RELEASE"
-           "admission-controller-descvalidatewebhooks:$KUBECTL describe ValidatingWebhookConfiguration --all-namespaces -l release=$RELEASE")
+           "daemonsets: $KUBECTL get ds --all-namespaces"
+           "container-security-get:$KUBECTL get all --all-namespaces -l release=$RELEASE"
+           "container-security-desc:$KUBECTL describe all --all-namespaces -l release=$RELEASE"
+           "container-security-desc-netpol:$KUBECTL describe networkpolicy --all-namespaces -l release=$RELEASE"
+           "container-security-secrets:$KUBECTL get secrets --all-namespaces -l release=$RELEASE"
+           "container-security-config:$KUBECTL describe configmap --all-namespaces -l release=$RELEASE"
+           "container-security-getvalidatewebhooks:$KUBECTL get ValidatingWebhookConfiguration --all-namespaces -l release=$RELEASE"
+           "container-security-descvalidatewebhooks:$KUBECTL describe ValidatingWebhookConfiguration --all-namespaces -l release=$RELEASE")
 
 echo "Fetching setting logs..."
 for command in "${COMMANDS[@]}"; do
@@ -85,7 +86,7 @@ done
 for pod in $(echo "$PODS" | tr ";" "\n"); do
     CONTAINERS=$($KUBECTL get pods "$NAMESPACE_PARAM" "$pod" -o jsonpath='{.spec.initContainers[*].name}')
     for container in $CONTAINERS; do
-        echo "Fetching admission controller logs... $pod - $container"
+        echo "Fetching container security logs... $pod - $container"
         $KUBECTL logs "$NAMESPACE_PARAM" "$pod" -c "$container" > "$MASTER_DIR/apps/$pod-$container.log"
         # check for any previous containers, this would indicate a crash
         PREV_LOGFILE="$MASTER_DIR/apps/$pod-$container-previous.log"
@@ -97,7 +98,7 @@ for pod in $(echo "$PODS" | tr ";" "\n"); do
     # list containers in pod
     CONTAINERS=$($KUBECTL get pods "$NAMESPACE_PARAM" "$pod" -o jsonpath='{.spec.containers[*].name}')
     for container in $CONTAINERS; do
-        echo "Fetching admission controller logs... $pod - $container"
+        echo "Fetching container security logs... $pod - $container"
         $KUBECTL logs "$NAMESPACE_PARAM" "$pod" -c "$container" > "$MASTER_DIR/apps/$pod-$container.log"
         # check for any previous containers, this would indicate a crash
         PREV_LOGFILE="$MASTER_DIR/apps/$pod-$container-previous.log"

@@ -1,3 +1,7 @@
+{{- if and (eq false .Values.cloudOne.admissionController.enabled) (eq false .Values.cloudOne.runtimeSecurity.enabled) }}
+{{- fail "At least one service must be enabled" }}
+{{- end }}
+{{- if eq true .Values.cloudOne.admissionController.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -104,7 +108,7 @@ spec:
           {{- $tag := (default $imageDefaults.tag .tag) }}
           image: {{ include "image.source" (dict "repository" $repository "registry" .registry "tag" $tag "imageDefaults" $imageDefaults "digest" .digest) }}
           imagePullPolicy: {{ default (default "Always" $imageDefaults.pullPolicy) .pullPolicy }}
-          {{- end }}
+      {{- end }}
           ports:
             - containerPort: 8443
           volumeMounts:
@@ -120,7 +124,7 @@ spec:
             - --tlsKeyFile=/etc/webhook/certs/key.pem
             - --cloud-one-endpoint={{ required "A valid Cloud One endpoint is required" .Values.cloudOne.admissionController.endpoint }}
             - --cloud-one-api-key=$(API_KEY)
-            - --enableKubeSystem={{ required "enableKubeSystem is required" .Values.enableKubeSystem }}
+            - --enableKubeSystem={{ required "enableKubeSystem is required" .Values.cloudOne.admissionController.enableKubeSystem }}
             - --application-version=$(APPLICATION_VERSION)
             {{- if .Values.telemetry.enabled }}
             - --telemetry-endpoint={{ .Values.telemetry.endpoint }}
@@ -160,4 +164,7 @@ spec:
 {{ toYaml (default .Values.nodeSelector.defaults .Values.nodeSelector.admissionController) | indent 8 }}
       tolerations:
 {{ toYaml (default .Values.tolerations.defaults .Values.tolerations.admissionController) | indent 8 }}
+      affinity:
+{{ toYaml (default .Values.affinity.defaults .Values.affinity.admissionController) | indent 8 }}
       restartPolicy: Always
+{{- end }}
