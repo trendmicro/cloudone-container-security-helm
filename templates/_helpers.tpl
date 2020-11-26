@@ -37,9 +37,9 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- else -}}
 {{- $name := default .Chart.Name .Values.runtimeSecurityNameOverride -}}
 {{- if contains $name .Release.Name -}}
-{{- printf "%s-%s" "runtime-security" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- printf "%s-%s" "runtime-protection" .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
-{{- printf "%s-%s-%s" "runtime-security" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- printf "%s-%s-%s" "runtime-protection" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}

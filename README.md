@@ -155,9 +155,9 @@ For the admission controller
 kubectl logs deployment/trendmicro-admission-controller
 ```
 
-For Runtime Security
+For Runtime protection
 ```sh
-kubectl logs daemonset/trendmicro-runtime-security
+kubectl logs daemonset/trendmicro-runtime-protection
 ```
 ### Collecting support logs
 To help debug issues reported in support cases, a log collection script is provided for customer use.

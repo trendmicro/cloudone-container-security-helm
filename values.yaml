@@ -217,5 +217,5 @@ images:
     digest: sha256:b50a2bcb0d5765765cd5aba12b7cba39a21308fab500a04aefa2f8d861fe49b0
 
   runtimeSecurity:
-    repository: runtime-security
+    repository: runtime-protection
     digest:

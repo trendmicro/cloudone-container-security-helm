@@ -2,10 +2,10 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: trendmicro-runtime-security
+  name: trendmicro-runtime-protection
   namespace: {{ .Release.Namespace }}
   labels:
-    service: trendmicro-runtime-security
+    service: trendmicro-runtime-protection
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
     appVersion: {{ .Chart.AppVersion }}
@@ -15,14 +15,14 @@ metadata:
 spec:
   selector:
     matchLabels:
-      service: runtime-security
+      service: trendmicro-runtime-protection
       release: {{ .Release.Name }}
   updateStrategy:
     type: RollingUpdate
   template:
     metadata:
       labels:
-        service: runtime-security
+        service: trendmicro-runtime-protection
         release: {{ .Release.Name }}
         heritage: {{ .Release.Service }}
         appVersion: {{ .Chart.AppVersion }}
@@ -48,7 +48,7 @@ spec:
       - name: {{ $secret | quote }}
       {{- end }}
       containers:
-      - name: runtime-security
+      - name: trendmicro-runtime-protection
         {{- $project := (default (default "trendmicrocloudone" $imageDefaults.project) .project) }}
         {{- $repository := printf "%s/%s" $project (required ".repository is required!" .repository) }}
         {{- $tag := (default $imageDefaults.tag .tag) }}
