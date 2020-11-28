@@ -98,7 +98,7 @@ cloudOne:
     ##
     ## Default value: stdout
     logFile: stdout
- 
+
 telemetry:
   ## enabled controls whether telemetry events will be sent.
   ##
@@ -199,7 +199,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 0.0.4
+    tag: 1.0.0
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -214,7 +214,7 @@ images:
     # imagePullSecret:
   admissionController:
     repository: admission-controller
-    digest: sha256:b50a2bcb0d5765765cd5aba12b7cba39a21308fab500a04aefa2f8d861fe49b0
+    digest: sha256:1441b475a7f6a3a91ec524a47ffc696a47f8c57783192aea9a2d00ce3891b44c
 
   runtimeSecurity:
     repository: runtime-protection
