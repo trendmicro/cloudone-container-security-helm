@@ -21,6 +21,8 @@ spec:
     type: RollingUpdate
   template:
     metadata:
+      annotations:
+        checksum/credentials: {{ include "runtimeSecurity.credentials.secret" . | sha256sum }}
       labels:
         service: trendmicro-runtime-protection
         release: {{ .Release.Name }}
