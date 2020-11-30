@@ -39,7 +39,6 @@ spec:
       - key: node-role.kubernetes.io/master
         effect: NoSchedule
 {{- end }}
-      hostNetwork: true
       hostPID: true
       dnsPolicy: ClusterFirstWithHostNet
       {{- $imageDefaults := .Values.images.defaults }}
