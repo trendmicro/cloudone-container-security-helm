@@ -109,13 +109,13 @@ Use the `helm list` command to list installed releases.
 
 ### Installing a specific version of the Trend Micro Cloud One Container Security helm chart
 
-If you want to install a specific version you can use the archive link for the tagged release. For example, to install Trend Micro Cloud One Container Security helm chart version 1.0.0, you can run:
+If you want to install a specific version you can use the archive link for the tagged release. For example, to install Trend Micro Cloud One Container Security helm chart version 1.0.1, you can run:
 
 ```sh
 helm install \
   --values overrides.yaml \
   trendmicro \
-  https://github.com/trendmicro/cloudone-container-security-helm/archive/1.0.0.tar.gz
+  https://github.com/trendmicro/cloudone-container-security-helm/archive/1.0.1.tar.gz
 ```
 
 ### Using an alternate Kubernetes namespace

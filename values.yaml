@@ -199,7 +199,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 1.0.0
+    tag: 1.0.1
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -218,4 +218,4 @@ images:
 
   runtimeSecurity:
     repository: runtime-protection
-    digest:
+    digest: sha256:5e990570a9a20776c311058c6de5695ef42d7747f87a2389d78421825c0da1c0
