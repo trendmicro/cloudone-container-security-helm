@@ -98,3 +98,36 @@ data:
   apiKey: {{ required "A valid runtime security api-key is required" .Values.cloudOne.runtimeSecurity.apiKey | toString | b64enc | quote }}
   secret: {{ required "A valid runtime security secret is required" .Values.cloudOne.runtimeSecurity.secret | toString | b64enc | quote }}
 {{- end -}}{{/* define */}}
+
+{{/*
+Provide HTTP proxy environment variables
+*/}}
+{{- define "admission.controller.proxy.env" -}}
+- name: _PROXY_CONFIG_CHECKSUM
+  value: {{ include (print $.Template.BasePath "/outbound-proxy.yaml") . | sha256sum }}
+- name: HTTP_PROXY
+  valueFrom:
+    configMapKeyRef:
+      name: {{ template "admission.controller.name" . }}-outbound-proxy
+      key: httpProxy
+- name: HTTPS_PROXY
+  valueFrom:
+    configMapKeyRef:
+      name: {{ template "admission.controller.name" . }}-outbound-proxy
+      key: httpsProxy
+- name: NO_PROXY
+  valueFrom:
+    configMapKeyRef:
+      name: {{ template "admission.controller.name" . }}-outbound-proxy
+      key: noProxy
+- name: PROXY_USER
+  valueFrom:
+    secretKeyRef:
+      name: {{ template "admission.controller.name" . }}-outbound-proxy-credentials
+      key: username
+- name: PROXY_PASS
+  valueFrom:
+    secretKeyRef:
+      name: {{ template "admission.controller.name" . }}-outbound-proxy-credentials
+      key: password
+{{- end -}}{{/*define*/}}

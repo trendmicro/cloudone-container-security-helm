@@ -136,6 +136,7 @@ spec:
             {{- end }}{{/* .Values.telemetry.enabled */}}
             - 2>&1
           env:
+            {{- include "admission.controller.proxy.env" . | nindent 12 }}
             - name: APPLICATION_VERSION
               value: {{ .Chart.Version | quote }}
             - name: API_KEY

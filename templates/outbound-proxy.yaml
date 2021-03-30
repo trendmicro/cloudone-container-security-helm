@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "admission.controller.name" . }}-outbound-proxy
+  labels:
+    service: {{ template "admission.controller.name" . }}-outbound-proxy
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+{{- range $k, $v := (default (dict) .Values.extraLabels) }}
+    {{ $k }}: {{ quote $v }}
+{{- end }}
+data:
+  httpProxy: {{ quote (default "" .Values.proxy.httpProxy) }}
+  httpsProxy: {{ quote (default "" .Values.proxy.httpsProxy) }}
+  noProxy: {{ (default (list) .Values.proxy.noProxy) | join "," | quote }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ template "admission.controller.name" . }}-outbound-proxy-credentials
+  labels:
+    app: {{ template "admission.controller.name" . }}
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+{{- range $k, $v := (default (dict) .Values.extraLabels) }}
+    {{ $k }}: {{ quote $v }}
+{{- end }}
+type: Opaque
+data:
+  username: {{ default "" .Values.proxy.username | toString | b64enc | quote }}
+  password: {{ default "" .Values.proxy.password | toString | b64enc | quote }}

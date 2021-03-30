@@ -150,6 +150,41 @@ securityContext:
       # seLinuxOptions: "If unspecified, the container runtime will allocate a random SELinux context for each container": this seems appropriate.
       runAsUser: 1
 
+proxy:
+  ## httpProxy, if set, will be used as the proxy for outbound HTTP traffic.
+  ##
+  ## The value may be either a complete URL or a `host[:port]`, in which
+  ## case the `http` scheme is assumed.
+  ##
+  ## Default value: (none)
+  httpProxy:
+
+  ## httpsProxy, if set, will be used as the proxy for outbound HTTPS traffic. 
+  ## If `httpsProxy` is not set, `httpProxy`
+  ## is also checked and will be used if set.
+  ##
+  ## The value may be either a complete URL or a `host[:port]`, in which
+  ## case the `http` scheme is assumed.
+  ##
+  ## Default value: (none)
+  httpsProxy:
+
+  ## noProxy, if set, is a list of hosts or `host:port` combinations which
+  ## should not be accessed through the proxy.
+  ##
+  ## Default value: (none)
+  noProxy: []
+
+  ## username, if set, is the user name to provide to the outbound proxy when making requests.
+  ##
+  ## Default value: (none)
+  username:
+
+  ## password, if set, is the password to provide to the outbound proxy when making requests.
+  ##
+  ## Default value: (none)
+  password:
+
 resources:
   defaults: {}
     # If you want to specify resources, uncomment the following
