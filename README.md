@@ -8,52 +8,48 @@ Trend Micro Cloud One Container Security components use the `helm` package manag
 
 #### Helm 3
 
-We recommend using Helm 3 (version 3.0.1 or later) to install the Trend Micro Cloud One Container Security components if this is possible for you.
+Helm 3 or later is supported when installing Trend Micro Cloud One - Container Security components.
+To get started, see the [Helm installation guide](https://helm.sh/docs/intro/install/). Installing Helm 3 should only require you to run one command.
 
-There is a handy [guide](https://helm.sh/docs/intro/install/) that will help you get started. In most cases installing Helm 3 involves running a single command.
+### Kubernetes Network Policies with Container Security Continuous Compliance
 
-If you have already installed the Trend Micro Cloud One Container Security components using Helm 2, you will need to migrate your install. The Helm folks have a helpful [blog post](https://helm.sh/blog/migrate-from-helm-v2-to-helm-v3/) that details this process.
+Container Security Continuous Compliance enforces policies by leveraging [Kubernetes network policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/) to perform isolation mitigation. Network policies are implemented by the [network plugin](https://kubernetes.io/docs/concepts/extend-kubernetes/compute-storage-net/network-plugins/).
 
-#### Helm 2
+To install Container Security, a network plugin with NetworkPolicy support is required to allow for network isolation mitigation. 
 
-<details>
-<summary>If you have to use Helm 2, you will need <code>helm</code> version <code>v2.14.1</code> or later. Expand this section for details.</summary>
+- In Amazon Elastic Kubernetes Service (Amazon EKS), the [Calico network plugin](https://docs.aws.amazon.com/eks/latest/userguide/calico.html) can be used as network policy engine.
+- In OpenShift 4.x, [OpenShift SDN](https://docs.openshift.com/container-platform/4.7/networking/network_policy/about-network-policy.html) supports using network policy in its default network isolation mode.
+- In Azure Kubernetes Service (AKS), network policy are supported by [Azure Network Policies or Calico](https://docs.microsoft.com/en-us/azure/aks/use-network-policies).
+- In Google Kubernetes Engine (GKE), you could enable [network policy enforcement](https://cloud.google.com/kubernetes-engine/docs/how-to/network-policy) for a cluster.
 
-There's a handy [quickstart](https://docs.helm.sh/using_helm/#quickstart) that will help you get started, or if you like living dangerously:
+By default, Container Security Continuous Compliance will create a Kubernetes network policy on your behalf. If you want to create it manually, follow the steps below:
+1. Change the value of `cloudOne.oversight.enableNetworkPolicyCreation` to `false`, as seen below:
 
-```sh
-curl -L https://git.io/get_helm.sh | bash
+```
+  cloudOne:
+    oversight:
+      enableNetworkPolicyCreation: false
 ```
 
-Helm has a cluster-side component called `tiller` that needs to be installed as well.
+2. Create a network policy with `matchLabels` set to `trendmicro-cloud-one: isolate` in your desired namespaces. 
 
-Make sure that your `kubectl` context is set correctly to point to your cluster:
-
-```sh
-kubectl config current-context
+```
+  apiVersion: networking.k8s.io/v1
+  kind: NetworkPolicy
+  metadata:
+    labels:
+      app.kubernetes.io/instance: trendmicro
+    name: trendmicro-oversight-isolate-policy
+  spec:
+    podSelector:
+      matchLabels:
+        trendmicro-cloud-one: isolate
+    policyTypes:
+    - Ingress
+    - Egress
 ```
 
-_If your `kubectl` context is not pointing to your cluster, use `kubectl config get-contexts` and `kubectl config use-context` to set it, or if you are using Google Cloud Platform follow the instructions in the **Connect to the cluster** dialog available by clicking the **Connect** button beside your cluster information in the console._
-
-Configure a service account for `tiller` and install:
-
-```sh
-kubectl create serviceaccount \
-  --namespace kube-system \
-  tiller
-
-kubectl create clusterrolebinding tiller-cluster-role \
-  --clusterrole=cluster-admin \
-  --serviceaccount=kube-system:tiller
-
-helm init --service-account tiller
-```
-
-Use `helm version` to confirm that you have at least version `v2.14.1` of the client and server installed.
-
-_Note: the commands above will give `tiller` full cluster administrator privileges. Review [Securing your Helm Installation](https://docs.helm.sh/using_helm/#securing-your-helm-installation) for help on what to consider when setting up Helm in your cluster._
-
-</details>
+**Warning**: The network policy with matchLabels `trendmicro-cloud-one: isolate` must exist in each application namespaces in order to perform proper isolation mitigation.
 
 ### Getting a Cloud One API Key
 
@@ -62,44 +58,92 @@ To use the Trend Micro Cloud One Container Security components with your Kuberne
 To obtain an API key:
 1. Navigate to the _Trend Micro Cloud One Container Security_ console using https://cloudone.trendmicro.com.
 
-2. Proceed to the clusters page.
+2. Go to [Add a cluster](https://cloudone.trendmicro.com/docs/container-security/cluster-add/).
 
-3. Add a cluster giving it a unique name which can identify your Kubernetes cluster. Upon registering the cluster, an API key will be provided for use in the installation process.
+3. Give your Kubernetes cluster a unique name. 
 
-### Installing the Trend Micro Cloud One Container Security helm chart
+4. Copy your API key, as it will be used during the installation process.
 
-1. Create a file called overrides.yaml that will contain your cluster-specific settings. These values are provided to you in the Container Security console or Container Security API when creating a cluster. The [Values.yaml](values.yaml) file can be used as a reference when creating your overrides file.
+### Override configuration defaults
 
-2. Use `helm` to install Trend Micro Cloud One Container Security components with your cluster-specific settings:
-    ```sh
-    helm install \
-      --values overrides.yaml \
-      trendmicro \
-      https://github.com/trendmicro/cloudone-container-security-helm/archive/master.tar.gz
-    ```
+Helm uses a file called `values.yaml` to set configuration defaults. You can find detailed documentation for each of the configuration options in this file.
 
-### Upgrading the Trend Micro Cloud One Container Security deployment
+You can override the defaults in this file by creating an `overrides.yaml` file and providing the location of this file as input during installation. The `cloudOne.APIKey` should be overridden in the `overrides.yaml` file. 
+
+**Note**: If you create a file to override the values, make sure to copy the structure from the chart's `values.yaml` file. You only need to provide the values that you are overriding.
+
+### Installing the Container Security Helm chart
+
+1. Create a file called overrides.yaml that will contain your cluster-specific settings. You can find these values in the Container Security console or Container Security API when creating a cluster. The [Values.yaml](values.yaml) file can be used as a reference when creating your overrides file.
+
+2. Use `helm` to install Container Security components with your cluster-specific settings. We recommend that you run Container Security in its own namespace. 
+
+To install Container Security chart into an existing Kubernetes namespace, use the `--namespace` flag with the `helm install` command:
+
+```sh
+  helm install \
+    --values overrides.yaml \
+    --namespace ${namespace} \
+    trendmicro \
+    https://github.com/trendmicro/cloudone-container-security-helm/archive/master.tar.gz
+```
+
+In the example below, we create a new namespace by using `helm`'s `--create-namespace` option: 
+
+```sh
+  helm install \
+    --values overrides.yaml \
+    --namespace trendmicro-system \
+    --create-namespace \
+    trendmicro \
+    https://github.com/trendmicro/cloudone-container-security-helm/archive/master.tar.gz
+```
+
+For more information about `helm install`, see the [Helm installation documentation](https://helm.sh/docs/helm/helm_install/).
+
+### Upgrade a Trend Micro Cloud One Container Security deployment
 
 To upgrade an existing installation in the default Kubernetes namespace to the latest version:
 
 ```sh
-helm upgrade \
-  --values overrides.yaml \
-  trendmicro \
-  https://github.com/trendmicro/cloudone-container-security-helm/archive/master.tar.gz
+  helm upgrade \
+    --values overrides.yaml \
+    --namespace ${namespace} \
+    trendmicro \
+    https://github.com/trendmicro/cloudone-container-security-helm/archive/master.tar.gz
 ```
 
-### Uninstalling the Trend Micro Cloud One Container Security components
-
-You can delete all of the resources created by this helm chart by running `helm delete`:
+**Note**: Helm will override or reset values in `overrides.yaml`. If you want to use the values you had previously, use the [--reuse-valeus](https://helm.sh/docs/helm/helm_upgrade/) option during a Helm upgrade:
 
 ```sh
-helm delete trendmicro
+  helm upgrade \
+    --namespace ${namespace} \
+    --reuse-values \
+    trendmicro \
+    https://github.com/trendmicro/cloudone-container-security-helm/archive/master.tar.gz 
 ```
 
-Use the `helm list` command to list installed releases.
+### Uninstall the Container Security Helm chart
 
-**`helm delete` is a destructive command and will delete all of the associated resources. Use with care.**
+You can delete all of the resources created by a helm chart using Helm's `uninstall` command:
+
+**Warning**: `helm uninstall` and `kubectl delete namespace` are destructive commands, and will delete all of the associated resources.
+
+```sh
+  helm uninstall trendmicro --namespace ${namespace}
+```
+
+Use the `helm list --all-namespaces` command to list installed releases in all namespaces.
+
+If you created a `trendmicro-system` namespace during install, and don't have any other components in the `trendmicro-system` namespace, you can delete the namespace by running `kubectl delete namespace trendmicro-system`. 
+
+By default, Container Security Continuous Compliance will create a Kubernetes network policy for you. The created network policies will be cleaned up, even if the chart is uninstalled. To clean them up, run:
+
+```sh
+  kubectl delete networkpolicy -l app.kubernetes.io/instance=trendmicro --all-namespaces
+```
+
+**Warning**: If you have running Pods that are isolated by a network policy, removing the network policy will give them network access again.
 
 ## Documentation
 
@@ -107,61 +151,50 @@ Use the `helm list` command to list installed releases.
 
 ## Advanced topics
 
-### Installing a specific version of the Trend Micro Cloud One Container Security helm chart
+### Install a specific version of the Container Security helm chart
 
-If you want to install a specific version you can use the archive link for the tagged release. For example, to install Trend Micro Cloud One Container Security helm chart version 1.0.1, you can run:
+If you want to install a specific version you can use the archive link for the tagged release. For example, to install Trend Micro Cloud One Container Security helm chart version 1.0.1, run the following command:
 
 ```sh
 helm install \
   --values overrides.yaml \
+  --namespace ${namespace} \
+  --create-namespace \
   trendmicro \
   https://github.com/trendmicro/cloudone-container-security-helm/archive/1.0.1.tar.gz
 ```
 
-### Using an alternate Kubernetes namespace
-
-To install into an existing Kubernetes namespace that's different from the current namespace, use the `--namespace` parameter in the `helm install` command:
-
-```sh
-helm install \
-  --namespace {namespace} \
-  --values overrides.yaml \
-  trendmicro \
-  https://github.com/trendmicro/cloudone-container-security-helm/archive/master.tar.gz
-```
-
-### Overriding configuration defaults
-
-Helm uses a file called `values.yaml` to set configuration defaults. You can find detailed documentation for each of the configuration options in this file.
-
-As described above, you can override the defaults in this file by creating an `overrides.yaml` file and providing the location of this file on the command line:
-
-```sh
-helm install \
-  --values overrides.yaml \
-  trendmicro \
-  https://github.com/trendmicro/cloudone-container-security-helm/archive/master.tar.gz
-```
-
-_If you create a file to override the values, make sure to copy the structure from the chart's `values.yaml` file. You only need to provide the values that you are overriding._
-
 ## Troubleshooting
 
-### Basic issues
-Most issues can be investigated using the Admission Controller logs. The Admission Controller logs can be accessed using kubectl with the following command:
+### Access logs
+Most issues can be investigated using the application logs. The logs can be accessed using `kubectl`.
 
-For the admission controller 
+* Access the logs for the admission controller using the following command: 
 ```sh
-kubectl logs deployment/trendmicro-admission-controller
+  kubectl logs deployment/trendmicro-admission-controller --namespace ${namespace}
 ```
 
-For Runtime protection
+* Access the logs for runtime protection using the following command:
 ```sh
-kubectl logs daemonset/trendmicro-runtime-protection
+  kubectl logs daemonset/trendmicro-runtime-protection --namespace ${namespace}
 ```
-### Collecting support logs
+
+* Access the logs for Oversight controller (Continuous Compliance policy enforcement) using the following command:
+```sh
+  kubectl logs deployment/trendmicro-oversight-oversight-controller-manager [controller-manager | rbac-proxy] --namespace ${namespace}
+```
+
+### Collect support logs
 To help debug issues reported in support cases, a log collection script is provided for customer use.
-Use the following command to gather logs for support:
+Gather logs using the following command:
+
 ```sh
 ./collect-logs.sh
 ```
+
+The following environment variables are supported for log collection:
+
+| Environment variable      | Description                             | Default                                                                                        |
+| ------------------------- |:----------------------------------------|:-----------------------------------------------------------------------------------------------|
+| RELEASE                   | Helm release name                       | `trendmicro`                                                                         |
+| NAMESPACE                 | The namespace that the helm chart is deployed in | Current namespace declared in `kubeconfig`. If no namespace setting exists in `kubeconfig`, then `trendmicro-system` will be used. |

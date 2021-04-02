@@ -1,0 +1,9 @@
+{{- if eq true .Values.cloudOne.oversight.enabled }}
+apiVersion: cloudone.trendmicro.com/v1
+kind: Oversight
+metadata:
+  name: {{ template "oversight.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "oversight.labels" . | nindent 4 }}
+{{- end }}

@@ -2,18 +2,19 @@
 # This is a YAML-formatted file.
 
 cloudOne:
+  ## API key to be used with Trend Micro Cloud One Container Security
+  ##
+  ## Default value: (none)
+  apiKey: 
+    
+  ## endpoint is the url of Trend Micro Cloud One Container Security service
+  ## Allows for full endpoint to be provided or the Cloud One region (ex: us-1).
+  ##
+  ## Default value: https://container.us-1.cloudone.trendmicro.com
+  endpoint: https://container.us-1.cloudone.trendmicro.com
+
   admissionController:
     enabled: true
-    ## API key to be used with Trend Micro Cloud One Container Security
-    ##
-    ## Default value: (none)
-    apiKey:
-
-    ## endpoint is the url of Trend Micro Cloud One Container Security service
-    ## Allows for full endpoint to be provided or the Cloud One region (ex: us-1).
-    ##
-    ## Default value: https://container.us-1.cloudone.trendmicro.com
-    endpoint: https://container.us-1.cloudone.trendmicro.com
 
     ## validationNamespaceSelector is a namespace selector defined so that matching namespaces will
     ## be subject to validation.
@@ -98,6 +99,47 @@ cloudOne:
     ##
     ## Default value: stdout
     logFile: stdout
+
+
+  oversight:
+    enabled: true
+
+    ## enableKubeSystem will tell the Oversight controller to not ignore requests from the kube-system
+    ## namespace.
+    ##
+    ## Default value: false
+    ##
+    ## WARNING: Enabling this could lead to your cluster to be unresponsive, depending on the policy set.
+    ##          Only enable this with the greatest of care.
+    enableKubeSystem: false
+    
+    ## syncPeriod is the time interval that how often Trend Micro Cloud One Container Security will evaluate 
+    ## the running pods. 
+    ##
+    ## Default value: 3600s
+    ##
+    syncPeriod: 3600s
+
+    ## enableNetworkPolicyCreation will tell the Oversight controller to create the Kubernetes network policy if it doesn't exist.
+    ## The created network policy is used to perform `isolate` mitigation. The created network policy will not get cleaned up automatically.
+    ##
+    ## Default value: true
+    ##
+    enableNetworkPolicyCreation: true
+
+serviceAccount:
+  # Enable the service account creation. Each component with specific permission will use individual service account.
+  # If set to false, the default service account will be used, which might not have sufficient permission and introduce the failure.
+  create: true
+
+  oversight:
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname of oversight template
+    name: ""
+    
+    # Annotations to add to the service account
+    annotations: {}
+
 
 telemetry:
   ## enabled controls whether telemetry events will be sent.
@@ -187,14 +229,13 @@ proxy:
 
 resources:
   defaults: {}
-    # If you want to specify resources, uncomment the following
-    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-    # limits:
-    #  cpu: 100m
-    #  memory: 128Mi
-    # requests:
-    #  cpu: 100m
-    #  memory: 128Mi
+  oversight: 
+    limits:
+      cpu: 800m
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 20Mi
 
 ## NOTE: nodeSelector does not apply to runtime security
 nodeSelector:
@@ -254,3 +295,11 @@ images:
   runtimeSecurity:
     repository: runtime-protection
     digest: sha256:5e990570a9a20776c311058c6de5695ef42d7747f87a2389d78421825c0da1c0
+
+  oversight:
+    repository: oversight
+    digest: 
+    
+  rbacProxy:
+    repository: rbac-proxy
+    digest: 

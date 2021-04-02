@@ -8,38 +8,15 @@ metadata:
   name: trendmicro-admission-controller
   namespace: {{ .Release.Namespace }}
   labels:
-    service: trendmicro-admission-controller
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-{{- range $k, $v := (default (dict) .Values.extraLabels) }}
-    {{ $k }}: {{ quote $v }}
-{{- end }}
+    {{- include "admissionController.labels" . | nindent 4 }}
 spec:
   ports:
     - port: 443
       targetPort: 8443
       protocol: TCP
   selector:
-    service: trendmicro-admission-controller
-    release: {{ .Release.Name }}
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: {{ template "admission.controller.fullname" . }}-telemetry
-  labels:
-    app: {{ template "admission.controller.name" . }}
-    release: "{{ .Release.Name }}"
-    heritage: "{{ .Release.Service }}"
-    {{- range $k, $v := (default (dict) .Values.extraLabels) }}
-    {{ $k }}: {{ quote $v }}
-    {{- end }}
-type: Opaque
-data:
-  apiKey: {{ default "" .Values.telemetry.apiKey | b64enc | quote }}
-  publicKey: {{ default "" .Values.telemetry.publicKey | b64enc | quote }}
----
-{{ include "admission.controller.auth.secret" . }}
+    {{- include "admissionController.selectorLabels" . | nindent 4 }}
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -47,13 +24,7 @@ metadata:
   name: trendmicro-admission-controller
   namespace: {{ .Release.Namespace }}
   labels:
-    service: trendmicro-admission-controller
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-    appVersion: {{ .Chart.AppVersion }}
-{{- range $k, $v := (default (dict) .Values.extraLabels) }}
-    {{ $k }}: {{ quote $v }}
-{{- end }}
+    {{- include "admissionController.labels" . | nindent 4 }}
 spec:
   # We set revisionHistoryLimit to 0 because rollback should be done
   # using `helm rollback` rather than with `kubectl rollout undo`, so
@@ -63,20 +34,13 @@ spec:
   replicas: {{ default 1 .Values.replicas.admissionController }}
   selector:
     matchLabels:
-      service: trendmicro-admission-controller
-      release: {{ .Release.Name }}
+      {{- include "admissionController.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       annotations:
-        checksum/auth: {{ include "admission.controller.auth.secret" . | sha256sum }}
+        checksum/auth: {{ include "container.security.auth.secret" . | sha256sum }}
       labels:
-        service: trendmicro-admission-controller
-        release: {{ .Release.Name }}
-        heritage: {{ .Release.Service }}
-        appVersion: {{ .Chart.AppVersion }}
-{{- range $k, $v := (default (dict) .Values.extraLabels) }}
-        {{ $k }}: {{ quote $v }}
-{{- end }}
+        {{- include "admissionController.selectorLabels" . | nindent 8 }}
       annotations:
         # Force the pods to restart when validatingwebhook.yaml is updated. This is to ensure certificate is in sync.
         checksum/cert: {{ include (print $.Template.BasePath "/validatingwebhook.yaml") . | sha256sum }}
@@ -122,7 +86,7 @@ spec:
           args:
             - --tlsCertFile=/etc/webhook/certs/cert.pem
             - --tlsKeyFile=/etc/webhook/certs/key.pem
-            - --cloud-one-endpoint={{ required "A valid Cloud One endpoint is required" .Values.cloudOne.admissionController.endpoint }}
+            - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
             - --cloud-one-api-key=$(API_KEY)
             - --enableKubeSystem={{ required "enableKubeSystem is required" .Values.cloudOne.admissionController.enableKubeSystem }}
             - --application-version=$(APPLICATION_VERSION)
@@ -136,14 +100,14 @@ spec:
             {{- end }}{{/* .Values.telemetry.enabled */}}
             - 2>&1
           env:
-            {{- include "admission.controller.proxy.env" . | nindent 12 }}
+            {{- include "container.security.proxy.env" . | nindent 12 }}
             - name: APPLICATION_VERSION
               value: {{ .Chart.Version | quote }}
             - name: API_KEY
               valueFrom:
                 secretKeyRef:
                   key: apiKey
-                  name: {{ template "admission.controller.fullname" . }}-auth
+                  name: {{ template "container.security.fullname" . }}-auth
           resources:
 {{ toYaml (default .Values.resources.defaults .Values.resources.admissionController) | indent 12 }}
       volumes:
@@ -152,11 +116,11 @@ spec:
             sizeLimit: 1Mi
         - name: webhook-certs
           secret:
-            secretName: {{ template "admission.controller.fullname" . }}-tls-certificate
+            secretName: {{ template "admissionController.fullname" . }}-tls-certificate
         {{- if .Values.telemetry.publicKey }}
         - name: telemetry-secret
           secret:
-            secretName: {{ template "admission.controller.fullname" . }}-telemetry
+            secretName: {{ template "container.security.fullname" . }}-telemetry
             items:
             - key: publicKey
               path: key.pem

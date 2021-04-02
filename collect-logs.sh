@@ -25,13 +25,13 @@ if ! command_exists $HELM; then
 fi
 
 CURRENT_NS=$(kubectl config view --minify --output 'jsonpath={..namespace}')
-CURRENT_NS=${CURRENT_NS:-default}
+CURRENT_NS=${CURRENT_NS:-trendmicro-system}
 NAMESPACE=${NAMESPACE:-$CURRENT_NS}
 NAMESPACE_PARAM="--namespace=$NAMESPACE"
 
-PODS=$($KUBECTL get pods "$NAMESPACE_PARAM" -o=jsonpath='{range .items[*]}{.metadata.name}{";"}{end}' -l release=$RELEASE)
+PODS=$($KUBECTL get pods "$NAMESPACE_PARAM" -o=jsonpath='{range .items[*]}{.metadata.name}{";"}{end}' -l app.kubernetes.io/instance=$RELEASE)
 if [ -z "${PODS}" ]; then
-  echo "No container secuirty pods are found in release '$RELEASE' in namespace '$NAMESPACE'.  You can use RELEASE and NAMESPACE environment variable to change its default settings."
+  echo "No container security pods are found in release '$RELEASE' in namespace '$NAMESPACE'.  You can use RELEASE and NAMESPACE environment variable to change its default settings."
   exit 1
 fi
 
@@ -40,7 +40,8 @@ case X`helm version --template="{{.Version}}"` in
   Xv3.*)
     HELM_COMMAND="$HELM list --all-namespaces";;
   *)
-    HELM_COMMAND="$HELM list";;
+    echo "Trend Micro Cloud One Container Security only supports Helm 3 or newer version, exiting..."
+    exit 1
 esac
 
 
@@ -59,17 +60,17 @@ COMMANDS=( "version:$KUBECTL version"
            "events:$KUBECTL get events --all-namespaces"
            "storageclass:$KUBECTL describe storageclass"
            "helm:$HELM_COMMAND"
-           "helm-status:$HELM status $RELEASE"
+           "helm-status:$HELM status $RELEASE $NAMESPACE_PARAM"
            "nodes:$KUBECTL describe nodes"
            "podlist:$KUBECTL get pods --all-namespaces"
            "daemonsets: $KUBECTL get ds --all-namespaces"
-           "container-security-get:$KUBECTL get all --all-namespaces -l release=$RELEASE"
-           "container-security-desc:$KUBECTL describe all --all-namespaces -l release=$RELEASE"
-           "container-security-desc-netpol:$KUBECTL describe networkpolicy --all-namespaces -l release=$RELEASE"
-           "container-security-secrets:$KUBECTL get secrets --all-namespaces -l release=$RELEASE"
-           "container-security-config:$KUBECTL describe configmap --all-namespaces -l release=$RELEASE"
-           "container-security-getvalidatewebhooks:$KUBECTL get ValidatingWebhookConfiguration --all-namespaces -l release=$RELEASE"
-           "container-security-descvalidatewebhooks:$KUBECTL describe ValidatingWebhookConfiguration --all-namespaces -l release=$RELEASE")
+           "container-security-get:$KUBECTL get all --all-namespaces -l app.kubernetes.io/instance=$RELEASE"
+           "container-security-desc:$KUBECTL describe all --all-namespaces -l app.kubernetes.io/instance=$RELEASE"
+           "container-security-desc-netpol:$KUBECTL describe networkpolicy --all-namespaces -l app.kubernetes.io/instance=$RELEASE"
+           "container-security-secrets:$KUBECTL get secrets --all-namespaces -l app.kubernetes.io/instance=$RELEASE"
+           "container-security-config:$KUBECTL describe configmap --all-namespaces -l app.kubernetes.io/instance=$RELEASE"
+           "container-security-getvalidatewebhooks:$KUBECTL get ValidatingWebhookConfiguration --all-namespaces -l app.kubernetes.io/instance=$RELEASE"
+           "container-security-descvalidatewebhooks:$KUBECTL describe ValidatingWebhookConfiguration --all-namespaces -l app.kubernetes.io/instance=$RELEASE")
 
 echo "Fetching setting logs..."
 for command in "${COMMANDS[@]}"; do

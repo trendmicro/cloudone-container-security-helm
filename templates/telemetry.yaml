@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ template "container.security.fullname" . }}-telemetry
+  labels:
+    {{- include "container.security.labels" . | nindent 4 }}
+type: Opaque
+data:
+  apiKey: {{ default "" .Values.telemetry.apiKey | b64enc | quote }}
+  publicKey: {{ default "" .Values.telemetry.publicKey | b64enc | quote }}

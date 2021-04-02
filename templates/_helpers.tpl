@@ -2,29 +2,144 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "admission.controller.name" -}}
-{{- default .Chart.Name .Values.admissionContollerNameOverride | trunc 63 | trimSuffix "-" -}}
+{{- define "container.security.name" -}}
+{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
+Create chart name and version as used by the chart label.
+*/}}
+{{- define "container.security.chart" -}}
+{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+
+{{/*
+Common labels
+*/}}
+{{- define "container.security.labels" -}}
+helm.sh/chart: {{ include "container.security.chart" . }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/name: {{ include "container.security.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- range $k, $v := (default (dict) .Values.extraLabels) }}
+    {{ $k }}: {{ quote $v }}
+{{- end }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+{{- end }}
+
+{{/*
+Admission Control Common labels
+*/}}
+{{- define "admissionController.labels" -}}
+helm.sh/chart: {{ include "container.security.chart" . }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/part-of: {{ include "container.security.name" . }}
+{{ include "admissionController.selectorLabels" . }}
+{{- range $k, $v := (default (dict) .Values.extraLabels) }}
+    {{ $k }}: {{ quote $v }}
+{{- end }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+{{- end }}
+
+{{/*
+Runtime Protection Common labels
+*/}}
+{{- define "runtimeSecurity.labels" -}}
+helm.sh/chart: {{ include "container.security.chart" . }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/part-of: {{ include "container.security.name" . }}
+{{ include "runtimeSecurity.selectorLabels" . }}
+{{- range $k, $v := (default (dict) .Values.extraLabels) }}
+    {{ $k }}: {{ quote $v }}
+{{- end }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+{{- end }}
+
+{{/*
+Oversight Common labels
+*/}}
+{{- define "oversight.labels" -}}
+helm.sh/chart: {{ include "container.security.chart" . }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/part-of: {{ include "container.security.name" . }}
+{{ include "oversight.selectorLabels" . }}
+{{- range $k, $v := (default (dict) .Values.extraLabels) }}
+    {{ $k }}: {{ quote $v }}
+{{- end }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+{{- end }}
+
+{{/*
+Admission Control Selector labels
+*/}}
+{{- define "admissionController.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "admissionController.fullname" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: trendmicro-admission-controller
+{{- end }}
+
+
+{{/*
+Runtime Protection Selector labels
+*/}}
+{{- define "runtimeSecurity.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "runtimeSecurity.fullname" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: trendmicro-runtime-protection
+{{- end }}
+
+{{/*
+Oversight Selector labels
+*/}}
+{{- define "oversight.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "oversight.fullname" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: trendmicro-oversight
+{{- end }}
+
+{{/*
+Create a default fully qualified app name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+*/}}
+{{- define "container.security.fullname" -}}
+{{- if .Values.containerSecurityFullnameOverride -}}
+{{- .Values.containerSecurityFullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default .Chart.Name .Values.containerSecurityNameOverride -}}
+{{- if contains "trendmicro" $name -}}
+{{- printf "%s" $name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s" "trendmicro" $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
 {{- end -}}
 
 {{/*
 Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
-{{- define "admission.controller.fullname" -}}
+{{- define "admissionController.fullname" -}}
 {{- if .Values.admissionControllerFullnameOverride -}}
 {{- .Values.admissionControllerFullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
 {{- $name := default .Chart.Name .Values.admissionContollerNameOverride -}}
 {{- if contains $name .Release.Name -}}
 {{- printf "%s-%s" "admission-controller" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else if contains .Release.Name $name -}}
+{{- printf "%s-%s" "admission-controller" $name | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
 {{- printf "%s-%s-%s" "admission-controller" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 {{- end -}}
-{{- end -}}
-
-{{- define "runtimeSecurity.name" -}}
-{{- default .Chart.Name .Values.runtimeSecurityNameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
@@ -38,18 +153,39 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- $name := default .Chart.Name .Values.runtimeSecurityNameOverride -}}
 {{- if contains $name .Release.Name -}}
 {{- printf "%s-%s" "runtime-protection" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else if contains .Release.Name $name -}}
+{{- printf "%s-%s" "runtime-protection" $name | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
 {{- printf "%s-%s-%s" "runtime-protection" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}
 
+{{/*
+Create a default fully qualified app name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+If release name contains chart name it will be used as a full name.
+*/}}
+{{- define "oversight.fullname" -}}
+{{- if .Values.oversightFullnameOverride -}}
+{{- .Values.oversightFullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default .Chart.Name .Values.oversightFullnameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- printf "%s-%s" "oversight" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else if contains .Release.Name $name -}}
+{{- printf "%s-%s" "oversight" $name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s-%s" "oversight" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
 
 {{/*
 Create an image source.
 */}}
 {{- define "image.source" -}}
-{{- if or (eq (default "" .registry) "-") (eq (default "-" .imageDefaults.registry) "-") -}}
+{{- if and (not .registry) (not .imageDefaults.registry) -}}
 {{- if .digest -}}
 {{- printf "%s@%s" .repository .digest | quote -}}
 {{- else -}}
@@ -64,35 +200,52 @@ Create an image source.
 {{- end -}}
 {{- end -}}
 
-{{- define "admission.controller.auth.secret" -}}
+{{/*
+Cloud One API Key auth
+*/}}
+{{- define "container.security.auth.secret" -}}
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ template "admission.controller.fullname" . }}-auth
+  name: {{ template "container.security.fullname" . }}-auth
   labels:
-    app: {{ template "admission.controller.name" . }}
-    release: "{{ .Release.Name }}"
-    heritage: "{{ .Release.Service }}"
-{{- range $k, $v := (default (dict) .Values.extraLabels) }}
-    {{ $k }}: {{ quote $v }}
-{{- end }}
+    {{- include "container.security.labels" . | nindent 4 }}
 type: Opaque
 data:
-  apiKey: {{ required "A valid Cloud One api-key is required" .Values.cloudOne.admissionController.apiKey | toString | b64enc | quote }}
+{{- if and (hasKey .Values.cloudOne "apiKey") (.Values.cloudOne.apiKey) }}
+  apiKey: {{ .Values.cloudOne.apiKey | toString | b64enc | quote }}
+{{- else if and (hasKey .Values.cloudOne.admissionController "apiKey") (.Values.cloudOne.admissionController.apiKey) }}
+  {{/* this is for backwards compatibility with the version <= v.1.0.1 */}}
+  apiKey: {{ .Values.cloudOne.admissionController.apiKey | toString | b64enc | quote }}
+{{- else }}
+  apiKey: {{ required "A valid Cloud One apiKey is required" .Values.cloudOne.apiKey | toString | b64enc | quote }}
+{{- end }}
 {{- end -}}{{/* define */}}
 
+{{/*
+Cloud One API endpoint
+*/}}
+{{- define "container.security.endpoint" -}}
+{{- if and (hasKey .Values.cloudOne "endpoint") (.Values.cloudOne.endpoint) }}
+{{- .Values.cloudOne.endpoint -}}
+{{- else if and (hasKey .Values.cloudOne.admissionController "endpoint") (.Values.cloudOne.admissionController.endpoint) }}
+{{/* this is for backwards compatibility with the version <= v.1.0.1 */}}
+{{- .Values.cloudOne.admissionController.endpoint -}}
+{{- else }}
+{{- required "A valid Cloud One endpoint is required" .Values.cloudOne.endpoint -}}
+{{- end }}
+{{- end -}}{{/* define */}}
+
+{{/*
+Runtime Protection auth
+*/}}
 {{- define "runtimeSecurity.credentials.secret" -}}
 apiVersion: v1
 kind: Secret
 metadata:
   name: {{ template "runtimeSecurity.fullname" . }}-credentials
   labels:
-    app: {{ template "runtimeSecurity.name" . }}
-    release: "{{ .Release.Name }}"
-    heritage: "{{ .Release.Service }}"
-{{- range $k, $v := (default (dict) .Values.extraLabels) }}
-    {{ $k }}: {{ quote $v }}
-{{- end }}
+    {{- include "runtimeSecurity.labels" . | nindent 4 }}
 type: Opaque
 data:
   apiKey: {{ required "A valid runtime security api-key is required" .Values.cloudOne.runtimeSecurity.apiKey | toString | b64enc | quote }}
@@ -102,32 +255,74 @@ data:
 {{/*
 Provide HTTP proxy environment variables
 */}}
-{{- define "admission.controller.proxy.env" -}}
+{{- define "container.security.proxy.env" -}}
 - name: _PROXY_CONFIG_CHECKSUM
   value: {{ include (print $.Template.BasePath "/outbound-proxy.yaml") . | sha256sum }}
 - name: HTTP_PROXY
   valueFrom:
     configMapKeyRef:
-      name: {{ template "admission.controller.name" . }}-outbound-proxy
+      name: {{ template "container.security.name" . }}-outbound-proxy
       key: httpProxy
 - name: HTTPS_PROXY
   valueFrom:
     configMapKeyRef:
-      name: {{ template "admission.controller.name" . }}-outbound-proxy
+      name: {{ template "container.security.name" . }}-outbound-proxy
       key: httpsProxy
 - name: NO_PROXY
   valueFrom:
     configMapKeyRef:
-      name: {{ template "admission.controller.name" . }}-outbound-proxy
+      name: {{ template "container.security.name" . }}-outbound-proxy
       key: noProxy
 - name: PROXY_USER
   valueFrom:
     secretKeyRef:
-      name: {{ template "admission.controller.name" . }}-outbound-proxy-credentials
+      name: {{ template "container.security.name" . }}-outbound-proxy-credentials
       key: username
 - name: PROXY_PASS
   valueFrom:
     secretKeyRef:
-      name: {{ template "admission.controller.name" . }}-outbound-proxy-credentials
+      name: {{ template "container.security.name" . }}-outbound-proxy-credentials
       key: password
 {{- end -}}{{/*define*/}}
+
+
+{{/*
+Oversight service account 
+*/}}
+{{- define "oversight.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "oversight.fullname" .) .Values.serviceAccount.oversight.name }}
+{{- else }}
+{{- default "default" .Values.serviceAccount.oversight.name }}
+{{- end }}
+{{- end }}
+
+
+{{/*
+Oversight RBAC proxy container
+*/}}
+{{- define "oversight.rbacProxy" -}}
+name: rbac-proxy
+{{- if and (.Values.securityContext) (eq true .Values.securityContext.enabled) }}
+{{- $securityContext := default .Values.securityContext.default .Values.securityContext.oversight }}
+{{- $podSecurityContext := default .Values.securityContext.default.pod $securityContext.pod }}
+{{- $containerSecurityContext := default .Values.securityContext.default.container $securityContext.container.rbacProxy }}
+securityContext: {{- toYaml $containerSecurityContext | nindent 4 }}
+{{- end }}{{/* if .Values.securityContext.enabled */}}
+{{- $imageDefaults := .Values.images.defaults }}
+{{- with .Values.images.rbacProxy -}}
+{{- $project := (default (default "trendmicrocloudone" $imageDefaults.project) .project) }}
+{{- $repository := printf "%s/%s" $project (required ".repository is required!" .repository) }}
+{{- $tag := (default $imageDefaults.tag .tag) }}
+image: {{ include "image.source" (dict "repository" $repository "registry" .registry "tag" $tag "imageDefaults" $imageDefaults "digest" .digest) }}
+imagePullPolicy: {{ default (default "Always" $imageDefaults.pullPolicy) .pullPolicy }}
+{{- end }}{{/* with .Values.images.rbacProxy */}}
+args:
+- --secure-listen-address=0.0.0.0:8443
+- --upstream=http://127.0.0.1:8080/
+- --logtostderr=true
+ports:
+- containerPort: 8443
+  name: http
+resources: {{ toYaml (default .Values.resources.defaults .Values.resources.rbacProxy) | nindent 2 }}
+{{- end -}}{{/* define */}}

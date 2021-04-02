@@ -1,0 +1,109 @@
+{{- if eq true .Values.cloudOne.oversight.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    {{- include "oversight.labels" . | nindent 4 }}
+  name: oversight-controller-manager
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ default 1 .Values.replicas.oversight }}
+  selector:
+    matchLabels:
+      {{- include "oversight.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/auth: {{ include "container.security.auth.secret" . | sha256sum }}
+      labels:
+        {{- include "oversight.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "oversight.serviceAccountName" . }}
+{{- $securityContextEnabled := .Values.securityContext.enabled }}
+{{- $securityContext := default .Values.securityContext.default .Values.securityContext.oversight }}
+{{- $podSecurityContext := default .Values.securityContext.default.pod $securityContext.pod }}
+{{- $containerSecurityContext := default .Values.securityContext.default.container $securityContext.container.oversight }}
+{{- if $securityContextEnabled }}
+      securityContext:
+{{ toYaml $podSecurityContext | indent 8 }}
+{{- end }}
+      {{- $imageDefaults := .Values.images.defaults }}
+      {{- with .Values.images.oversight }}
+      {{- $secret := (default (default "" $imageDefaults.imagePullSecret) .imagePullSecret) }}
+      {{- if not (eq "" $secret) }}
+      imagePullSecrets:
+        - name: {{ $secret | quote }}
+      {{- end }}
+      containers:
+      - name: controller-manager
+{{- if $securityContextEnabled }}
+        securityContext:
+{{ toYaml $containerSecurityContext | indent 12 }}
+{{- end }}
+        {{- $project := (default (default "trendmicrocloudone" $imageDefaults.project) .project) }}
+        {{- $repository := printf "%s/%s" $project (required ".repository is required!" .repository) }}
+        {{- $tag := (default $imageDefaults.tag .tag) }}
+        image: {{ include "image.source" (dict "repository" $repository "registry" .registry "tag" $tag "imageDefaults" $imageDefaults "digest" .digest) }}
+        imagePullPolicy: {{ default (default "Always" $imageDefaults.pullPolicy) .pullPolicy }}
+        {{- end }}
+        args:
+        - --metrics-addr=127.0.0.1:8080
+        - --enable-leader-election
+        - --sync-period={{ default "3600s" .Values.cloudOne.oversight.syncPeriod }}
+        - --enable-kube-system={{ default false .Values.cloudOne.oversight.enableKubeSystem }}
+        - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
+        - --cloud-one-api-key=$(API_KEY)
+        - --network-policy-label={{ default "trendmicro" .Release.Name }}
+{{- if (eq .Values.cloudOne.oversight.enableNetworkPolicyCreation false) }}
+        - --enable-network-policy-creation=false
+{{- end }}
+        command:
+        - /manager
+        env:
+        - name: API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: apiKey
+              name: {{ template "container.security.fullname" . }}-auth
+        resources:
+{{ toYaml (default .Values.resources.defaults .Values.resources.oversight) | indent 12 }}
+      - {{ include "oversight.rbacProxy" . | nindent 8 | trim }}
+      terminationGracePeriodSeconds: 10
+      nodeSelector:
+{{ toYaml (default .Values.nodeSelector.defaults .Values.nodeSelector.oversight) | indent 8 }}
+      tolerations:
+{{ toYaml (default .Values.tolerations.defaults .Values.tolerations.oversight) | indent 8 }}
+      affinity:
+{{ toYaml (default .Values.affinity.defaults .Values.affinity.oversight) | indent 8 }}
+      restartPolicy: Always
+      
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    {{- include "oversight.labels" . | nindent 4 }}
+  name: controller-manager-metrics-service
+  namespace: {{ .Release.Namespace }}
+spec:
+  ports:
+  - name: https
+    port: 8443
+    targetPort: https
+  selector:
+    {{- include "oversight.selectorLabels" . | nindent 4 }}
+
+---
+{{- if .Values.serviceAccount.create -}}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "oversight.serviceAccountName" . }}
+  labels:
+    {{- include "oversight.labels" . | nindent 4 }}
+  {{- with .Values.serviceAccount.oversight.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}
+{{- end }}
