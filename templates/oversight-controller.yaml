@@ -96,7 +96,7 @@ spec:
           periodSeconds: 10
         resources:
 {{ toYaml (default .Values.resources.defaults .Values.resources.oversight) | indent 12 }}
-      - {{ include "oversight.rbacProxy" . | nindent 8 | trim }}
+      - {{ include "rbacProxy" (dict "securityContext" .Values.securityContext "images" .Values.images "resources" .Values.resources "customSecurityContext" .Values.securityContext.oversight ) | nindent 8 | trim }}
       terminationGracePeriodSeconds: 10
       nodeSelector:
 {{ toYaml (default .Values.nodeSelector.defaults .Values.nodeSelector.oversight) | indent 8 }}
@@ -120,7 +120,7 @@ kind: Service
 metadata:
   labels:
     {{- include "oversight.labels" . | nindent 4 }}
-  name: controller-manager-metrics-service
+  name: oversight-controller-manager-metrics-service
   namespace: {{ .Release.Namespace }}
 spec:
   ports:

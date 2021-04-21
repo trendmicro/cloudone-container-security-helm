@@ -1,0 +1,7 @@
+apiVersion: cloudone.trendmicro.com/v1
+kind: Usage
+metadata:
+  name: {{ template "usage.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "usage.labels" . | nindent 4 }}

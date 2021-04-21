@@ -79,6 +79,22 @@ app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 
 {{/*
+Usage Controller Common labels
+*/}}
+{{- define "usage.labels" -}}
+helm.sh/chart: {{ include "container.security.chart" . }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/part-of: {{ include "container.security.name" . }}
+{{ include "usage.selectorLabels" . }}
+{{- range $k, $v := (default (dict) .Values.extraLabels) }}
+    {{ $k }}: {{ quote $v }}
+{{- end }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+{{- end }}
+
+{{/*
 Admission Control Selector labels
 */}}
 {{- define "admissionController.selectorLabels" -}}
@@ -104,6 +120,15 @@ Oversight Selector labels
 app.kubernetes.io/name: {{ include "oversight.fullname" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/component: trendmicro-oversight
+{{- end }}
+
+{{/*
+Usage Controller Selector labels
+*/}}
+{{- define "usage.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "usage.fullname" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: trendmicro-usage
 {{- end }}
 
 {{/*
@@ -177,6 +202,26 @@ If release name contains chart name it will be used as a full name.
 {{- printf "%s-%s" "oversight" $name | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
 {{- printf "%s-%s-%s" "oversight" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create a default fully qualified app name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+If release name contains chart name it will be used as a full name.
+*/}}
+{{- define "usage.fullname" -}}
+{{- if .Values.usageFullnameOverride -}}
+{{- .Values.usageFullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default .Chart.Name .Values.usageFullnameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- printf "%s-%s" "usage" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else if contains .Release.Name $name -}}
+{{- printf "%s-%s" "usage" $name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s-%s" "usage" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}
@@ -285,7 +330,6 @@ Provide HTTP proxy environment variables
       key: password
 {{- end -}}{{/*define*/}}
 
-
 {{/*
 Oversight service account 
 */}}
@@ -297,32 +341,43 @@ Oversight service account
 {{- end }}
 {{- end }}
 
+{{/*
+Usage Controller service account 
+*/}}
+{{- define "usage.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "usage.fullname" .) .Values.serviceAccount.usage.name }}
+{{- else }}
+{{- default "default" .Values.serviceAccount.usage.name }}
+{{- end }}
+{{- end }}
+
 
 {{/*
-Oversight RBAC proxy container
+RBAC proxy container
 */}}
-{{- define "oversight.rbacProxy" -}}
+{{- define "rbacProxy" -}}
 name: rbac-proxy
-{{- if and (.Values.securityContext) (eq true .Values.securityContext.enabled) }}
-{{- $securityContext := default .Values.securityContext.default .Values.securityContext.oversight }}
-{{- $podSecurityContext := default .Values.securityContext.default.pod $securityContext.pod }}
-{{- $containerSecurityContext := default .Values.securityContext.default.container $securityContext.container.rbacProxy }}
+{{- if and (.securityContext) (eq true .securityContext.enabled) }}
+{{- $securityContext := default .securityContext.default .customSecurityContext }}
+{{- $podSecurityContext := default .securityContext.default.pod $securityContext.pod }}
+{{- $containerSecurityContext := default .securityContext.default.container $securityContext.container.rbacProxy }}
 securityContext: {{- toYaml $containerSecurityContext | nindent 4 }}
-{{- end }}{{/* if .Values.securityContext.enabled */}}
-{{- $imageDefaults := .Values.images.defaults }}
-{{- with .Values.images.rbacProxy -}}
+{{- end }}{{/* if .securityContext.enabled */}}
+{{- $imageDefaults := .images.defaults }}
+{{- with .images.rbacProxy -}}
 {{- $project := (default (default "trendmicrocloudone" $imageDefaults.project) .project) }}
 {{- $repository := printf "%s/%s" $project (required ".repository is required!" .repository) }}
 {{- $tag := (default $imageDefaults.tag .tag) }}
 image: {{ include "image.source" (dict "repository" $repository "registry" .registry "tag" $tag "imageDefaults" $imageDefaults "digest" .digest) }}
 imagePullPolicy: {{ default (default "Always" $imageDefaults.pullPolicy) .pullPolicy }}
-{{- end }}{{/* with .Values.images.rbacProxy */}}
+{{- end }}{{/* with .images.rbacProxy */}}
 args:
 - --secure-listen-address=0.0.0.0:8443
 - --upstream=http://127.0.0.1:8080/
 - --logtostderr=true
 ports:
 - containerPort: 8443
-  name: http
-resources: {{ toYaml (default .Values.resources.defaults .Values.resources.rbacProxy) | nindent 2 }}
+  name: https
+resources: {{ toYaml (default .resources.defaults .resources.rbacProxy) | nindent 2 }}
 {{- end -}}{{/* define */}}

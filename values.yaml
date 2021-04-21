@@ -142,6 +142,14 @@ serviceAccount:
     
     ## Annotations to add to the service account
     annotations: {}
+  
+  usage:
+    ## The name of the service account to use.
+    ## If not set and create is true, a name is generated using the fullname of oversight template
+    name: ""
+    
+    ## Annotations to add to the service account
+    annotations: {}
 
 networkPolicy:
   ## enabled the network policy.
@@ -244,6 +252,13 @@ resources:
     requests:
       cpu: 100m
       memory: 20Mi
+  usage: 
+    limits:
+      cpu: 800m
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 20Mi
 
 ## NOTE: nodeSelector does not apply to runtime security
 nodeSelector:
@@ -307,6 +322,10 @@ images:
   oversight:
     repository: oversight-controller
     digest: 
+
+  usage:
+    repository: usage-controller
+    digest:
     
   rbacProxy:
     repository: rbac-proxy
