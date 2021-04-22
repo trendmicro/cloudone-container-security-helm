@@ -46,6 +46,11 @@ spec:
         image: {{ include "image.source" (dict "repository" $repository "registry" .registry "tag" $tag "imageDefaults" $imageDefaults "digest" .digest) }}
         imagePullPolicy: {{ default (default "Always" $imageDefaults.pullPolicy) .pullPolicy }}
         {{- end }}
+        volumeMounts:
+          {{- if .Values.telemetry.publicKey }}
+          - name: telemetry-secret
+            mountPath: /telemetry
+          {{- end }}{{/* .Values.telemetry.publicKey */}}
         args:
         - --metrics-addr=127.0.0.1:8080
         - --enable-leader-election
@@ -54,12 +59,23 @@ spec:
         - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
         - --cloud-one-api-key=$(API_KEY)
         - --network-policy-label={{ default "trendmicro" .Release.Name }}
-{{- if (eq .Values.cloudOne.oversight.enableNetworkPolicyCreation false) }}
+        - --application-version=$(APPLICATION_VERSION)
+        {{- if (eq .Values.cloudOne.oversight.enableNetworkPolicyCreation false) }}
         - --enable-network-policy-creation=false
-{{- end }}
+        {{- end }}
+        {{- if .Values.telemetry.enabled }}
+        - --telemetry-endpoint={{ .Values.telemetry.endpoint }}
+        - --telemetry-interval={{ .Values.telemetry.interval }}
+        - --telemetry-api-key={{ default "" .Values.telemetry.apiKey }}
+        {{- if .Values.telemetry.publicKey }}
+        - --telemetry-key-file=/telemetry/key.pem
+        {{- end }}{{/* .Values.telemetry.publicKey */}}
+        {{- end }}{{/* .Values.telemetry.enabled */}}
         command:
         - /manager
         env:
+        - name: APPLICATION_VERSION
+          value: {{ .Chart.Version | quote }}
         - name: API_KEY
           valueFrom:
             secretKeyRef:
@@ -76,7 +92,15 @@ spec:
       affinity:
 {{ toYaml (default .Values.affinity.defaults .Values.affinity.oversight) | indent 8 }}
       restartPolicy: Always
-      
+      volumes:
+        {{- if .Values.telemetry.publicKey }}
+        - name: telemetry-secret
+          secret:
+            secretName: {{ template "container.security.fullname" . }}-telemetry
+            items:
+            - key: publicKey
+              path: key.pem
+        {{- end }}{{/* .Values.telemetry.publicKey */}}
 ---
 apiVersion: v1
 kind: Service
