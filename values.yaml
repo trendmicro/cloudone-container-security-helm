@@ -128,18 +128,25 @@ cloudOne:
     enableNetworkPolicyCreation: true
 
 serviceAccount:
-  # Enable the service account creation. Each component with specific permission will use individual service account.
-  # If set to false, the default service account will be used, which might not have sufficient permission and introduce the failure.
+  ## enable the service account creation. Each component with specific permission will use individual service account.
+  ## If set to false, the default service account will be used, which might not have sufficient permission and introduce the failure.
+  ##
+  ## Default value: true  
   create: true
 
   oversight:
-    # The name of the service account to use.
-    # If not set and create is true, a name is generated using the fullname of oversight template
+    ## The name of the service account to use.
+    ## If not set and create is true, a name is generated using the fullname of oversight template
     name: ""
     
-    # Annotations to add to the service account
+    ## Annotations to add to the service account
     annotations: {}
 
+networkPolicy:
+  ## enabled the network policy.
+  ##
+  ## Default value: true 
+  enabled: true
 
 telemetry:
   ## enabled controls whether telemetry events will be sent.

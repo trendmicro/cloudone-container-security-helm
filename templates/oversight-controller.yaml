@@ -52,8 +52,9 @@ spec:
             mountPath: /telemetry
           {{- end }}{{/* .Values.telemetry.publicKey */}}
         args:
-        - --metrics-addr=127.0.0.1:8080
-        - --enable-leader-election
+        - --health-probe-bind-address=:8081
+        - --metrics-bind-address=127.0.0.1:8080
+        - --leader-elect
         - --sync-period={{ default "3600s" .Values.cloudOne.oversight.syncPeriod }}
         - --enable-kube-system={{ default false .Values.cloudOne.oversight.enableKubeSystem }}
         - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
@@ -81,6 +82,18 @@ spec:
             secretKeyRef:
               key: apiKey
               name: {{ template "container.security.fullname" . }}-auth
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8081
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: 8081
+          initialDelaySeconds: 5
+          periodSeconds: 10
         resources:
 {{ toYaml (default .Values.resources.defaults .Values.resources.oversight) | indent 12 }}
       - {{ include "oversight.rbacProxy" . | nindent 8 | trim }}
@@ -117,8 +130,34 @@ spec:
   selector:
     {{- include "oversight.selectorLabels" . | nindent 4 }}
 
+{{ if .Values.networkPolicy.enabled }}
 ---
-{{- if .Values.serviceAccount.create -}}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: oversight-controller-networkpolicy
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "oversight.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "oversight.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from: # any -- this is for metrics
+      ports:
+        - protocol: TCP
+          port: 8443
+    - from: # any -- this should just be kubelet for health probes
+      ports:
+        - protocol: TCP
+          port: 8081
+{{- end }}
+
+{{ if .Values.serviceAccount.create }}
+---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
