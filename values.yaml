@@ -117,6 +117,7 @@ cloudOne:
     ## the running pods. 
     ##
     ## Default value: 3600s
+    ## Minimum value: 600s
     ##
     syncPeriod: 3600s
 
