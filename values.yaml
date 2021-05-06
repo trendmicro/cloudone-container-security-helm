@@ -305,7 +305,7 @@ images:
     digest: sha256:5e990570a9a20776c311058c6de5695ef42d7747f87a2389d78421825c0da1c0
 
   oversight:
-    repository: oversight
+    repository: oversight-controller
     digest: 
     
   rbacProxy:
