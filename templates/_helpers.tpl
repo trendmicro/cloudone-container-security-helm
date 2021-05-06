@@ -215,7 +215,7 @@ data:
 {{- if and (hasKey .Values.cloudOne "apiKey") (.Values.cloudOne.apiKey) }}
   apiKey: {{ .Values.cloudOne.apiKey | toString | b64enc | quote }}
 {{- else if and (hasKey .Values.cloudOne.admissionController "apiKey") (.Values.cloudOne.admissionController.apiKey) }}
-  {{/* this is for backwards compatibility with the version <= v.1.0.1 */}}
+  {{- /* this is for backwards compatibility with the version <= v.1.0.1 */ -}}
   apiKey: {{ .Values.cloudOne.admissionController.apiKey | toString | b64enc | quote }}
 {{- else }}
   apiKey: {{ required "A valid Cloud One apiKey is required" .Values.cloudOne.apiKey | toString | b64enc | quote }}
@@ -226,11 +226,11 @@ data:
 Cloud One API endpoint
 */}}
 {{- define "container.security.endpoint" -}}
-{{- if and (hasKey .Values.cloudOne "endpoint") (.Values.cloudOne.endpoint) }}
-{{- .Values.cloudOne.endpoint -}}
-{{- else if and (hasKey .Values.cloudOne.admissionController "endpoint") (.Values.cloudOne.admissionController.endpoint) }}
-{{/* this is for backwards compatibility with the version <= v.1.0.1 */}}
+{{- if and (hasKey .Values.cloudOne.admissionController "endpoint") (.Values.cloudOne.admissionController.endpoint) }}
+{{- /* this is for backwards compatibility with the version <= v.1.0.1 */ -}}
 {{- .Values.cloudOne.admissionController.endpoint -}}
+{{- else if and (hasKey .Values.cloudOne "endpoint") (.Values.cloudOne.endpoint) }}
+{{- .Values.cloudOne.endpoint -}}
 {{- else }}
 {{- required "A valid Cloud One endpoint is required" .Values.cloudOne.endpoint -}}
 {{- end }}
