@@ -247,6 +247,7 @@ Create an image source.
 
 {{/*
 Cloud One API Key auth
+.Values.cloudOne.admissionController.apiKey is for backwards compatibility with the version <= v.1.0.1
 */}}
 {{- define "container.security.auth.secret" -}}
 apiVersion: v1
@@ -260,7 +261,6 @@ data:
 {{- if and (hasKey .Values.cloudOne "apiKey") (.Values.cloudOne.apiKey) }}
   apiKey: {{ .Values.cloudOne.apiKey | toString | b64enc | quote }}
 {{- else if and (hasKey .Values.cloudOne.admissionController "apiKey") (.Values.cloudOne.admissionController.apiKey) }}
-  {{- /* this is for backwards compatibility with the version <= v.1.0.1 */ -}}
   apiKey: {{ .Values.cloudOne.admissionController.apiKey | toString | b64enc | quote }}
 {{- else }}
   apiKey: {{ required "A valid Cloud One apiKey is required" .Values.cloudOne.apiKey | toString | b64enc | quote }}
@@ -269,10 +269,10 @@ data:
 
 {{/*
 Cloud One API endpoint
+.Values.cloudOne.admissionController.endpoint is for backwards compatibility with the version <= v.1.0.1
 */}}
 {{- define "container.security.endpoint" -}}
 {{- if and (hasKey .Values.cloudOne.admissionController "endpoint") (.Values.cloudOne.admissionController.endpoint) }}
-{{- /* this is for backwards compatibility with the version <= v.1.0.1 */ -}}
 {{- .Values.cloudOne.admissionController.endpoint -}}
 {{- else if and (hasKey .Values.cloudOne "endpoint") (.Values.cloudOne.endpoint) }}
 {{- .Values.cloudOne.endpoint -}}
