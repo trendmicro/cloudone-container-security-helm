@@ -75,6 +75,24 @@ spec:
       {{- end }}
           ports:
             - containerPort: 8443
+            - containerPort: 8083
+              name: health
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8083
+            initialDelaySeconds: 20
+            timeoutSeconds: 5
+            periodSeconds: 20
+            failureThreshold: 6
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8083
+            initialDelaySeconds: 20
+            timeoutSeconds: 5
+            periodSeconds: 20
+            failureThreshold: 6            
           volumeMounts:
             - name: webhook-certs
               mountPath: /etc/webhook/certs
