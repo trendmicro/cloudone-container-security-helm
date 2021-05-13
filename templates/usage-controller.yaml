@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   labels:
     {{- include "usage.labels" . | nindent 4 }}
-  name: usage-controller-manager
+  name: trendmicro-usage-controller
   namespace: {{ .Release.Namespace }}
 spec:
   replicas:  {{ default 1 .Values.replicas.usage }}
@@ -89,7 +89,7 @@ kind: Service
 metadata:
   labels:
     {{- include "usage.labels" . | nindent 4 }}
-  name: usage-controller-manager-metrics-service
+  name: trendmicro-usage-controller-metrics-service
   namespace: {{ .Release.Namespace }}
 spec:
   ports:

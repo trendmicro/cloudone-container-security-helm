@@ -4,7 +4,7 @@ kind: Deployment
 metadata:
   labels:
     {{- include "oversight.labels" . | nindent 4 }}
-  name: oversight-controller-manager
+  name: trendmicro-oversight-controller
   namespace: {{ .Release.Namespace }}
 spec:
   replicas: {{ default 1 .Values.replicas.oversight }}
@@ -120,7 +120,7 @@ kind: Service
 metadata:
   labels:
     {{- include "oversight.labels" . | nindent 4 }}
-  name: oversight-controller-manager-metrics-service
+  name: trendmicro-oversight-controller-metrics-service
   namespace: {{ .Release.Namespace }}
 spec:
   ports:

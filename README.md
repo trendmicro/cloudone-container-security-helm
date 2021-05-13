@@ -181,7 +181,12 @@ Most issues can be investigated using the application logs. The logs can be acce
 
 * Access the logs for Oversight controller (Continuous Compliance policy enforcement) using the following command:
 ```sh
-  kubectl logs deployment/trendmicro-oversight-oversight-controller-manager [controller-manager | rbac-proxy] --namespace ${namespace}
+  kubectl logs deployment/trendmicro-oversight-controller [controller-manager | rbac-proxy] --namespace ${namespace}
+```
+
+* Access the logs for Usage controller using the following command:
+```sh
+  kubectl logs deployment/trendmicro-usage-controller [controller-manager | rbac-proxy] --namespace ${namespace}
 ```
 
 ### Collect support logs
