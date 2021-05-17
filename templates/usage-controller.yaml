@@ -59,6 +59,10 @@ spec:
             secretKeyRef:
               key: apiKey
               name: {{ template "container.security.fullname" . }}-auth
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
         livenessProbe:
           httpGet:
             path: /healthz
