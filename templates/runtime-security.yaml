@@ -5,18 +5,11 @@ metadata:
   name: trendmicro-runtime-protection
   namespace: {{ .Release.Namespace }}
   labels:
-    service: trendmicro-runtime-protection
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-    appVersion: {{ .Chart.AppVersion }}
-{{- range $k, $v := (default (dict) .Values.extraLabels) }}
-    {{ $k }}: {{ quote $v }}
-{{- end }}
+    {{- include "runtimeSecurity.labels" . | nindent 4 }}
 spec:
   selector:
     matchLabels:
-      service: trendmicro-runtime-protection
-      release: {{ .Release.Name }}
+      {{- include "runtimeSecurity.selectorLabels" . | nindent 6 }}
   updateStrategy:
     type: RollingUpdate
   template:
@@ -24,13 +17,7 @@ spec:
       annotations:
         checksum/credentials: {{ include "runtimeSecurity.credentials.secret" . | sha256sum }}
       labels:
-        service: trendmicro-runtime-protection
-        release: {{ .Release.Name }}
-        heritage: {{ .Release.Service }}
-        appVersion: {{ .Chart.AppVersion }}
-{{- range $k, $v := (default (dict) .Values.extraLabels) }}
-        {{ $k }}: {{ quote $v }}
-{{- end }}
+        {{- include "runtimeSecurity.labels" . | nindent 8 }}
     spec:
 {{- if eq true .Values.cloudOne.runtimeSecurity.enableMasterNode }}
       tolerations:
