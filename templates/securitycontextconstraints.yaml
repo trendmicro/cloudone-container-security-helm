@@ -1,0 +1,43 @@
+{{- if and .Values.securityContextConstraints.create (.Capabilities.APIVersions.Has "security.openshift.io/v1") }}
+apiVersion: security.openshift.io/v1
+kind: SecurityContextConstraints
+metadata:
+  annotations:
+    kubernetes.io/description: |
+      This SCC provides least-privilege requirement to run Trend Micro Cloud One Container Security in Openshift.
+  name: {{ template "container.security.name" . }}-default
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "container.security.labels" . | nindent 4 }} 
+allowHostDirVolumePlugin: false
+allowHostIPC: false
+allowHostNetwork: false
+allowHostPID: false
+allowHostPorts: false
+allowPrivilegeEscalation: false
+allowPrivilegedContainer: false
+allowedCapabilities: []
+allowedUnsafeSysctls: []
+defaultAddCapabilities: []
+fsGroup: 
+  type: MustRunAs
+groups: 
+- system:authenticated
+priority: 0
+readOnlyRootFilesystem: false
+requiredDropCapabilities: []
+runAsUser:
+  type: RunAsAny
+seLinuxContext:
+  type: MustRunAs
+supplementalGroups:
+  type: RunAsAny
+users: 
+- system:serviceaccount:{{ .Release.Namespace }}:{{ include "oversight.serviceAccountName" . }}
+- system:serviceaccount:{{ .Release.Namespace }}:{{ include "usage.serviceAccountName" . }}
+volumes:
+- configMap
+- downwardAPI
+- emptyDir
+- secret
+{{- end }}

@@ -128,6 +128,10 @@ cloudOne:
     ##
     enableNetworkPolicyCreation: true
 
+securityContextConstraints:
+  # enable the Security Context Constraints creation in Openshift
+  create: true
+
 serviceAccount:
   ## enable the service account creation. Each component with specific permission will use individual service account.
   ## If set to false, the default service account will be used, which might not have sufficient permission and introduce the failure.
@@ -206,7 +210,7 @@ securityContext:
       readOnlyRootFilesystem: true
       runAsNonRoot: true
       # seLinuxOptions: "If unspecified, the container runtime will allocate a random SELinux context for each container": this seems appropriate.
-      runAsUser: 1
+      runAsUser: 65532  # nonroot user
 
 proxy:
   ## httpProxy, if set, will be used as the proxy for outbound HTTP traffic.
