@@ -153,7 +153,7 @@ By default, Container Security Continuous Compliance will create a Kubernetes ne
 
 ### Install a specific version of the Container Security helm chart
 
-If you want to install a specific version you can use the archive link for the tagged release. For example, to install Trend Micro Cloud One Container Security helm chart version 1.0.1, run the following command:
+If you want to install a specific version you can use the archive link for the tagged release. For example, to install Trend Micro Cloud One Container Security helm chart version 2.0.0, run the following command:
 
 ```sh
 helm install \
@@ -161,7 +161,7 @@ helm install \
   --namespace ${namespace} \
   --create-namespace \
   trendmicro \
-  https://github.com/trendmicro/cloudone-container-security-helm/archive/1.0.1.tar.gz
+  https://github.com/trendmicro/cloudone-container-security-helm/archive/2.0.0.tar.gz
 ```
 
 ## Troubleshooting

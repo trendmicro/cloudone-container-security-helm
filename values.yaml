@@ -5,8 +5,7 @@ cloudOne:
   ## API key to be used with Trend Micro Cloud One Container Security
   ##
   ## Default value: (none)
-  apiKey: 
-    
+  apiKey:
   ## endpoint is the url of Trend Micro Cloud One Container Security service
   ## Allows for full endpoint to be provided or the Cloud One region (ex: us-1).
   ##
@@ -112,7 +111,7 @@ cloudOne:
     ## WARNING: Enabling this could lead to your cluster to be unresponsive, depending on the policy set.
     ##          Only enable this with the greatest of care.
     enableKubeSystem: false
-    
+
     ## syncPeriod is the time interval that how often Trend Micro Cloud One Container Security will evaluate 
     ## the running pods. 
     ##
@@ -142,16 +141,15 @@ serviceAccount:
   oversight:
     ## The name of the service account to use.
     ## If not set and create is true, a name is generated using the fullname of oversight template
-    name: ""
-    
+    name: ''
+
     ## Annotations to add to the service account
     annotations: {}
-  
   usage:
     ## The name of the service account to use.
     ## If not set and create is true, a name is generated using the fullname of oversight template
-    name: ""
-    
+    name: ''
+
     ## Annotations to add to the service account
     annotations: {}
 
@@ -249,14 +247,14 @@ proxy:
 
 resources:
   defaults: {}
-  oversight: 
+  oversight:
     limits:
       cpu: 800m
       memory: 1Gi
     requests:
       cpu: 100m
       memory: 20Mi
-  usage: 
+  usage:
     limits:
       cpu: 800m
       memory: 1Gi
@@ -302,7 +300,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 1.0.1
+    tag: 2.0.0
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -317,7 +315,7 @@ images:
     # imagePullSecret:
   admissionController:
     repository: admission-controller
-    digest: sha256:1441b475a7f6a3a91ec524a47ffc696a47f8c57783192aea9a2d00ce3891b44c
+    digest: sha256:dd19820f10cf0d711b7662e25c163dc20b58802ff0be01808b56b6ad36eef84f
 
   runtimeSecurity:
     repository: runtime-protection
@@ -325,12 +323,11 @@ images:
 
   oversight:
     repository: oversight-controller
-    digest: 
+    digest: sha256:ced7c56433c68b2b3cfc31ec04aefd055b819d76e131b55da4207d8ed67bfb81
 
   usage:
     repository: usage-controller
-    digest:
-    
+    digest: sha256:90bc5d1c7f43eda72b1991b4008e473b66331a3fabb8b5946c1d49b0923d8b62
   rbacProxy:
     repository: rbac-proxy
-    digest: 
+    digest: sha256:c43be26f3ce3e934e9c1d12bb00b79201940cee1c22b0f445538fbf82645166a
