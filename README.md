@@ -101,6 +101,8 @@ In the example below, we create a new namespace by using `helm`'s `--create-name
 
 For more information about `helm install`, see the [Helm installation documentation](https://helm.sh/docs/helm/helm_install/).
 
+**Note**: If you are running Container Security in a pure **AWS EKS Fargate** environment, you may need to adjust your Fargate profile to allow pods in a non-default namespace (ex: `trendmicro-system`) to be scheduled. See [AWS documentation](https://docs.aws.amazon.com/eks/latest/userguide/fargate-profile.html) for more information on Fargate profiles.
+
 ### Upgrade a Trend Micro Cloud One Container Security deployment
 
 To upgrade an existing installation in the default Kubernetes namespace to the latest version:
