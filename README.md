@@ -103,6 +103,8 @@ For more information about `helm install`, see the [Helm installation documentat
 
 **Note**: If you are running Container Security in a pure **AWS EKS Fargate** environment, you may need to adjust your Fargate profile to allow pods in a non-default namespace (ex: `trendmicro-system`) to be scheduled. See [AWS documentation](https://docs.aws.amazon.com/eks/latest/userguide/fargate-profile.html) for more information on Fargate profiles.
 
+**Note**: If you are running Container Security in a **Redhat OpenShift** environment, the Helm Chart creates a [Security Context Constraint](https://docs.openshift.com/container-platform/4.7/authentication/managing-security-context-constraints.html) to allow Container Security components to have the minimum security context requirements to run.
+
 ### Upgrade a Trend Micro Cloud One Container Security deployment
 
 To upgrade an existing installation in the default Kubernetes namespace to the latest version:
