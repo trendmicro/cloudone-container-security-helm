@@ -21,18 +21,18 @@ allowedUnsafeSysctls: []
 defaultAddCapabilities: []
 fsGroup: 
   type: MustRunAs
-groups: 
-- system:authenticated
+groups: []
 priority: 0
-readOnlyRootFilesystem: false
+readOnlyRootFilesystem: true
 requiredDropCapabilities: []
 runAsUser:
-  type: RunAsAny
+  type: MustRunAsNonRoot
 seLinuxContext:
   type: MustRunAs
 supplementalGroups:
   type: RunAsAny
 users: 
+- system:serviceaccount:{{ .Release.Namespace }}:default
 - system:serviceaccount:{{ .Release.Namespace }}:{{ include "oversight.serviceAccountName" . }}
 - system:serviceaccount:{{ .Release.Namespace }}:{{ include "usage.serviceAccountName" . }}
 volumes:
