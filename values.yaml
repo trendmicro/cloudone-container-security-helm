@@ -300,7 +300,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.0.1
+    tag: 2.0.2
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -315,7 +315,7 @@ images:
     # imagePullSecret:
   admissionController:
     repository: admission-controller
-    digest: sha256:dd19820f10cf0d711b7662e25c163dc20b58802ff0be01808b56b6ad36eef84f
+    digest: sha256:25312b645c15bd1df665b8286f60144823bbe6b69b5e19fa7a11255954317692
 
   runtimeSecurity:
     repository: runtime-protection
@@ -323,11 +323,11 @@ images:
 
   oversight:
     repository: oversight-controller
-    digest: sha256:cc88c59fd1b31ecf25516756c0c8a8e465d68b3d03a88c0142d3334dd52dd650
+    digest: sha256:c8a7670bc90a08b4fddd4412c9b0737cb90c8b8af5cbee250065e03f9bc638aa
 
   usage:
     repository: usage-controller
-    digest: sha256:785a3acb0d96b079df1fbc5500c264bb5c8f691bd4ddbe5212130a94aa1bc74d
+    digest: sha256:e539dde67c13445d578907a20d05371b51d031278dd4307b309b9df2da8bd17c
   rbacProxy:
     repository: rbac-proxy
     digest: sha256:c43be26f3ce3e934e9c1d12bb00b79201940cee1c22b0f445538fbf82645166a
