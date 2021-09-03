@@ -65,41 +65,6 @@ cloudOne:
       ## Default value: 3650
       lifetime: 3650
 
-
-  runtimeSecurity:
-    enabled: false
-
-    ## enableMasterNode will enable Runtime Security to run on master nodes as well
-    ##
-    ## Default value: false
-    enableMasterNode: false
-
-    ## API key to be used with Trend Micro Cloud One Runtime Security
-    ##
-    ## Default value: (none)
-    apiKey:
-
-    ## The API secret used to authenticate with Trend Micro Cloud One Runtime Security
-    ##
-    ## Default value: (none)
-    secret:
-
-    ## The helloURL for Trend Micro Cloud One Runtime Security
-    ##
-    ## Default value: https://agent-manager.app-protect.trendmicro.com
-    helloURL: https://agent-manager.app-protect.trendmicro.com
-
-    ## The level for Trend Micro Cloud One Runtime Security
-    ##
-    ## Default value: info
-    logLevel: info
-
-    ## The log location for Trend Micro Cloud One Runtime Security
-    ##
-    ## Default value: stdout
-    logFile: stdout
-
-
   oversight:
     enabled: true
 
@@ -127,6 +92,9 @@ cloudOne:
     ##
     enableNetworkPolicyCreation: true
 
+  runtimeSecurity:
+    enabled: false
+
 securityContextConstraints:
   # enable the Security Context Constraints creation in Openshift
   create: true
@@ -152,6 +120,18 @@ serviceAccount:
 
     ## Annotations to add to the service account
     annotations: {}
+
+  scout:
+    ## The name of the service account to use.
+    ## If not set and create is true, a name is generated using the fullname of scout template
+    name: ""
+    
+    ## Annotations to add to the service account
+    annotations: {}
+
+rbac:
+  # Create and use rbac resources
+  create: true
 
 networkPolicy:
   ## enabled the network policy.
@@ -187,7 +167,7 @@ telemetry:
 
 ## securityContext specifies the security contexts that we'll apply to the pods.
 ##
-## NOTE: securityContext does not apply to runtime security, since it requires special privileges
+## NOTE: securityContext does not apply to scout, since it requires special privileges
 securityContext:
   ## enabled is a global flag controlling whether security contexts are included at all in the manifest
   ## Default value: true
@@ -261,25 +241,103 @@ resources:
     requests:
       cpu: 100m
       memory: 20Mi
+  scout:
+    requests:
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1024Mi
+    
 
-## NOTE: nodeSelector does not apply to runtime security
 nodeSelector:
+  ## nodeSelector if set, ensures pods are only assigned to a particular set of nodes.
+  ## Defaults apply to all pods created by this chart unless overridden by a non default configuration.
+  ##
+  ## Default Value: {}
   defaults: {}
 
-## NOTE: tolerations does not apply to runtime security
 tolerations:
+  ## tolerations if set, allows (but does not require) the pods to schedule onto nodes with matching taints.
+  ## Defaults apply to all pods created by this chart unless overridden by a non default configuration.
+  ##
+  ## Default Value: {}
   defaults: []
 
-## NOTE: affinity does not apply to runtime security
 affinity:
+  ## affinity if set, provides the ability constrain which nodes your pod is eligible to be scheduled on, based on labels.
+  ## Defaults apply to all pods created by this chart unless overridden by a non default configuration.
+  ##
+  ## Default Value: {}
   defaults: {}
 
-## NOTE: replicas does not apply to runtime security
+## replicas if set, allows for additional replica counts to be set for specified pods.
+## NOTE: replicas does not apply to scout
+##
+## Default Value: {}
 replicas: {}
 
-## extraLabels is a dictionary of additional labels that will be added to all resources
-## created by this chart.
+## extraLabels is a dictionary of additional labels that will be added to all resources created by this chart.
+##
+## Default Value: {}
 extraLabels: {}
+
+podAnnotations:
+  ## podAnnotations if set, applies additional pod annotations to all pods unless overridden by a non default configuration.
+  ##
+  ## Default Value: {}
+  defaults: {}
+
+priorityClassName:
+  ## podAnnotations if set, applies priority class to all pods unless overridden by a non default configuration.
+  ##
+  ## Default Value: (none)
+  default:
+
+scout:
+  exclusion:
+    ## List of namespaces for which Scout Runtime Security feature will not trigger events.
+    ##
+    ## Default Value:
+    ##  - kube-system
+    namespaces:
+      - kube-system
+    ## If set to true, excludeSameNamespace will add the namespace in which this helm chart is deployed as an excluded namespace.
+    ##
+    ## Default Value: true
+    excludeSameNamespace: true
+  falco:
+    ## extraArgs, if set will apply additional arguments to falco container
+    ##
+    ## Default Value: []
+    extraArgs: []
+    ## env, if set will apply additional environment variables to the falco container
+    ##
+    ## Default Value: []
+    env: {}
+
+    docker:
+      ## Determines if the docker socket is mounted in the falco container.
+      ## Required for docker based runtimes
+      enabled: true
+      ## socket, determines which socket to mount for enabling docker based runtimes.
+      socket: /var/run/docker.sock
+
+    containerd:
+      ## Determines if the containerd socket is mounted in the falco container.
+      ## Required for containerd based runtimes
+      enabled: true
+      ## socket, determines which socket to mount for enabling containerd based runtimes.
+      socket: /run/containerd/containerd.sock
+  scout:
+    ## extraArgs, if set will apply additional arguments to scout container
+    ##
+    ## Default Value: []
+    extraArgs: []
+    ## env, if set will apply additional environment variables to the scout container
+    ##
+    ## Default Value: []
+    env: {}
 
 images:
   defaults:
@@ -317,10 +375,6 @@ images:
     repository: admission-controller
     digest: sha256:25312b645c15bd1df665b8286f60144823bbe6b69b5e19fa7a11255954317692
 
-  runtimeSecurity:
-    repository: runtime-protection
-    digest: sha256:5e990570a9a20776c311058c6de5695ef42d7747f87a2389d78421825c0da1c0
-
   oversight:
     repository: oversight-controller
     digest: sha256:c8a7670bc90a08b4fddd4412c9b0737cb90c8b8af5cbee250065e03f9bc638aa
@@ -328,6 +382,15 @@ images:
   usage:
     repository: usage-controller
     digest: sha256:e539dde67c13445d578907a20d05371b51d031278dd4307b309b9df2da8bd17c
+
   rbacProxy:
     repository: rbac-proxy
     digest: sha256:c43be26f3ce3e934e9c1d12bb00b79201940cee1c22b0f445538fbf82645166a
+
+  falco:
+    repository: falco
+    digest: 
+
+  scout:
+    repository: scout
+    digest: 

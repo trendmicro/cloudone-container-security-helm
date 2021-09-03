@@ -47,22 +47,6 @@ app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 
 {{/*
-Runtime Protection Common labels
-*/}}
-{{- define "runtimeSecurity.labels" -}}
-helm.sh/chart: {{ include "container.security.chart" . }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
-app.kubernetes.io/part-of: {{ include "container.security.name" . }}
-{{ include "runtimeSecurity.selectorLabels" . }}
-{{- range $k, $v := (default (dict) .Values.extraLabels) }}
-    {{ $k }}: {{ quote $v }}
-{{- end }}
-{{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-{{- end }}
-{{- end }}
-
-{{/*
 Oversight Common labels
 */}}
 {{- define "oversight.labels" -}}
@@ -95,6 +79,22 @@ app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 
 {{/*
+Scout Common labels
+*/}}
+{{- define "scout.labels" -}}
+helm.sh/chart: {{ include "container.security.chart" . }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/part-of: {{ include "container.security.name" . }}
+{{ include "scout.selectorLabels" . }}
+{{- range $k, $v := (default (dict) .Values.extraLabels) }}
+    {{ $k }}: {{ quote $v }}
+{{- end }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+{{- end }}
+
+{{/*
 Admission Control Selector labels
 */}}
 {{- define "admissionController.selectorLabels" -}}
@@ -103,15 +103,6 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/component: trendmicro-admission-controller
 {{- end }}
 
-
-{{/*
-Runtime Protection Selector labels
-*/}}
-{{- define "runtimeSecurity.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "runtimeSecurity.fullname" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
-app.kubernetes.io/component: trendmicro-runtime-protection
-{{- end }}
 
 {{/*
 Oversight Selector labels
@@ -129,6 +120,15 @@ Usage Controller Selector labels
 app.kubernetes.io/name: {{ include "usage.fullname" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/component: trendmicro-usage
+{{- end }}
+
+{{/*
+Scout Controller Selector labels
+*/}}
+{{- define "scout.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "scout.fullname" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: trendmicro-scout
 {{- end }}
 
 {{/*
@@ -227,6 +227,26 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 
 {{/*
+Create a default fully qualified app name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+If release name contains chart name it will be used as a full name.
+*/}}
+{{- define "scout.fullname" -}}
+{{- if .Values.scoutFullnameOverride -}}
+{{- .Values.scoutFullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default .Chart.Name .Values.scoutFullnameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- printf "%s-%s" "scout" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else if contains .Release.Name $name -}}
+{{- printf "%s-%s" "scout" $name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s-%s" "scout" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Create an image source.
 */}}
 {{- define "image.source" -}}
@@ -279,22 +299,6 @@ Cloud One API endpoint
 {{- else }}
 {{- required "A valid Cloud One endpoint is required" .Values.cloudOne.endpoint -}}
 {{- end }}
-{{- end -}}{{/* define */}}
-
-{{/*
-Runtime Protection auth
-*/}}
-{{- define "runtimeSecurity.credentials.secret" -}}
-apiVersion: v1
-kind: Secret
-metadata:
-  name: {{ template "runtimeSecurity.fullname" . }}-credentials
-  labels:
-    {{- include "runtimeSecurity.labels" . | nindent 4 }}
-type: Opaque
-data:
-  apiKey: {{ required "A valid runtime security api-key is required" .Values.cloudOne.runtimeSecurity.apiKey | toString | b64enc | quote }}
-  secret: {{ required "A valid runtime security secret is required" .Values.cloudOne.runtimeSecurity.secret | toString | b64enc | quote }}
 {{- end -}}{{/* define */}}
 
 {{/*
@@ -352,6 +356,16 @@ Usage Controller service account
 {{- end }}
 {{- end }}
 
+{{/*
+Scout Controller service account 
+*/}}
+{{- define "scout.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "scout.fullname" .) .Values.serviceAccount.scout.name }}
+{{- else }}
+{{- default "default" .Values.serviceAccount.scout.name }}
+{{- end }}
+{{- end }}
 
 {{/*
 RBAC proxy container

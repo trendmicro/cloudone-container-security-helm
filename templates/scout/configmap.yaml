@@ -1,0 +1,16 @@
+{{- if eq true .Values.cloudOne.runtimeSecurity.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "container.security.name" . }}-scout-config
+  labels:
+    {{- include "scout.labels" . | nindent 4 }}
+data:
+  default_rules.yaml: |
+    - rule: Dummy rule
+      desc: A dummy rule
+      condition: evt.type = setuid and (evt.num=0)
+      output: none
+      priority: NOTICE
+{{ (.Files.Glob "config/*").AsConfig | indent 2 }}
+{{- end }}

@@ -1,0 +1,237 @@
+{{- if eq true .Values.cloudOne.runtimeSecurity.enabled }}
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: trendmicro-scout
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "scout.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+    {{- include "scout.selectorLabels" .| nindent 6 }}
+  template:
+    metadata:
+      name: trendmicro-scout
+      labels:
+      {{- include "scout.selectorLabels" .| nindent 8 }}
+      annotations:
+        container.apparmor.security.beta.kubernetes.io/falco: unconfined
+        container.apparmor.security.beta.kubernetes.io/scout: unconfined
+        checksum/config: {{ include (print $.Template.BasePath "/scout/configmap.yaml") . | sha256sum }}
+{{- with (default .Values.podAnnotations.defaults .Values.podAnnotations.scout) }}
+{{- toYaml . | nindent 8 }}
+{{- end }}
+
+    spec:
+      serviceAccountName: {{ include "scout.serviceAccountName" . }}
+      hostNetwork: true
+      shareProcessNamespace: true
+      dnsPolicy: ClusterFirstWithHostNet
+{{- $classname := (default (default "" .Values.priorityClassName.default ) .Values.priorityClassName.scout) }}
+{{- if not (eq "" $classname) }}
+      priorityClassName: "{{ $classname }}"
+{{- end }}
+      nodeSelector:
+{{ toYaml (default .Values.nodeSelector.defaults .Values.nodeSelector.scout) | indent 8 }}
+      affinity:
+{{ toYaml (default .Values.affinity.defaults .Values.affinity.scout) | indent 8 }}
+      tolerations:
+{{ toYaml (default .Values.tolerations.defaults .Values.tolerations.scout) | indent 8 }}
+      {{- $imageDefaults := .Values.images.defaults }}
+      {{- with .Values.images.falco }}
+      {{- $secret := (default (default "" $imageDefaults.imagePullSecret) .imagePullSecret) }}
+      {{- if not (eq "" $secret) }}
+      imagePullSecrets:
+        - name: {{ $secret | quote }}
+      {{- end }}
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: falco
+          {{- $project := (default (default "trendmicrocloudone" $imageDefaults.project) .project) }}
+          {{- $repository := printf "%s/%s" $project (required ".repository is required!" .repository) }}
+          {{- $tag := (default $imageDefaults.tag .tag) }}
+          image: {{ include "image.source" (dict "repository" $repository "registry" .registry "tag" $tag "imageDefaults" $imageDefaults "digest" .digest) }}
+          imagePullPolicy: {{ default (default "Always" $imageDefaults.pullPolicy) .pullPolicy }}
+          {{- end }}
+          resources:
+{{ toYaml (default .Values.resources.defaults .Values.resources.scout) | indent 12 }}
+          securityContext:
+            privileged: true
+            readOnlyRootFilesystem: false
+            runAsNonRoot: false
+            runAsUser: 0
+          args:
+            - /usr/bin/falco
+            {{- if .Values.scout.falco.containerd.enabled }}
+            - --cri
+            - /run/containerd/containerd.sock
+            {{- end }}
+            - -K
+            - /var/run/secrets/kubernetes.io/serviceaccount/token
+            - -k
+            - "https://$(KUBERNETES_SERVICE_HOST)"
+            - -p
+            - "rawtime=%evt.rawtime k8s.ns=%k8s.ns.name k8s.pod=%k8s.pod.name k8s.pod.labels=%k8s.pod.labels container=%container.id repo=%container.image.repository tag=%container.image.tag digest=%container.image.digest"
+        {{- if .Values.scout.falco.extraArgs }}
+{{ toYaml .Values.scout.falco.extraArgs | indent 12 }}
+        {{- end }}
+          env:
+            - name: FALCO_BPF_PROBE
+              value: 
+            - name: TZ
+              value:
+          {{- range $key, $value := .Values.scout.falco.env }}
+            - name: "{{ $key }}"
+              value: "{{ $value }}"
+          {{- end }}
+          volumeMounts:
+            {{- if .Values.scout.falco.docker.enabled }}
+            - mountPath: /host/var/run/docker.sock
+              name: docker-socket
+            {{- end}}
+            {{- if .Values.scout.falco.containerd.enabled }}
+            - mountPath: /host/run/containerd/containerd.sock
+              name: containerd-socket
+            {{- end}}
+            - mountPath: /host/dev
+              name: dev-fs
+              readOnly: true
+            - mountPath: /host/proc
+              name: proc-fs
+              readOnly: true
+            - mountPath: /host/boot
+              name: boot-fs
+              readOnly: true
+            - mountPath: /host/lib/modules
+              name: lib-modules
+            - mountPath: /host/usr
+              name: usr-fs
+              readOnly: true
+            - mountPath: /host/etc
+              name: etc-fs
+              readOnly: true
+            - mountPath: /etc/falco
+              name: config-volume
+            - mountPath: /etc/scout/rules.d
+              name: rules-volume
+            - mountPath: /var/run/scout
+              name: grpc-socket-dir
+        - name: scout
+          {{- $imageDefaults := .Values.images.defaults }}
+          {{- with .Values.images.scout }}
+          {{- $project := (default (default "trendmicrocloudone" $imageDefaults.project) .project) }}
+          {{- $repository := printf "%s/%s" $project (required ".repository is required!" .repository) }}
+          {{- $tag := (default $imageDefaults.tag .tag) }}
+          image: {{ include "image.source" (dict "repository" $repository "registry" .registry "tag" $tag "imageDefaults" $imageDefaults "digest" .digest) }}
+          imagePullPolicy: {{ default (default "Always" $imageDefaults.pullPolicy) .pullPolicy }}
+          {{- end }}
+          args: 
+            - --grpc-socket-path
+            - unix:///var/run/scout/scout.sock
+            - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
+            - --cloud-one-api-key=$(API_KEY)
+            - --excluded-namespaces
+            {{- $excludeNS := (default (list) .Values.scout.exclusion.namespaces) }}
+            {{- if .Values.scout.exclusion.excludeSameNamespace }}
+                {{- $excludeNS = append $excludeNS .Release.Namespace }}
+            {{- end}}
+            - {{ $excludeNS | join "," | quote }}
+            - --log-level
+            - debug
+        {{- if .Values.scout.scout.extraArgs }}
+{{ toYaml .Values.scout.scout.extraArgs | indent 12 }}
+        {{- end }}
+          env:
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: apiKey
+                  name: {{ template "container.security.fullname" . }}-auth
+          {{- range $key, $value := .Values.scout.scout.env }}
+            - name: "{{ $key }}"
+              value: "{{ $value }}"
+          {{- end }}
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: NODE_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          securityContext:
+            privileged: true
+            readOnlyRootFilesystem: false
+            runAsNonRoot: false
+            runAsUser: 0
+          volumeMounts:
+            - mountPath: /var/run/scout/
+              name: grpc-socket-dir
+              readOnly: true
+            - mountPath: /etc/scout/rules.d
+              name: rules-volume
+            - mountPath: /var/scout
+              name: scout-workdir
+            - mountPath: /host/sys/fs/cgroup
+              name: cgroup
+              readOnly: true
+      volumes:
+        {{- if .Values.scout.falco.docker.enabled }}
+        - name: docker-socket
+          hostPath:
+            path: {{ .Values.scout.falco.docker.socket }}
+        {{- end}}
+        {{- if .Values.scout.falco.containerd.enabled }}
+        - name: containerd-socket
+          hostPath:
+            path: {{ .Values.scout.falco.containerd.socket }}
+        {{- end}}
+        - name: dev-fs
+          hostPath:
+            path: /dev
+        - name: proc-fs
+          hostPath:
+            path: /proc
+        - name: boot-fs
+          hostPath:
+            path: /boot
+        - name: lib-modules
+          hostPath:
+            path: /lib/modules
+        - name: usr-fs
+          hostPath:
+            path: /usr
+        - name: etc-fs
+          hostPath:
+            path: /etc
+        - name: config-volume
+          configMap:
+            name: {{ template "container.security.name" . }}-scout-config
+            items:
+              - key: falco.yaml
+                path: falco.yaml
+              - key: default_rules.yaml
+                path: default_rules.yaml
+        - name: grpc-socket-dir
+          emptyDir: {}
+        - name: cgroup
+          hostPath:
+            path: /sys/fs/cgroup
+        - name: rules-volume
+          emptyDir: {}
+        - name: scout-workdir
+          emptyDir:
+            sizeLimit: 500Mi
+  updateStrategy:
+    type: RollingUpdate
+{{- end }}

@@ -15,6 +15,9 @@ spec:
     metadata:
       annotations:
         checksum/auth: {{ include "container.security.auth.secret" . | sha256sum }}
+{{- with (default .Values.podAnnotations.defaults .Values.podAnnotations.oversight) }}
+{{- toYaml . | nindent 8 }}
+{{- end }}
       labels:
         {{- include "oversight.selectorLabels" . | nindent 8 }}
     spec:
@@ -104,6 +107,10 @@ spec:
 {{ toYaml (default .Values.tolerations.defaults .Values.tolerations.oversight) | indent 8 }}
       affinity:
 {{ toYaml (default .Values.affinity.defaults .Values.affinity.oversight) | indent 8 }}
+{{- $classname := (default (default "" .Values.priorityClassName.default ) .Values.priorityClassName.oversight) }}
+{{- if not (eq "" $classname) }}
+      priorityClassName: "{{ $classname }}"
+{{- end }}
       restartPolicy: Always
       volumes:
         {{- if .Values.telemetry.publicKey }}

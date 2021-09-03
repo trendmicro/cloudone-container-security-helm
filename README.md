@@ -160,12 +160,22 @@ By default, Container Security Continuous Compliance will create a Kubernetes ne
 If you want to install a specific version you can use the archive link for the tagged release. For example, to install Trend Micro Cloud One Container Security helm chart version 2.0.2, run the following command:
 
 ```sh
-helm install \
-  --values overrides.yaml \
-  --namespace ${namespace} \
-  --create-namespace \
-  trendmicro \
-  https://github.com/trendmicro/cloudone-container-security-helm/archive/2.0.2.tar.gz
+  helm install \
+    --values overrides.yaml \
+    --namespace ${namespace} \
+    --create-namespace \
+    trendmicro \
+    https://github.com/trendmicro/cloudone-container-security-helm/archive/2.0.2.tar.gz
+```
+
+### Enabling or disabling a specific component
+
+If desired, specifics components of the Container Security helm chart can be enabled or disabled individually using an overrides file.
+For example, you can choose to enable the runtime security component by including the below in your `overrides.yaml` file:
+```yaml
+  cloudOne:
+    runtimeSecurity:
+      enabled: true
 ```
 
 ## Troubleshooting
@@ -178,9 +188,9 @@ Most issues can be investigated using the application logs. The logs can be acce
   kubectl logs deployment/trendmicro-admission-controller --namespace ${namespace}
 ```
 
-* Access the logs for runtime protection using the following command:
+* Access the logs for the runtime security component using the following command, where container can be one of `scout`, or `falco`:
 ```sh
-  kubectl logs daemonset/trendmicro-runtime-protection --namespace ${namespace}
+  kubectl logs daemonset/trendmicro-scout --namespace ${namespace} -c ${container}
 ```
 
 * Access the logs for Oversight controller (Continuous Compliance policy enforcement) using the following command:

@@ -14,6 +14,9 @@ spec:
     metadata:
       annotations:
         checksum/auth: {{ include "container.security.auth.secret" . | sha256sum }}
+{{- with (default .Values.podAnnotations.defaults .Values.podAnnotations.usage) }}
+{{- toYaml . | nindent 8 }}
+{{- end }}
       labels:
         {{- include "usage.selectorLabels" . | nindent 8 }}
     spec:
@@ -85,6 +88,10 @@ spec:
 {{ toYaml (default .Values.tolerations.defaults .Values.tolerations.usage) | indent 8 }}
       affinity:
 {{ toYaml (default .Values.affinity.defaults .Values.affinity.usage) | indent 8 }}
+{{- $classname := (default (default "" .Values.priorityClassName.default ) .Values.priorityClassName.usage) }}
+{{- if not (eq "" $classname) }}
+      priorityClassName: "{{ $classname }}"
+{{- end }}
       restartPolicy: Always
 
 ---

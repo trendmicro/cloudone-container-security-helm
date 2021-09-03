@@ -1,6 +1,3 @@
-{{- if and (eq false .Values.cloudOne.admissionController.enabled) (eq false .Values.cloudOne.runtimeSecurity.enabled) }}
-{{- fail "At least one service must be enabled" }}
-{{- end }}
 {{- if eq true .Values.cloudOne.admissionController.enabled }}
 apiVersion: v1
 kind: Service
@@ -39,11 +36,13 @@ spec:
     metadata:
       annotations:
         checksum/auth: {{ include "container.security.auth.secret" . | sha256sum }}
-      labels:
-        {{- include "admissionController.selectorLabels" . | nindent 8 }}
-      annotations:
         # Force the pods to restart when validatingwebhook.yaml is updated. This is to ensure certificate is in sync.
         checksum/cert: {{ include (print $.Template.BasePath "/validatingwebhook.yaml") . | sha256sum }}
+{{- with (default .Values.podAnnotations.defaults .Values.podAnnotations.admissionController) }}
+{{- toYaml . | nindent 8 }}
+{{- end }}
+      labels:
+        {{- include "admissionController.selectorLabels" . | nindent 8 }}
     spec:
       automountServiceAccountToken: false
 {{- $securityContextEnabled := .Values.securityContext.enabled }}
@@ -149,5 +148,9 @@ spec:
 {{ toYaml (default .Values.tolerations.defaults .Values.tolerations.admissionController) | indent 8 }}
       affinity:
 {{ toYaml (default .Values.affinity.defaults .Values.affinity.admissionController) | indent 8 }}
+{{- $classname := (default (default "" .Values.priorityClassName.default ) .Values.priorityClassName.admissionController) }}
+{{- if not (eq "" $classname) }}
+      priorityClassName: "{{ $classname }}"
+{{- end }}
       restartPolicy: Always
 {{- end }}
