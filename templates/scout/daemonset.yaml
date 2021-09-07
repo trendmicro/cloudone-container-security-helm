@@ -64,9 +64,9 @@ spec:
             runAsUser: 0
           args:
             - /usr/bin/falco
-            {{- if .Values.scout.falco.containerd.enabled }}
+            {{- if .Values.scout.falco.cri.enabled }}
             - --cri
-            - /run/containerd/containerd.sock
+            - /run/cri/cri.sock
             {{- end }}
             - -K
             - /var/run/secrets/kubernetes.io/serviceaccount/token
@@ -91,9 +91,9 @@ spec:
             - mountPath: /host/var/run/docker.sock
               name: docker-socket
             {{- end}}
-            {{- if .Values.scout.falco.containerd.enabled }}
-            - mountPath: /host/run/containerd/containerd.sock
-              name: containerd-socket
+            {{- if .Values.scout.falco.cri.enabled }}
+            - mountPath: /host/run/cri/cri.sock
+              name: cri-socket
             {{- end}}
             - mountPath: /host/dev
               name: dev-fs
@@ -191,10 +191,15 @@ spec:
           hostPath:
             path: {{ .Values.scout.falco.docker.socket }}
         {{- end}}
-        {{- if .Values.scout.falco.containerd.enabled }}
-        - name: containerd-socket
+        {{- if .Values.scout.falco.cri.enabled }}
+        - name: cri-socket
           hostPath:
-            path: {{ .Values.scout.falco.containerd.socket }}
+            # default is /run/crio/crio.sock on OpenShift.
+            {{- $defaultcripath := "/run/containerd/containerd.sock" }}
+            {{- if .Capabilities.APIVersions.Has "security.openshift.io/v1" }}
+            {{- $defaultcripath = "/run/crio/crio.sock" }}
+            {{- end }}
+            path: {{ .Values.scout.falco.cri.socket | default $defaultcripath }}
         {{- end}}
         - name: dev-fs
           hostPath:

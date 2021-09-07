@@ -323,12 +323,13 @@ scout:
       ## socket, determines which socket to mount for enabling docker based runtimes.
       socket: /var/run/docker.sock
 
-    containerd:
-      ## Determines if the containerd socket is mounted in the falco container.
-      ## Required for containerd based runtimes
+    cri:
+      ## Determines if the cri (containerd or crio) socket is mounted in the falco container.
+      ## Required for cri based runtimes
       enabled: true
-      ## socket, determines which socket to mount for enabling containerd based runtimes.
-      socket: /run/containerd/containerd.sock
+      ## socket, determines which socket to mount for enabling cri based runtimes.
+      ## Default value: (determined by platform)
+      socket:
   scout:
     ## extraArgs, if set will apply additional arguments to scout container
     ##
