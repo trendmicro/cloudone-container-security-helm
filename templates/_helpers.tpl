@@ -267,7 +267,7 @@ Create an image source.
 
 {{/*
 Cloud One API Key auth
-.Values.cloudOne.admissionController.apiKey is for backwards compatibility with the version <= v.2.0.2
+.Values.cloudOne.admissionController.apiKey is for backwards compatibility with the version <= v.1.0.1
 */}}
 {{- define "container.security.auth.secret" -}}
 apiVersion: v1
@@ -289,7 +289,7 @@ data:
 
 {{/*
 Cloud One API endpoint
-.Values.cloudOne.admissionController.endpoint is for backwards compatibility with the version <= v.2.0.2
+.Values.cloudOne.admissionController.endpoint is for backwards compatibility with the version <= v.1.0.1
 */}}
 {{- define "container.security.endpoint" -}}
 {{- if and (hasKey .Values.cloudOne.admissionController "endpoint") (.Values.cloudOne.admissionController.endpoint) }}
