@@ -124,8 +124,8 @@ serviceAccount:
   scout:
     ## The name of the service account to use.
     ## If not set and create is true, a name is generated using the fullname of scout template
-    name: ""
-    
+    name: ''
+
     ## Annotations to add to the service account
     annotations: {}
 
@@ -248,7 +248,7 @@ resources:
     limits:
       cpu: 1000m
       memory: 1024Mi
-    
+
 
 nodeSelector:
   ## nodeSelector if set, ensures pods are only assigned to a particular set of nodes.
@@ -301,7 +301,7 @@ scout:
     ## Default Value:
     ##  - kube-system
     namespaces:
-      - kube-system
+    - kube-system
     ## If set to true, excludeSameNamespace will add the namespace in which this helm chart is deployed as an excluded namespace.
     ##
     ## Default Value: true
@@ -358,7 +358,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.0.2
+    tag: 2.1.0
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -381,7 +381,7 @@ images:
 
   usage:
     repository: usage-controller
-    digest: sha256:e539dde67c13445d578907a20d05371b51d031278dd4307b309b9df2da8bd17c
+    digest: sha256:d290c718dbb2735344cc88b863030ffb84eb433a93d3a628c38f8e7b443229e1
 
   rbacProxy:
     repository: rbac-proxy
@@ -389,8 +389,8 @@ images:
 
   falco:
     repository: falco
-    digest: 
+    digest: sha256:60bb108b197517e04db84ce9bda5e86d62ae87651beefda9b000c43773bb6ab2
 
   scout:
     repository: scout
-    digest: 
+    digest: sha256:ab9e9b13ae5dcb2beea2e5a9cb40d4fd2fedfcb61f552c1f325f2c1a13ef7c04
