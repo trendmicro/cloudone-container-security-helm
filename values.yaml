@@ -359,7 +359,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.1.0
+    tag: 2.1.1
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -390,8 +390,8 @@ images:
 
   falco:
     repository: falco
-    digest: sha256:60bb108b197517e04db84ce9bda5e86d62ae87651beefda9b000c43773bb6ab2
+    digest: sha256:782477ba08ecb3a0eea7f41fc182b40cc9152f517c323528a6a9558f5727b7ac
 
   scout:
     repository: scout
-    digest: sha256:ab9e9b13ae5dcb2beea2e5a9cb40d4fd2fedfcb61f552c1f325f2c1a13ef7c04
+    digest: sha256:caed90e5b40e5eddbe15aa00a8d30cde4f5096497240436b6bc773bb564cc7d6
