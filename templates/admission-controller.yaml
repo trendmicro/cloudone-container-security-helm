@@ -96,6 +96,9 @@ spec:
             - name: webhook-certs
               mountPath: /etc/webhook/certs
               readOnly: true
+            - name: api-key
+              mountPath: /secrets
+              readOnly: true
             {{- if .Values.telemetry.publicKey }}
             - name: telemetry-secret
               mountPath: /telemetry
@@ -104,7 +107,6 @@ spec:
             - --tlsCertFile=/etc/webhook/certs/cert.pem
             - --tlsKeyFile=/etc/webhook/certs/key.pem
             - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
-            - --cloud-one-api-key=$(API_KEY)
             - --enableKubeSystem={{ required "enableKubeSystem is required" .Values.cloudOne.admissionController.enableKubeSystem }}
             - --application-version=$(APPLICATION_VERSION)
             {{- if .Values.telemetry.enabled }}
@@ -120,14 +122,12 @@ spec:
             {{- include "container.security.proxy.env" . | nindent 12 }}
             - name: APPLICATION_VERSION
               value: {{ .Chart.Version | quote }}
-            - name: API_KEY
-              valueFrom:
-                secretKeyRef:
-                  key: apiKey
-                  name: {{ template "container.security.fullname" . }}-auth
           resources:
 {{ toYaml (default .Values.resources.defaults .Values.resources.admissionController) | indent 12 }}
       volumes:
+        - name: api-key
+          secret:
+            secretName: {{ template "container.security.fullname" . }}-auth
         - name: varrun
           emptyDir:
             sizeLimit: 1Mi

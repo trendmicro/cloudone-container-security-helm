@@ -53,15 +53,9 @@ spec:
         - --metrics-bind-address=127.0.0.1:8080
         - --leader-elect
         - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
-        - --cloud-one-api-key=$(API_KEY)
         command:
         - /manager
         env:
-        - name: API_KEY
-          valueFrom:
-            secretKeyRef:
-              key: apiKey
-              name: {{ template "container.security.fullname" . }}-auth
         - name: NAMESPACE
           valueFrom:
             fieldRef:
@@ -78,9 +72,16 @@ spec:
             port: 8081
           initialDelaySeconds: 5
           periodSeconds: 10
+        volumeMounts:
+          - mountPath: /secrets
+            name: api-key
         resources:
 {{ toYaml (default .Values.resources.defaults .Values.resources.usage) | indent 12 }}
       - {{ include "rbacProxy" (dict "securityContext" .Values.securityContext "images" .Values.images "resources" .Values.resources "customSecurityContext" .Values.securityContext.usage) | nindent 8 | trim }}
+      volumes:
+        - name: api-key
+          secret:
+            secretName: {{ template "container.security.fullname" . }}-auth
       terminationGracePeriodSeconds: 10
       nodeSelector:
 {{ toYaml (default .Values.nodeSelector.defaults .Values.nodeSelector.usage) | indent 8 }}

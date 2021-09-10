@@ -50,6 +50,8 @@ spec:
         imagePullPolicy: {{ default (default "Always" $imageDefaults.pullPolicy) .pullPolicy }}
         {{- end }}
         volumeMounts:
+          - name: api-key
+            mountPath: /secrets
           {{- if .Values.telemetry.publicKey }}
           - name: telemetry-secret
             mountPath: /telemetry
@@ -61,7 +63,6 @@ spec:
         - --sync-period={{ default "3600s" .Values.cloudOne.oversight.syncPeriod }}
         - --enable-kube-system={{ default false .Values.cloudOne.oversight.enableKubeSystem }}
         - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
-        - --cloud-one-api-key=$(API_KEY)
         - --network-policy-label={{ default "trendmicro" .Release.Name }}
         - --application-version=$(APPLICATION_VERSION)
         {{- if (eq .Values.cloudOne.oversight.enableNetworkPolicyCreation false) }}
@@ -80,11 +81,6 @@ spec:
         env:
         - name: APPLICATION_VERSION
           value: {{ .Chart.Version | quote }}
-        - name: API_KEY
-          valueFrom:
-            secretKeyRef:
-              key: apiKey
-              name: {{ template "container.security.fullname" . }}-auth
         livenessProbe:
           httpGet:
             path: /healthz
@@ -113,6 +109,9 @@ spec:
 {{- end }}
       restartPolicy: Always
       volumes:
+        - name: api-key
+          secret:
+            secretName: {{ template "container.security.fullname" . }}-auth
         {{- if .Values.telemetry.publicKey }}
         - name: telemetry-secret
           secret:

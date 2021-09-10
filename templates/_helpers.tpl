@@ -279,11 +279,11 @@ metadata:
 type: Opaque
 data:
 {{- if and (hasKey .Values.cloudOne "apiKey") (.Values.cloudOne.apiKey) }}
-  apiKey: {{ .Values.cloudOne.apiKey | toString | b64enc | quote }}
+  api.key: {{ .Values.cloudOne.apiKey | toString | b64enc | quote }}
 {{- else if and (hasKey .Values.cloudOne.admissionController "apiKey") (.Values.cloudOne.admissionController.apiKey) }}
-  apiKey: {{ .Values.cloudOne.admissionController.apiKey | toString | b64enc | quote }}
+  api.key: {{ .Values.cloudOne.admissionController.apiKey | toString | b64enc | quote }}
 {{- else }}
-  apiKey: {{ required "A valid Cloud One apiKey is required" .Values.cloudOne.apiKey | toString | b64enc | quote }}
+  api.key: {{ required "A valid Cloud One apiKey is required" .Values.cloudOne.apiKey | toString | b64enc | quote }}
 {{- end }}
 {{- end -}}{{/* define */}}
 

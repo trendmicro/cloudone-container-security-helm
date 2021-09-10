@@ -131,7 +131,6 @@ spec:
             - --grpc-socket-path
             - unix:///var/run/scout/scout.sock
             - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
-            - --cloud-one-api-key=$(API_KEY)
             - --excluded-namespaces
             {{- $excludeNS := (default (list) .Values.scout.exclusion.namespaces) }}
             {{- if .Values.scout.exclusion.excludeSameNamespace }}
@@ -144,11 +143,6 @@ spec:
 {{ toYaml .Values.scout.scout.extraArgs | indent 12 }}
         {{- end }}
           env:
-            - name: API_KEY
-              valueFrom:
-                secretKeyRef:
-                  key: apiKey
-                  name: {{ template "container.security.fullname" . }}-auth
           {{- range $key, $value := .Values.scout.scout.env }}
             - name: "{{ $key }}"
               value: "{{ $value }}"
@@ -185,7 +179,13 @@ spec:
             - mountPath: /host/sys/fs/cgroup
               name: cgroup
               readOnly: true
+            - mountPath: /secrets
+              name: api-key
+              readOnly: true
       volumes:
+        - name: api-key
+          secret:
+            secretName: {{ template "container.security.fullname" . }}-auth
         {{- if .Values.scout.falco.docker.enabled }}
         - name: docker-socket
           hostPath:
