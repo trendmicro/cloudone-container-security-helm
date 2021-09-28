@@ -359,7 +359,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.1.1
+    tag: 2.1.2
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -374,15 +374,15 @@ images:
     # imagePullSecret:
   admissionController:
     repository: admission-controller
-    digest: sha256:25312b645c15bd1df665b8286f60144823bbe6b69b5e19fa7a11255954317692
+    digest: sha256:6d42cc616f95b070977cf88ab00100471014fdbbab83ce1bdbbd054e54a37be3
 
   oversight:
     repository: oversight-controller
-    digest: sha256:c8a7670bc90a08b4fddd4412c9b0737cb90c8b8af5cbee250065e03f9bc638aa
+    digest: sha256:60165af787fa0a9a43a0d0e9fa57801d4dfe0c787d5c5ac4a9d2a3fc8a2e80d6
 
   usage:
     repository: usage-controller
-    digest: sha256:d290c718dbb2735344cc88b863030ffb84eb433a93d3a628c38f8e7b443229e1
+    digest: sha256:d113bdb1a32ef10b1d45d149d5b4dc9eeaf4edbca9778396d341d85ab8ffdf87
 
   rbacProxy:
     repository: rbac-proxy
@@ -390,8 +390,8 @@ images:
 
   falco:
     repository: falco
-    digest: sha256:782477ba08ecb3a0eea7f41fc182b40cc9152f517c323528a6a9558f5727b7ac
+    digest: sha256:2728786e69d7158c3d33876c1ba4eb1dd922f6bd4f6e584b3377979e4ea2ff43
 
   scout:
     repository: scout
-    digest: sha256:caed90e5b40e5eddbe15aa00a8d30cde4f5096497240436b6bc773bb564cc7d6
+    digest: sha256:bcc653cf54e690ee79007c39ff2cf08f33be5a13158f45019ee05d82f2458704
