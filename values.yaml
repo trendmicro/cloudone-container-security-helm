@@ -339,6 +339,19 @@ scout:
     ##
     ## Default Value: []
     env: {}
+  downloader:
+    ## extraArgs, if set will apply additional arguments to scout container
+    ##
+    ## Default Value: []
+    extraArgs: []
+    ## env, if set will apply additional environment variables to the scout container
+    ##
+    ## Default Value: []
+    env: {}
+    ## componentType, the type of component to download
+    componentType: "falco-ebpf-program"
+    ## componentDir, the directory where the component to be downloaded
+    componentDir: /var/component
 
 images:
   defaults:

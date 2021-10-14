@@ -80,6 +80,8 @@ spec:
           env:
             - name: FALCO_BPF_PROBE
               value: 
+            - name: SKIP_DRIVER_LOADER
+              value: "true"
             - name: TZ
               value:
           {{- range $key, $value := .Values.scout.falco.env }}
@@ -118,6 +120,9 @@ spec:
               name: rules-volume
             - mountPath: /var/run/scout
               name: grpc-socket-dir
+            - mountPath: /root/.falco
+              name: components-dir
+              readOnly: true
         - name: scout
           {{- $imageDefaults := .Values.images.defaults }}
           {{- with .Values.images.scout }}
@@ -182,6 +187,88 @@ spec:
             - mountPath: /secrets
               name: api-key
               readOnly: true
+      initContainers:
+{{- $securityContextEnabled := .Values.securityContext.enabled }}
+{{- $securityContext := default .Values.securityContext.default .Values.securityContext.downloader }}
+{{- $containerSecurityContext := default .Values.securityContext.default.container $securityContext.container }}
+        {{ if eq .Values.scout.downloader.componentType "falco-ebpf-program" }}
+        - name: falcoversion
+          {{- $imageDefaults := .Values.images.defaults }}
+          {{- with .Values.images.falco }}
+          {{- $project := (default (default "trendmicrocloudone" $imageDefaults.project) .project) }}
+          {{- $repository := printf "%s/%s" $project (required ".repository is required!" .repository) }}
+          {{- $tag := (default $imageDefaults.tag .tag) }}
+          image: {{ include "image.source" (dict "repository" $repository "registry" .registry "tag" $tag "imageDefaults" $imageDefaults "digest" .digest) }}
+          imagePullPolicy: {{ default (default "Always" $imageDefaults.pullPolicy) .pullPolicy }}
+          {{- end }}
+          resources:
+{{ toYaml (default .Values.resources.defaults .Values.resources.scout) | indent 12 }}
+{{- if $securityContextEnabled }}
+          securityContext:
+{{ toYaml $containerSecurityContext | indent 12 }}
+{{- end }}
+          volumeMounts:
+            - mountPath: {{ .Values.scout.downloader.componentDir }}
+              name: components-dir
+          command:
+            - cp
+          args: 
+            - /component.version
+            - {{ .Values.scout.downloader.componentDir }}
+        {{- end }}
+        - name: downloader
+          {{- $imageDefaults := .Values.images.defaults }}
+          {{- with .Values.images.scout }}
+          {{- $project := (default (default "trendmicrocloudone" $imageDefaults.project) .project) }}
+          {{- $repository := printf "%s/%s" $project (required ".repository is required!" .repository) }}
+          {{- $tag := (default $imageDefaults.tag .tag) }}
+          image: {{ include "image.source" (dict "repository" $repository "registry" .registry "tag" $tag "imageDefaults" $imageDefaults "digest" .digest) }}
+          imagePullPolicy: {{ default (default "Always" $imageDefaults.pullPolicy) .pullPolicy }}
+          {{- end }}
+          command:
+            - /downloader
+          args: 
+            - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
+            - --log-level
+            - debug
+            - --componentdir
+            - {{ .Values.scout.downloader.componentDir }}
+        {{- if .Values.scout.downloader.extraArgs }}
+{{ toYaml .Values.scout.downloader.extraArgs | indent 12 }}
+        {{- end }}
+          env:
+          {{- range $key, $value := .Values.scout.downloader.env }}
+            - name: "{{ $key }}"
+              value: "{{ $value }}"
+          {{- end }}
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: HOST_ROOT
+              value: "/host"
+            - name: SCOUT_COMPONENT_TYPE
+              value: {{ .Values.scout.downloader.componentType }}
+            - name: SCOUT_COMPONENT_VERSION
+              value: "{{ .Values.scout.downloader.componentDir }}/component.version"
+          volumeMounts:
+            - mountPath: /var/scout
+              name: scout-workdir
+            - mountPath: {{ .Values.scout.downloader.componentDir }}
+              name: components-dir
+            - mountPath: /host/etc
+              name: etc-fs
+              readOnly: true
+            - mountPath: /host/usr
+              name: usr-fs
+              readOnly: true
+            - mountPath: /secrets
+              name: api-key
+              readOnly: true
+{{- if $securityContextEnabled }}
+          securityContext:
+{{ toYaml $containerSecurityContext | indent 12 }}
+{{- end }}
       volumes:
         - name: api-key
           secret:
@@ -237,6 +324,9 @@ spec:
         - name: scout-workdir
           emptyDir:
             sizeLimit: 500Mi
+        - name: components-dir
+          emptyDir:
+            sizeLimit: 50Mi
   updateStrategy:
     type: RollingUpdate
 {{- end }}
