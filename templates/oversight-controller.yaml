@@ -50,6 +50,8 @@ spec:
         imagePullPolicy: {{ default (default "Always" $imageDefaults.pullPolicy) .pullPolicy }}
         {{- end }}
         volumeMounts:
+          - name: workdir
+            mountPath: /var/oversight
           - name: api-key
             mountPath: /secrets
           {{- if .Values.telemetry.publicKey }}
@@ -61,6 +63,7 @@ spec:
         - --metrics-bind-address=127.0.0.1:8080
         - --leader-elect
         - --sync-period={{ default "3600s" .Values.cloudOne.oversight.syncPeriod }}
+        - --enable-runtime-mitigation={{ default false .Values.cloudOne.oversight.enableRuntimeMitigation }}
         - --enable-kube-system={{ default false .Values.cloudOne.oversight.enableKubeSystem }}
         - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
         - --network-policy-label={{ default "trendmicro" .Release.Name }}
@@ -81,6 +84,14 @@ spec:
         env:
         - name: APPLICATION_VERSION
           value: {{ .Chart.Version | quote }}
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
         livenessProbe:
           httpGet:
             path: /healthz
@@ -109,6 +120,9 @@ spec:
 {{- end }}
       restartPolicy: Always
       volumes:
+        - name: workdir
+          emptyDir:
+            sizeLimit: 50Mi      
         - name: api-key
           secret:
             secretName: {{ template "container.security.fullname" . }}-auth
