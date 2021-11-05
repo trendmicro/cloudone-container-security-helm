@@ -17,7 +17,7 @@ allowHostPID: true
 allowHostPorts: false
 allowPrivilegeEscalation: true
 allowPrivilegedContainer: true
-allowedCapabilities: []
+allowedCapabilities: [SYS_PTRACE]
 allowedUnsafeSysctls: []
 defaultAddCapabilities: []
 fsGroup:
