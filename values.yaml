@@ -12,6 +12,14 @@ cloudOne:
   ## Default value: https://container.us-1.cloudone.trendmicro.com
   endpoint: https://container.us-1.cloudone.trendmicro.com
 
+  exclusion:
+    ## List of namespaces for which events will not be generated
+    ##
+    ## Default Value:
+    ##  - kube-system
+    namespaces:
+    - kube-system
+
   admissionController:
     enabled: true
 
@@ -25,15 +33,6 @@ cloudOne:
       matchExpressions:
       - key: ignoreAdmissionControl
         operator: DoesNotExist
-
-    ## enableKubeSystem will tell the admission controller to not ignore requests from the kube-system
-    ## namespace.
-    ##
-    ## Default value: false
-    ##
-    ## WARNING: Enabling this could lead to your cluster to be unresponsive, depending on the policy set.
-    ##          Only enable this with the greatest of care.
-    enableKubeSystem: false
 
     ## failurePolicy defines the bahaviour if an unreconized error or timeout occurs. Enabling
     ## this while not tagging kube-system to be ignored can easily cause the cluster to be
@@ -67,15 +66,6 @@ cloudOne:
 
   oversight:
     enabled: true
-
-    ## enableKubeSystem will tell the Oversight controller to not ignore requests from the kube-system
-    ## namespace.
-    ##
-    ## Default value: false
-    ##
-    ## WARNING: Enabling this could lead to your cluster to be unresponsive, depending on the policy set.
-    ##          Only enable this with the greatest of care.
-    enableKubeSystem: false
 
     ## syncPeriod is the time interval that how often Trend Micro Cloud One Container Security will evaluate 
     ## the running pods. 
@@ -330,17 +320,11 @@ priorityClassName:
   default:
 
 scout:
-  exclusion:
-    ## List of namespaces for which Scout Runtime Security feature will not trigger events.
-    ##
-    ## Default Value:
-    ##  - kube-system
-    namespaces:
-    - kube-system
-    ## If set to true, excludeSameNamespace will add the namespace in which this helm chart is deployed as an excluded namespace.
-    ##
-    ## Default Value: true
-    excludeSameNamespace: true
+  ## If set to true, excludeSameNamespace will add the namespace in which this helm chart is deployed as an excluded namespace.
+  ##
+  ## Default Value: true
+  excludeSameNamespace: true
+  
   falco:
     ## extraArgs, if set will apply additional arguments to falco container
     ##

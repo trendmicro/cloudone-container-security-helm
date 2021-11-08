@@ -64,7 +64,9 @@ spec:
         - --leader-elect
         - --sync-period={{ default "3600s" .Values.cloudOne.oversight.syncPeriod }}
         - --enable-runtime-mitigation={{ default false .Values.cloudOne.oversight.enableRuntimeMitigation }}
-        - --enable-kube-system={{ default false .Values.cloudOne.oversight.enableKubeSystem }}
+        - --excluded-namespaces
+        {{- $excludeNS := (default (list) .Values.cloudOne.exclusion.namespaces) }}
+        - {{ $excludeNS | join "," | quote }}
         - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
         - --network-policy-label={{ default "trendmicro" .Release.Name }}
         - --application-version=$(APPLICATION_VERSION)

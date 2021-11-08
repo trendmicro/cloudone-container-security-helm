@@ -107,7 +107,9 @@ spec:
             - --tlsCertFile=/etc/webhook/certs/cert.pem
             - --tlsKeyFile=/etc/webhook/certs/key.pem
             - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
-            - --enableKubeSystem={{ required "enableKubeSystem is required" .Values.cloudOne.admissionController.enableKubeSystem }}
+            - --excluded-namespaces
+            {{- $excludeNS := (default (list) .Values.cloudOne.exclusion.namespaces) }}
+            - {{ $excludeNS | join "," | quote }}
             - --application-version=$(APPLICATION_VERSION)
             {{- if .Values.telemetry.enabled }}
             - --telemetry-endpoint={{ .Values.telemetry.endpoint }}

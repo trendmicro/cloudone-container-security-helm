@@ -149,8 +149,8 @@ spec:
             - unix:///var/run/scout/scout.sock
             - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
             - --excluded-namespaces
-            {{- $excludeNS := (default (list) .Values.scout.exclusion.namespaces) }}
-            {{- if .Values.scout.exclusion.excludeSameNamespace }}
+            {{- $excludeNS := (default (list) .Values.cloudOne.exclusion.namespaces) }}
+            {{- if .Values.scout.excludeSameNamespace }}
                 {{- $excludeNS = append $excludeNS .Release.Namespace }}
             {{- end}}{{/* if */}}
             - {{ $excludeNS | join "," | quote }}
