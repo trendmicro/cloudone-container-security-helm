@@ -63,7 +63,7 @@ spec:
         - --metrics-bind-address=127.0.0.1:8080
         - --leader-elect
         - --sync-period={{ default "3600s" .Values.cloudOne.oversight.syncPeriod }}
-        - --enable-runtime-mitigation={{ default false .Values.cloudOne.oversight.enableRuntimeMitigation }}
+        - --enable-runtime-mitigation={{ default true .Values.cloudOne.oversight.enableRuntimeMitigation }}
         - --excluded-namespaces
         {{- $excludeNS := (default (list) .Values.cloudOne.exclusion.namespaces) }}
         - {{ $excludeNS | join "," | quote }}
