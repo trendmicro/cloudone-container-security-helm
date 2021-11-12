@@ -324,7 +324,7 @@ scout:
   ##
   ## Default Value: true
   excludeSameNamespace: true
-  
+
   falco:
     ## extraArgs, if set will apply additional arguments to falco container
     ##
@@ -391,7 +391,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.1.4
+    tag: 2.2.0
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -406,15 +406,15 @@ images:
     # imagePullSecret:
   admissionController:
     repository: admission-controller
-    digest: sha256:6d42cc616f95b070977cf88ab00100471014fdbbab83ce1bdbbd054e54a37be3
+    digest: sha256:bc2d5f7f9d6212b124ebb1300bfad414cd4ab2cf41cf80a9fab7bafc198fc1d9
 
   oversight:
     repository: oversight-controller
-    digest: sha256:60165af787fa0a9a43a0d0e9fa57801d4dfe0c787d5c5ac4a9d2a3fc8a2e80d6
+    digest: sha256:00e49c31b520719878ff2fa0ed11736af48e42cd46e2cac61750d0b0f4e28eec
 
   usage:
     repository: usage-controller
-    digest: sha256:d113bdb1a32ef10b1d45d149d5b4dc9eeaf4edbca9778396d341d85ab8ffdf87
+    digest: sha256:3bf05af31c0cdce2ec1500664f3ba020b5d096ccc8fda3afd7d677f21f20f0c3
 
   rbacProxy:
     repository: rbac-proxy
@@ -422,8 +422,8 @@ images:
 
   falco:
     repository: falco
-    digest: sha256:9c6dbdcadb87bf8ec0c67418cb42e4c1615ef3ace0eec9994b72762ee9e997dd
+    digest: sha256:8f8c972d39158c1fc59398248f3e327cf94a7ce1df80e42b0289c2c487158409
 
   scout:
     repository: scout
-    digest: sha256:f7f665eb3362ebb28baa513b94c2c112bcc6f596d3b95fa5eb81a2c6e9af9542
+    digest: sha256:9fe701cce0e6a3ae9e3ed2d73142d9dc6c946b9ee49c14cfafa2d1df133dc5e8
