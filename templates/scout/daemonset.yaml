@@ -83,7 +83,7 @@ spec:
             - -k
             - "https://$(KUBERNETES_SERVICE_HOST)"
             - -p
-            - "rawtime=%evt.rawtime k8s.ns=%k8s.ns.name k8s.pod=%k8s.pod.name k8s.pod.labels=%k8s.pod.labels container=%container.id repo=%container.image.repository tag=%container.image.tag digest=%container.image.digest"
+            - "rawtime=%evt.rawtime k8s.ns=%k8s.ns.name k8s.pod=%k8s.pod.name k8s.pod.labels=%k8s.pod.labels container=%container.id repo=%container.image.repository tag=%container.image.tag digest=%container.image.digest proc.pid=%proc.pid"
         {{- if .Values.scout.falco.extraArgs }}
 {{ toYaml .Values.scout.falco.extraArgs | indent 12 }}
         {{- end }}{{/* if */}}
