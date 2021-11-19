@@ -33,7 +33,6 @@ supplementalGroups:
   type: RunAsAny
 users: 
 - system:serviceaccount:{{ .Release.Namespace }}:default
-- system:serviceaccount:{{ .Release.Namespace }}:{{ include "oversight.serviceAccountName" . }}
 - system:serviceaccount:{{ .Release.Namespace }}:{{ include "usage.serviceAccountName" . }}
 volumes:
 - configMap
