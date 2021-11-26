@@ -104,6 +104,11 @@ serviceAccount:
     ## Annotations to add to the service account
     annotations: {}
 
+    ## Size of the buffer that will receive mitigation requests
+    ##
+    ## Default value: 50
+    mitigationHandlerBufferSize: 50
+
     ## Security context constraints to add to the service account
     securityContextConstraints:
       allowHostDirVolumePlugin: false
