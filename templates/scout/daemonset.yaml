@@ -187,6 +187,7 @@ spec:
 {{ toYaml .Values.scout.scout.extraArgs | indent 12 }}
         {{- end }}{{/* if */}}
           env:
+          {{- include "container.security.proxy.env" . | nindent 12 }}
           {{- range $key, $value := .Values.scout.scout.env }}
             - name: "{{ $key }}"
               value: "{{ $value }}"

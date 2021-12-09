@@ -317,6 +317,11 @@ Provide HTTP proxy environment variables
     configMapKeyRef:
       name: {{ template "container.security.name" . }}-outbound-proxy
       key: httpsProxy
+- name: all_proxy
+  valueFrom:
+    secretKeyRef:
+      name: {{ template "container.security.name" . }}-outbound-proxy-credentials
+      key: allProxy
 - name: NO_PROXY
   valueFrom:
     configMapKeyRef:

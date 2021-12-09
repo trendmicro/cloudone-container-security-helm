@@ -180,6 +180,17 @@ For example, you can choose to enable the runtime security component by includin
       enabled: true
 ```
 
+### Configure Container Security to use a proxy
+
+You can configure Container Security to use a socks5 proxy by setting the `httpsProxy` value. It is possible to use an http proxy, **but the runtime feature will only work with socks5 proxies**.
+For example, you can configure a socks5 proxy with authentication in your `overrides.yaml` file this way:
+```
+proxy:
+  httpsProxy: socks5://10.10.10.10:1080
+  username: user
+  password: password  
+```
+
 ## Troubleshooting
 
 ### Access logs

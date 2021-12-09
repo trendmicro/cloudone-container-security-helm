@@ -65,6 +65,7 @@ spec:
         - --mitigation-handler-buffer-size={{ default 50 .Values.cloudOne.oversight.mitigationHandlerBufferSize }}
         - --sync-period={{ default "3600s" .Values.cloudOne.oversight.syncPeriod }}
         - --enable-runtime-mitigation={{ default true .Values.cloudOne.oversight.enableRuntimeMitigation }}
+        - --exclude-kubernetes-service-host-from-proxy={{ default true .Values.proxy.excludeKubernetesServiceHost }}
         - --excluded-namespaces
         {{- $excludeNS := (default (list) .Values.cloudOne.exclusion.namespaces) }}
         - {{ $excludeNS | join "," | quote }}
@@ -85,6 +86,7 @@ spec:
         command:
         - /manager
         env:
+        {{- include "container.security.proxy.env" . | nindent 8 }}
         - name: APPLICATION_VERSION
           value: {{ .Chart.Version | quote }}
         - name: POD_NAME

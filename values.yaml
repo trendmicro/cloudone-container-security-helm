@@ -239,8 +239,7 @@ securityContext:
 proxy:
   ## httpProxy, if set, will be used as the proxy for outbound HTTP traffic.
   ##
-  ## The value may be either a complete URL or a `host[:port]`, in which
-  ## case the `http` scheme is assumed.
+  ## The value may be either a complete URL, a `host[:port]`, or `socks5://host[:port]` when using a socks proxy
   ##
   ## Default value: (none)
   httpProxy:
@@ -249,8 +248,7 @@ proxy:
   ## If `httpsProxy` is not set, `httpProxy`
   ## is also checked and will be used if set.
   ##
-  ## The value may be either a complete URL or a `host[:port]`, in which
-  ## case the `http` scheme is assumed.
+  ## The value may be either a complete URL, a `host[:port]`, or `socks5://host[:port]` when using a socks proxy
   ##
   ## Default value: (none)
   httpsProxy:
@@ -258,8 +256,10 @@ proxy:
   ## noProxy, if set, is a list of hosts or `host:port` combinations which
   ## should not be accessed through the proxy.
   ##
-  ## Default value: (none)
-  noProxy: []
+  ## Default value:
+  ## .cluster.local
+  noProxy:
+  - .cluster.local
 
   ## username, if set, is the user name to provide to the outbound proxy when making requests.
   ##
@@ -270,6 +270,11 @@ proxy:
   ##
   ## Default value: (none)
   password:
+
+  ## If set to true, Container Security Controllers will not use a proxy when communicating with the Kubernetes service host
+  ##
+  ## Default value: true
+  excludeKubernetesServiceHost: true
 
 resources:
   defaults: {}
