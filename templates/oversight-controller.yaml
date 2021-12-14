@@ -64,7 +64,7 @@ spec:
         - --leader-elect
         - --mitigation-handler-buffer-size={{ default 50 .Values.cloudOne.oversight.mitigationHandlerBufferSize }}
         - --sync-period={{ default "3600s" .Values.cloudOne.oversight.syncPeriod }}
-        - --enable-runtime-mitigation={{ default true .Values.cloudOne.oversight.enableRuntimeMitigation }}
+        - --enable-runtime-mitigation={{ default false .Values.cloudOne.runtimeSecurity.enabled }}
         - --exclude-kubernetes-service-host-from-proxy={{ default true .Values.proxy.excludeKubernetesServiceHost }}
         - --excluded-namespaces
         {{- $excludeNS := (default (list) .Values.cloudOne.exclusion.namespaces) }}
