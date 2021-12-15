@@ -121,16 +121,16 @@ serviceAccount:
       apiVersion: security.openshift.io/v1
       defaultAddCapabilities: []
       kind: SecurityContextConstraints
-      priority: null
+      priority:
       readOnlyRootFilesystem: false
-      requiredDropCapabilities: [] 
-      runAsUser: 
+      requiredDropCapabilities: []
+      runAsUser:
         type: RunAsAny
       seLinuxContext:
         type: MustRunAs
-      supplementalGroups: 
-        type: RunAsAny 
-   
+      supplementalGroups:
+        type: RunAsAny
+
   usage:
     ## The name of the service account to use.
     ## If not set and create is true, a name is generated using the fullname of oversight template
@@ -424,7 +424,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.2.1
+    tag: 2.2.2
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -439,15 +439,15 @@ images:
     # imagePullSecret:
   admissionController:
     repository: admission-controller
-    digest: sha256:bc2d5f7f9d6212b124ebb1300bfad414cd4ab2cf41cf80a9fab7bafc198fc1d9
+    digest: sha256:0e06df82f84de01733f8efc19ffbd67a7b54573a9262aabe42dcc1c505845942
 
   oversight:
     repository: oversight-controller
-    digest: sha256:00e49c31b520719878ff2fa0ed11736af48e42cd46e2cac61750d0b0f4e28eec
+    digest: sha256:cb7c3937b969342179d2b042f1f8863cc1603936eb39bef5196bf0108f575721
 
   usage:
     repository: usage-controller
-    digest: sha256:3bf05af31c0cdce2ec1500664f3ba020b5d096ccc8fda3afd7d677f21f20f0c3
+    digest: sha256:bdfbe991bd36a8c0b0262e2def66abdaa80c761626241db3266d7923defd90ad
 
   rbacProxy:
     repository: rbac-proxy
@@ -455,8 +455,8 @@ images:
 
   falco:
     repository: falco
-    digest: sha256:72145f01bd6ffd9d46273036a8436070ba22eac6d7a725db96c4927ef7fcdc51
+    digest: sha256:2e20e31cd017cc8ebf7750b3256745da31fe23b8f71be77c9a38a0599eeb0e77
 
   scout:
     repository: scout
-    digest: sha256:9fe701cce0e6a3ae9e3ed2d73142d9dc6c946b9ee49c14cfafa2d1df133dc5e8
+    digest: sha256:26c5b91b8735cb26582c102eb0c4c17bb8f33e7af1f00949b17c4b64a09a34a8
