@@ -368,6 +368,12 @@ scout:
     ## Default Value: []
     env: {}
 
+    ## extra configs applied to falco container
+    config:
+      evt_queue:
+        enabled: true
+        timeout_sec: 2
+
     docker:
       ## Determines if the docker socket is mounted in the falco container.
       ## Required for docker based runtimes

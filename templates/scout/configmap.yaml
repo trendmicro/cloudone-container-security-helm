@@ -13,4 +13,5 @@ data:
       output: none
       priority: NOTICE
 {{ (.Files.Glob "config/*").AsConfig | indent 2 }}
+{{ toYaml .Values.scout.falco.config | indent 4 }}
 {{- end }}
