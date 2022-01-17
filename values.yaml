@@ -430,7 +430,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.2.2
+    tag: 2.2.3
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -453,7 +453,7 @@ images:
 
   usage:
     repository: usage-controller
-    digest: sha256:bdfbe991bd36a8c0b0262e2def66abdaa80c761626241db3266d7923defd90ad
+    digest: sha256:25f09c178b96894bee13f3a554ca2fd933838d6e570063e16da1345fdd8de37b
 
   rbacProxy:
     repository: rbac-proxy
@@ -461,7 +461,7 @@ images:
 
   falco:
     repository: falco
-    digest: sha256:2e20e31cd017cc8ebf7750b3256745da31fe23b8f71be77c9a38a0599eeb0e77
+    digest: sha256:2ae411de8cbc705d9b1f32ddb9cef9934dcf046f2a4809719327c39d5ac68a25
 
   scout:
     repository: scout
