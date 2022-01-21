@@ -44,6 +44,8 @@ webhooks:
           - '*'
         resources:
           - "pods"
+          - "pods/exec"
+          - "pods/portforward"
           - "pods/ephemeralcontainers"
           - "replicasets"
           - "replicationcontrollers"
