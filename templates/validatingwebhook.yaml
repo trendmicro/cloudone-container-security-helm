@@ -46,6 +46,7 @@ webhooks:
           - "pods"
           - "pods/exec"
           - "pods/portforward"
+          - "pods/attach"
           - "pods/ephemeralcontainers"
           - "replicasets"
           - "replicationcontrollers"
