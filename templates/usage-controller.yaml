@@ -54,6 +54,7 @@ spec:
         - --exclude-kubernetes-service-host-from-proxy={{ default true .Values.proxy.excludeKubernetesServiceHost }}
         - --leader-elect
         - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
+        - --application-version={{ .Chart.Version }}
         command:
         - /manager
         env:
