@@ -10,6 +10,7 @@ data:
   noProxy: {{ (default (list) .Values.proxy.noProxy) | join "," | quote }}
 
 ---
+{{if not .Values.useExistingSecrets }}
 apiVersion: v1
 kind: Secret
 metadata:
@@ -29,3 +30,4 @@ data:
   {{else}}
   allProxy: {{ default "" .Values.proxy.httpsProxy | toString | b64enc | quote }}
   {{ end }}
+{{ end }}

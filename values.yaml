@@ -466,3 +466,22 @@ images:
   scout:
     repository: scout
     digest: sha256:7344e929af64886a4a51de4ccce628a16e2fe40b23517b0c01339a6c3dd8136b
+
+## 
+## Determine whether to use existing secrets in the target namespace rather than
+## specifying in overrides.yaml. Useful if you want to manage secrets on your own, e.g., in argocd.
+## 
+## When this is enabled, typically you will need these secrets created in your target namespace. 
+## (names may vary depending on your settings): 
+##
+## - trendmicro-container-security-auth
+## - trendmicro-container-security-outbound-proxy-credentials
+## 
+## You can fill overrides.yaml and use helm install --dry-run to generate these secret's
+## template.
+##
+## After deployment, if you update the secret after deployment, you will need to restart pods of
+## container security to make changes take effect.
+## 
+## Default Value: false
+useExistingSecrets: false
