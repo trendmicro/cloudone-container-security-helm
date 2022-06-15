@@ -430,7 +430,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.2.10
+    tag: 2.2.11
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -445,15 +445,15 @@ images:
     # imagePullSecret:
   admissionController:
     repository: admission-controller
-    digest: sha256:d7917dde75b297f24f02497ad1f6910dd73ab26a106d21072d06c7ef1874d1ec
+    digest: sha256:1b9ccb1e2def91f765c9638bf00755358cf8345e472265a7a87504033a716f1a
 
   oversight:
     repository: oversight-controller
-    digest: sha256:b8bc0cb40ba4dc2fd233b2508e7dd3b2acb95d58303422bd2b33dabbb32bcb75
+    digest: sha256:376e1e330cfb5ccc6f4c5e3306f160e97ccd33dad9b220b707e555786643b7fc
 
   usage:
     repository: usage-controller
-    digest: sha256:c1444cfb0d2223f33a1d930ac0a1d0a92c171cf69a9c627059c6c9b349d367ba
+    digest: sha256:c5046c280d00cfe71115060a2541c87adafc22c95f7fe5e13fe96b7bec293b5f
 
   rbacProxy:
     repository: rbac-proxy
@@ -465,7 +465,7 @@ images:
 
   scout:
     repository: scout
-    digest: sha256:92e61e9e8f0d69d2fd83a238897a38871ac1774d97707777fcdf150b794a9573
+    digest: sha256:81fcb08f6f5e890be414705c62ac5f034f6c567c3a7bf9e3b5ac6ba1a1ecc90c
 
 ## 
 ## Determine whether to use existing secrets in the target namespace rather than
