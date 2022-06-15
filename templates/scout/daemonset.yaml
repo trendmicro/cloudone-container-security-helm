@@ -71,7 +71,7 @@ spec:
 {{- if $securityContextEnabled }}
           securityContext:
 {{ toYaml $falcoSecurityContext | indent 12 }}
-{{- end }}{{/* if $securityContextEnabled */}} 
+{{- end }}{{/* if $securityContextEnabled */}}
           args:
             - /usr/bin/falco
             {{- if .Values.scout.falco.cri.enabled }}
@@ -116,7 +116,7 @@ spec:
         {{- end }}{{/* if */}}
           env:
             - name: FALCO_BPF_PROBE
-              value: 
+              value:
             - name: SKIP_DRIVER_LOADER
               value: "true"
             - name: TZ
@@ -171,7 +171,7 @@ spec:
           image: {{ include "image.source" (dict "repository" $repository "registry" .registry "tag" $tag "imageDefaults" $imageDefaults "digest" .digest) }}
           imagePullPolicy: {{ default (default "Always" $imageDefaults.pullPolicy) .pullPolicy }}
           {{- end }}{{/* with */}}
-          args: 
+          args:
             - --grpc-socket-path
             - unix:///var/run/scout/scout.sock
             - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
@@ -247,7 +247,7 @@ spec:
               name: components-dir
           command:
             - cp
-          args: 
+          args:
             - /component.version
             - {{ .Values.scout.downloader.componentDir }}
         {{- end }}{{/* if eq */}}
@@ -262,7 +262,7 @@ spec:
           {{- end }}{{/* with */}}
           command:
             - /downloader
-          args: 
+          args:
             - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
             - --log-level
             - debug
@@ -272,6 +272,7 @@ spec:
 {{ toYaml .Values.scout.downloader.extraArgs | indent 12 }}
         {{- end }}{{/* if */}}
           env:
+          {{- include "container.security.proxy.env" . | nindent 12 }}
           {{- range $key, $value := .Values.scout.downloader.env }}
             - name: "{{ $key }}"
               value: "{{ $value }}"
