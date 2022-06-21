@@ -82,6 +82,8 @@ spec:
             - /var/run/secrets/kubernetes.io/serviceaccount/token
             - -k
             - "https://$(KUBERNETES_SERVICE_HOST)"
+            - --k8s-node
+            - $(NODE_NAME)
             - -p
             - >
               container.id=%container.id
@@ -125,6 +127,10 @@ spec:
             - name: "{{ $key }}"
               value: "{{ $value }}"
           {{- end }}{{/* range */}}
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
           volumeMounts:
             {{- if .Values.scout.falco.docker.enabled }}
             - mountPath: /host/var/run/docker.sock
