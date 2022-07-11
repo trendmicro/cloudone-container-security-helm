@@ -44,7 +44,7 @@ spec:
       labels:
         {{- include "admissionController.selectorLabels" . | nindent 8 }}
     spec:
-      automountServiceAccountToken: false
+      automountServiceAccountToken: true
 {{- $securityContextEnabled := .Values.securityContext.enabled }}
 {{- $securityContext := default .Values.securityContext.default .Values.securityContext.admissionController }}
 {{- $podSecurityContext := default .Values.securityContext.default.pod $securityContext.pod }}
@@ -91,7 +91,7 @@ spec:
             initialDelaySeconds: 20
             timeoutSeconds: 5
             periodSeconds: 20
-            failureThreshold: 6            
+            failureThreshold: 6
           volumeMounts:
             - name: webhook-certs
               mountPath: /etc/webhook/certs
@@ -107,6 +107,16 @@ spec:
             - --tlsCertFile=/etc/webhook/certs/cert.pem
             - --tlsKeyFile=/etc/webhook/certs/key.pem
             - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
+            - --admission-controller-instance-name={{ .Release.Name }}
+            - --enable-vulnerability-scanning={{ .Values.cloudOne.vulnerabilityScanning.enabled }}
+            {{- if .Values.cloudOne.vulnerabilityScanning.enabled }}
+            - --cloud-one-scan-job-image=$(SCAN_JOB_IMAGE)
+            {{- $secret := (default (default "" $imageDefaults.imagePullSecret) .imagePullSecret) }}
+            {{- if not (eq "" $secret) }}
+            - --image-pull-secret-name={{ $secret }}
+            {{- end }}{{/* if not (eq "" $secret) */}}
+            - --cache-expiry-time={{ default "24h" .Values.cloudOne.vulnerabilityScanning.cacheExpiryTime }}
+            {{- end }} {{/* .Values.vulnerabilityScanning.enabled */}}
             - --excluded-namespaces
             {{- $excludeNS := (default (list) .Values.cloudOne.exclusion.namespaces) }}
             - {{ $excludeNS | join "," | quote }}
@@ -122,6 +132,15 @@ spec:
             - 2>&1
           env:
             {{- include "container.security.proxy.env" . | nindent 12 }}
+            {{- $scanJobImageDefaults := .Values.images.defaults }}
+            {{- with .Values.images.scanJob }}
+            {{- $scanJobProject := (default (default "trendmicrocloudone" $scanJobImageDefaults.project) .project) }}
+            {{- $scanJobRepository := printf "%s/%s" $scanJobProject (required ".repository is required!" .repository) }}
+            {{- $scanJobTag := (default $scanJobImageDefaults.tag .tag) }}
+            {{- $scanJobImage := include "image.source" (dict "repository" $scanJobRepository "registry" .registry "tag" $scanJobTag "imageDefaults" $scanJobImageDefaults "digest" .digest)}}
+            - name: SCAN_JOB_IMAGE
+              value: {{ $scanJobImage }}
+            {{- end}} {{/* - with .Values.images.scanJob */}}
             - name: APPLICATION_VERSION
               value: {{ .Chart.Version | quote }}
           resources:

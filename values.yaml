@@ -89,8 +89,18 @@ cloudOne:
     ##
     enableNetworkPolicyCreation: true
 
+  jobManager:
+    enabled: true
+
   runtimeSecurity:
     enabled: false
+
+  vulnerabilityScanning:
+    enabled: false
+    ## Vulnerabilities scan cache expiry duration
+    ## Default value: 24h
+    cacheExpiryTime: 24h
+
 
 securityContextConstraints:
   # enable the Security Context Constraints creation in Openshift
@@ -149,6 +159,14 @@ serviceAccount:
   scout:
     ## The name of the service account to use.
     ## If not set and create is true, a name is generated using the fullname of scout template
+    name: ''
+
+    ## Annotations to add to the service account
+    annotations: {}
+
+  jobManager:
+    ## The name of the service account to use.
+    ## If not set and create is true, a name is generated using the fullname of jobManager template
     name: ''
 
     ## Annotations to add to the service account
@@ -313,6 +331,13 @@ resources:
     limits:
       cpu: 1000m
       memory: 1024Mi
+  jobManager:
+    requests:
+      cpu: 100m
+      memory: 20Mi
+    limits:
+      cpu: 800m
+      memory: 1Gi
 
 
 nodeSelector:
@@ -473,6 +498,14 @@ images:
   scout:
     repository: scout
     digest: sha256:81fcb08f6f5e890be414705c62ac5f034f6c567c3a7bf9e3b5ac6ba1a1ecc90c
+
+  jobManager:
+    repository: job-manager
+    digest: sha256:f8632d325dc24ef72ffe718b6a989a41a24032e3350dca23f0d06c36398bfa95
+
+  scanJob:
+    repository: scan-job
+    digest: sha256:dd128c85d11c54a6629c13df1865a71005741c03c498035713fecf85d021eb2d
 
 ##
 ## Determine whether to use existing secrets in the target namespace rather than
