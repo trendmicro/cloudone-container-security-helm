@@ -147,6 +147,14 @@ serviceAccount:
     ## Annotations to add to the service account
     annotations: {}
 
+  jobManager:
+    ## The name of the service account to use.
+    ## If not set and create is true, a name is generated using the fullname of jobManager template
+    name: ''
+
+    ## Annotations to add to the service account
+    annotations: {}
+
 rbac:
   # Create and use rbac resources
   create: true
@@ -306,6 +314,13 @@ resources:
     limits:
       cpu: 1000m
       memory: 1024Mi
+  jobManager:
+    requests:
+      cpu: 100m
+      memory: 20Mi
+    limits:
+      cpu: 800m
+      memory: 1Gi
 
 
 nodeSelector:
@@ -466,6 +481,13 @@ images:
   scout:
     repository: scout
     digest: sha256:81fcb08f6f5e890be414705c62ac5f034f6c567c3a7bf9e3b5ac6ba1a1ecc90c
+
+  jobManager:
+    repository: scan-controller/job-manager
+    digest: sha256:6466384140848c6997bdeca47811ba233435bd250d07ca6931ada305e96a331a
+
+jobManager:
+  scanJobImage: "gcr.io/smartcheck-development/scan-controller/job:latest"
 
 ## 
 ## Determine whether to use existing secrets in the target namespace rather than

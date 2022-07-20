@@ -79,6 +79,22 @@ app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 
 {{/*
+Job Manager Common labels
+*/}}
+{{- define "jobManager.labels" -}}
+helm.sh/chart: {{ include "container.security.chart" . }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/part-of: {{ include "container.security.name" . }}
+{{ include "jobManager.selectorLabels" . }}
+{{- range $k, $v := (default (dict) .Values.extraLabels) }}
+    {{ $k }}: {{ quote $v }}
+{{- end }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+{{- end }}
+
+{{/*
 Scout Common labels
 */}}
 {{- define "scout.labels" -}}
@@ -120,6 +136,15 @@ Usage Controller Selector labels
 app.kubernetes.io/name: {{ include "usage.fullname" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/component: trendmicro-usage
+{{- end }}
+
+{{/*
+Job Manager Selector labels
+*/}}
+{{- define "jobManager.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "jobManager.fullname" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: trendmicro-job-manager
 {{- end }}
 
 {{/*
@@ -222,6 +247,26 @@ If release name contains chart name it will be used as a full name.
 {{- printf "%s-%s" "usage" $name | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
 {{- printf "%s-%s-%s" "usage" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create a default fully qualified app name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+If release name contains chart name it will be used as a full name.
+*/}}
+{{- define "jobManager.fullname" -}}
+{{- if .Values.jobManagerFullnameOverride -}}
+{{- .Values.jobManagerFullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default .Chart.Name .Values.jobManagerFullnameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- printf "%s-%s" "jobManager" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else if contains .Release.Name $name -}}
+{{- printf "%s-%s" "job-manager" $name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s-%s" "job-manager" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}
@@ -371,6 +416,17 @@ Scout Controller service account
 {{- default (include "scout.fullname" .) .Values.serviceAccount.scout.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.scout.name }}
+{{- end }}
+{{- end }}
+
+{{/*
+Job Manager service account
+*/}}
+{{- define "jobManager.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "jobManager.fullname" .) .Values.serviceAccount.jobManager.name }}
+{{- else }}
+{{- default "default" .Values.serviceAccount.jobManager.name }}
 {{- end }}
 {{- end }}
 

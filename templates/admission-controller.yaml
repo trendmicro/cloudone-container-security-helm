@@ -44,7 +44,7 @@ spec:
       labels:
         {{- include "admissionController.selectorLabels" . | nindent 8 }}
     spec:
-      automountServiceAccountToken: false
+      automountServiceAccountToken: true
 {{- $securityContextEnabled := .Values.securityContext.enabled }}
 {{- $securityContext := default .Values.securityContext.default .Values.securityContext.admissionController }}
 {{- $podSecurityContext := default .Values.securityContext.default.pod $securityContext.pod }}
@@ -107,6 +107,13 @@ spec:
             - --tlsCertFile=/etc/webhook/certs/cert.pem
             - --tlsKeyFile=/etc/webhook/certs/key.pem
             - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
+            - --cloud-one-scan-job-image={{ .Values.jobManager.scanJobImage }}
+            {{- with .Values.images.jobManager }}
+            {{- $secret := (default (default "" $imageDefaults.imagePullSecret) .imagePullSecret) }}
+            {{- if not (eq "" $secret) }}
+            - --image-pull-secret-name={{ $secret }}
+            {{- end }}
+            {{- end }}
             - --excluded-namespaces
             {{- $excludeNS := (default (list) .Values.cloudOne.exclusion.namespaces) }}
             - {{ $excludeNS | join "," | quote }}
