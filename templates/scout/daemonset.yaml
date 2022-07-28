@@ -187,6 +187,8 @@ spec:
                 {{- $excludeNS = append $excludeNS .Release.Namespace }}
             {{- end}}{{/* if */}}
             - {{ $excludeNS | join "," | quote }}
+            - --falco-event-max-diff
+            - 90s
             - --log-level
             - debug
         {{- if .Values.scout.scout.extraArgs }}
