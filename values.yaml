@@ -67,13 +67,20 @@ cloudOne:
   oversight:
     enabled: true
 
-    ## syncPeriod is the time interval that how often Trend Micro Cloud One Container Security will evaluate 
-    ## the running pods. 
+    ## syncPeriod is the time interval that how often Trend Micro Cloud One Container Security will evaluate
+    ## the running pods.
     ##
     ## Default value: 3600s
     ## Minimum value: 600s
     ##
     syncPeriod: 3600s
+
+    ## pageSize is the maximum page size when fetching list of pods.
+    ##
+    ## Default value: 100
+    ## Minimum value: 1
+    ##
+    pageSize: 100
 
     ## enableNetworkPolicyCreation will tell the Oversight controller to create the Kubernetes network policy if it doesn't exist.
     ## The created network policy is used to perform `isolate` mitigation. The created network policy will not get cleaned up automatically.
@@ -93,7 +100,7 @@ serviceAccount:
   ## enable the service account creation. Each component with specific permission will use individual service account.
   ## If set to false, the default service account will be used, which might not have sufficient permission and introduce the failure.
   ##
-  ## Default value: true  
+  ## Default value: true
   create: true
 
   oversight:
@@ -154,7 +161,7 @@ rbac:
 networkPolicy:
   ## enabled the network policy.
   ##
-  ## Default value: true 
+  ## Default value: true
   enabled: true
 
 telemetry:
@@ -244,7 +251,7 @@ proxy:
   ## Default value: (none)
   httpProxy:
 
-  ## httpsProxy, if set, will be used as the proxy for outbound HTTPS traffic. 
+  ## httpsProxy, if set, will be used as the proxy for outbound HTTPS traffic.
   ## If `httpsProxy` is not set, `httpProxy`
   ## is also checked and will be used if set.
   ##
@@ -467,21 +474,21 @@ images:
     repository: scout
     digest: sha256:81fcb08f6f5e890be414705c62ac5f034f6c567c3a7bf9e3b5ac6ba1a1ecc90c
 
-## 
+##
 ## Determine whether to use existing secrets in the target namespace rather than
 ## specifying in overrides.yaml. Useful if you want to manage secrets on your own, e.g., in argocd.
-## 
-## When this is enabled, typically you will need these secrets created in your target namespace. 
-## (names may vary depending on your settings): 
+##
+## When this is enabled, typically you will need these secrets created in your target namespace.
+## (names may vary depending on your settings):
 ##
 ## - trendmicro-container-security-auth
 ## - trendmicro-container-security-outbound-proxy-credentials
-## 
+##
 ## You can fill overrides.yaml and use helm install --dry-run to generate these secret's
 ## template.
 ##
 ## After deployment, if you update the secret after deployment, you will need to restart pods of
 ## container security to make changes take effect.
-## 
+##
 ## Default Value: false
 useExistingSecrets: false

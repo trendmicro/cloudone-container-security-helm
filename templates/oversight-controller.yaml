@@ -63,6 +63,7 @@ spec:
         - --metrics-bind-address=127.0.0.1:8080
         - --leader-elect
         - --mitigation-handler-buffer-size={{ default 50 .Values.cloudOne.oversight.mitigationHandlerBufferSize }}
+        - --page-size={{ default 100 .Values.cloudOne.oversight.pageSize }}
         - --sync-period={{ default "3600s" .Values.cloudOne.oversight.syncPeriod }}
         - --enable-runtime-mitigation={{ default false .Values.cloudOne.runtimeSecurity.enabled }}
         - --exclude-kubernetes-service-host-from-proxy={{ default true .Values.proxy.excludeKubernetesServiceHost }}
@@ -127,7 +128,7 @@ spec:
       volumes:
         - name: workdir
           emptyDir:
-            sizeLimit: 50Mi      
+            sizeLimit: 50Mi
         - name: api-key
           secret:
             secretName: {{ template "container.security.fullname" . }}-auth
