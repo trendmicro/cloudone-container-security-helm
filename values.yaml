@@ -462,7 +462,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.3.0
+    tag: 2.3.1
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -477,11 +477,11 @@ images:
     # imagePullSecret:
   admissionController:
     repository: admission-controller
-    digest: sha256:a7a09c7e6f9c90ce9c4b14755f557859e8dccd94677fe58d59a1a690816a2076
+    digest: sha256:c6164fb81774ac5e03502088c4435ea7f6907fb269829f55433eebf94361dd15
 
   oversight:
     repository: oversight-controller
-    digest: sha256:295e17c60aaba66e29814a4607da8ec5bfbcb8fd71ff010ddf2292a2047ba77e
+    digest: sha256:fe8ceff8f11038f01ea8424547cd23c626c2bfe4183741a1358f2be775982da9
 
   usage:
     repository: usage-controller
@@ -501,11 +501,11 @@ images:
 
   jobManager:
     repository: job-manager
-    digest: sha256:a93498ca95eeb7bb4ddc01a6d3fef1099d5c9cd92889850c5993d978950aa702
+    digest: sha256:111e6745e7034867513e12f14b3a942f6a752a2ad5636667e365530aec763d5c
 
   scanJob:
     repository: scan-job
-    digest: sha256:abcd544c42682a9ea1cdcf5778000678d2b60040de60ac3cbe42db708784ac6d
+    digest: sha256:a6a983268a62175b527da134b5ed40d4a79c70d6f21a800754f38e4db5a26f7f
 
 ##
 ## Determine whether to use existing secrets in the target namespace rather than
