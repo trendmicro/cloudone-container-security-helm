@@ -210,7 +210,9 @@ telemetry:
 
 ## securityContext specifies the security contexts that we'll apply to the pods.
 ##
-## NOTE: securityContext does not apply to scout, since it requires special privileges
+## To use on bottlerocket, set
+## securityContext.scout.scout.allowPrivilegeEscalation=true
+## securityContext.scout.scout.privileged=true
 securityContext:
   ## enabled is a global flag controlling whether security contexts are included at all in the manifest
   ## Default value: true
@@ -418,6 +420,13 @@ scout:
       ## Required for cri based runtimes
       enabled: true
       ## socket, determines which socket to mount for enabling cri based runtimes.
+      ## Default value: (determined by platform)
+      socket:
+    dockershim:
+      ## Determines if the dockershim socket is mounted in the falco container.
+      ## Required for bottlerocket
+      enabled: true
+      ## socket, determines which socket to mount for enabling dockershim based runtimes.
       ## Default value: (determined by platform)
       socket:
   scout:

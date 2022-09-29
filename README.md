@@ -191,6 +191,17 @@ proxy:
   password: password  
 ```
 
+### Enable runtime security on AWS bottlerocket
+
+You can run runtime security on AWS bottlerocket nodes by adding these configurations in your `overrides.yaml` file:
+```yaml
+securityContext:
+  scout:
+    scout:
+      allowPrivilegeEscalation: true
+      privileged: true
+```
+
 ## Troubleshooting
 
 ### Access logs

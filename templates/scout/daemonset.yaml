@@ -78,6 +78,10 @@ spec:
             - --cri
             - /run/cri/cri.sock
             {{- end }}{{/* if */}}
+            {{- if .Values.scout.falco.dockershim.enabled }}
+            - --cri
+            - /run/dockershim.sock
+            {{- end }}{{/* if */}}
             - -K
             - /var/run/secrets/kubernetes.io/serviceaccount/token
             - -k
@@ -139,6 +143,10 @@ spec:
             {{- if .Values.scout.falco.cri.enabled }}
             - mountPath: /host/run/cri/cri.sock
               name: cri-socket
+            {{- end}}{{/* if */}}
+            {{- if .Values.scout.falco.dockershim.enabled }}
+            - mountPath: /host/run/dockershim.sock
+              name: dockershim-socket
             {{- end}}{{/* if */}}
             - mountPath: /host/dev
               name: dev-fs
@@ -333,6 +341,13 @@ spec:
             {{- $defaultcripath = "/run/crio/crio.sock" }}
             {{- end }}{{/* if */}}
             path: {{ .Values.scout.falco.cri.socket | default $defaultcripath }}
+        {{- end }}{{/* if */}}
+        {{- if .Values.scout.falco.dockershim.enabled }}
+        - name: dockershim-socket
+          hostPath:
+            # default is /run/dockershim.sock on bottlerocket.
+            {{- $defaultdockershimpath := "/run/dockershim.sock" }}
+            path: {{ .Values.scout.falco.dockershim.socket | default $defaultdockershimpath }}
         {{- end }}{{/* if */}}
         - name: dev-fs
           hostPath:
