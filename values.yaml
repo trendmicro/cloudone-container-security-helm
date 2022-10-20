@@ -64,6 +64,11 @@ cloudOne:
       ## Default value: 3650
       lifetime: 3650
 
+    ## webhookTimeoutSeconds defines the timeout used in validating admission webhook.
+    ##
+    ## Default value: 30
+    webhookTimeoutSeconds: 30
+
   oversight:
     enabled: true
 

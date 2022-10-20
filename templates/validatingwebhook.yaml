@@ -65,5 +65,5 @@ webhooks:
       caBundle: {{ $ca.Cert | b64enc | quote }}
     admissionReviewVersions: ["v1", "v1beta1"]
     sideEffects: None
-    timeoutSeconds: 30
+    timeoutSeconds: {{ default 30 .Values.cloudOne.admissionController.webhookTimeoutSeconds }}
 {{- end }}
