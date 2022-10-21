@@ -16,7 +16,7 @@ Options:
 -release          [Optional] Specifies the Trend Micro Cloud One container security release name. The default is trendmicro
 -namespace        [Optional] Specifies the the namespace of Trend Micro Cloud One container security deployment.
                              The default is the current namespace or default.
--corefilepattern  [Optional] S[ecifies the core dump file name prefix pattern. The default value is 'core'.
+-corefilepattern  [Optional] Specifies the core dump file name prefix pattern. The default value is 'core'.
 -resultdir        [Optional] Specifies the directory to save the logs.
 Usage examples:
 # Display this help
