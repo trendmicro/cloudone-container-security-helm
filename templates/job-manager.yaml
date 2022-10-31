@@ -63,8 +63,6 @@ spec:
         {{- $excludeNS := (default (list) .Values.cloudOne.exclusion.namespaces) }}
         - {{ $excludeNS | join "," | quote }}
         - --cache-expiry-time={{ default "24h" .Values.cloudOne.vulnerabilityScanning.cacheExpiryTime }}
-        - --log-level
-        - info
         command:
         - /app/job-manager
         env:

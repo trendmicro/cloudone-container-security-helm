@@ -129,8 +129,6 @@ spec:
             - --telemetry-key-file=/telemetry/key.pem
             {{- end }}{{/* .Values.telemetry.publicKey */}}
             {{- end }}{{/* .Values.telemetry.enabled */}}
-            - --log-level
-            - info
             - 2>&1
           env:
             {{- include "container.security.proxy.env" . | nindent 12 }}

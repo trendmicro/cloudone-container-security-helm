@@ -84,7 +84,6 @@ spec:
         - --telemetry-key-file=/telemetry/key.pem
         {{- end }}{{/* .Values.telemetry.publicKey */}}
         {{- end }}{{/* .Values.telemetry.enabled */}}
-        - --with-debug=false
         command:
         - /manager
         env:
