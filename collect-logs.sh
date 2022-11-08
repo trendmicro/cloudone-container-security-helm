@@ -11,7 +11,7 @@ CONTEXT=""
 help()
 {
 cat << EOF
-Helper script to fetch Kubernetes setting and DTrend Micro Cloud One container security logs.
+Helper script to fetch Kubernetes settings and Trend Micro Cloud One container security logs.
 Options:
 -release          [Optional] Specifies the Trend Micro Cloud One container security release name. The default is trendmicro
 -namespace        [Optional] Specifies the the namespace of Trend Micro Cloud One container security deployment.
