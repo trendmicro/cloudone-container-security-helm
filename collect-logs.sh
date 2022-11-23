@@ -70,7 +70,8 @@ COMMANDS=( "version:$KUBECTL version"
            "container-security-secrets:$KUBECTL get secrets --all-namespaces -l app.kubernetes.io/instance=$RELEASE"
            "container-security-config:$KUBECTL describe configmap --all-namespaces -l app.kubernetes.io/instance=$RELEASE"
            "container-security-getvalidatewebhooks:$KUBECTL get ValidatingWebhookConfiguration --all-namespaces -l app.kubernetes.io/instance=$RELEASE"
-           "container-security-descvalidatewebhooks:$KUBECTL describe ValidatingWebhookConfiguration --all-namespaces -l app.kubernetes.io/instance=$RELEASE")
+           "container-security-descvalidatewebhooks:$KUBECTL describe ValidatingWebhookConfiguration --all-namespaces -l app.kubernetes.io/instance=$RELEASE"
+           "workloadmages: $KUBECTL get workloadimages --all-namespaces -o yaml")
 
 echo "Fetching setting logs..."
 for command in "${COMMANDS[@]}"; do

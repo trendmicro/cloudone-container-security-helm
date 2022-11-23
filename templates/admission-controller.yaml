@@ -107,16 +107,6 @@ spec:
             - --tlsCertFile=/etc/webhook/certs/cert.pem
             - --tlsKeyFile=/etc/webhook/certs/key.pem
             - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
-            - --admission-controller-instance-name={{ .Release.Name }}
-            - --enable-vulnerability-scanning={{ .Values.cloudOne.vulnerabilityScanning.enabled }}
-            {{- if .Values.cloudOne.vulnerabilityScanning.enabled }}
-            - --cloud-one-scan-job-image=$(SCAN_JOB_IMAGE)
-            {{- $secret := (default (default "" $imageDefaults.imagePullSecret) .imagePullSecret) }}
-            {{- if not (eq "" $secret) }}
-            - --image-pull-secret-name={{ $secret }}
-            {{- end }}{{/* if not (eq "" $secret) */}}
-            - --cache-expiry-time={{ default "24h" .Values.cloudOne.vulnerabilityScanning.cacheExpiryTime }}
-            {{- end }} {{/* .Values.vulnerabilityScanning.enabled */}}
             - --excluded-namespaces
             {{- $excludeNS := (default (list) .Values.cloudOne.exclusion.namespaces) }}
             - {{ $excludeNS | join "," | quote }}
@@ -143,6 +133,10 @@ spec:
             {{- end}} {{/* - with .Values.images.scanJob */}}
             - name: APPLICATION_VERSION
               value: {{ .Chart.Version | quote }}
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
           resources:
 {{ toYaml (default .Values.resources.defaults .Values.resources.admissionController) | indent 12 }}
       volumes:

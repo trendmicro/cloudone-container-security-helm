@@ -79,13 +79,13 @@ app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 
 {{/*
-Job Manager Common labels
+Scan Manager Common labels
 */}}
-{{- define "jobManager.labels" -}}
+{{- define "scanManager.labels" -}}
 helm.sh/chart: {{ include "container.security.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 app.kubernetes.io/part-of: {{ include "container.security.name" . }}
-{{ include "jobManager.selectorLabels" . }}
+{{ include "scanManager.selectorLabels" . }}
 {{- range $k, $v := (default (dict) .Values.extraLabels) }}
     {{ $k }}: {{ quote $v }}
 {{- end }}
@@ -102,6 +102,36 @@ helm.sh/chart: {{ include "container.security.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 app.kubernetes.io/part-of: {{ include "container.security.name" . }}
 {{ include "scout.selectorLabels" . }}
+{{- range $k, $v := (default (dict) .Values.extraLabels) }}
+    {{ $k }}: {{ quote $v }}
+{{- end }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+{{- end }}
+
+{{/*
+Workload Operator Common labels
+*/}}
+{{- define "workloadOperator.labels" -}}
+helm.sh/chart: {{ include "container.security.chart" . }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/part-of: {{ include "container.security.name" . }}
+{{ include "workloadOperator.selectorLabels" . }}
+{{- range $k, $v := (default (dict) .Values.extraLabels) }}
+    {{ $k }}: {{ quote $v }}
+{{- end }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+{{- end }}
+
+{{/*
+Scanner Common labels
+*/}}
+{{- define "scanner.labels" -}}
+app.kubernetes.io/part-of: {{ include "container.security.name" . }}
+{{ include "scanner.selectorLabels" . }}
 {{- range $k, $v := (default (dict) .Values.extraLabels) }}
     {{ $k }}: {{ quote $v }}
 {{- end }}
@@ -139,12 +169,12 @@ app.kubernetes.io/component: trendmicro-usage
 {{- end }}
 
 {{/*
-Job Manager Selector labels
+Scan Manager Selector labels
 */}}
-{{- define "jobManager.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "jobManager.fullname" . }}
+{{- define "scanManager.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "scanManager.fullname" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
-app.kubernetes.io/component: trendmicro-job-manager
+app.kubernetes.io/component: trendmicro-scan-manager
 {{- end }}
 
 {{/*
@@ -154,6 +184,24 @@ Scout Controller Selector labels
 app.kubernetes.io/name: {{ include "scout.fullname" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/component: trendmicro-scout
+{{- end }}
+
+{{/*
+Workload Operator Selector labels
+*/}}
+{{- define "workloadOperator.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "workloadOperator.fullname" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: trendmicro-workload-operator
+{{- end }}
+
+{{/*
+Scanner Job Selector labels
+*/}}
+{{- define "scanner.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "scanner.fullname" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: trendmicro-scanner
 {{- end }}
 
 {{/*
@@ -256,17 +304,17 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "jobManager.fullname" -}}
-{{- if .Values.jobManagerFullnameOverride -}}
-{{- .Values.jobManagerFullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- define "scanManager.fullname" -}}
+{{- if .Values.scanManagerFullnameOverride -}}
+{{- .Values.scanManagerFullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
-{{- $name := default .Chart.Name .Values.jobManagerFullnameOverride -}}
+{{- $name := default .Chart.Name .Values.scanManagerFullnameOverride -}}
 {{- if contains $name .Release.Name -}}
-{{- printf "%s-%s" "jobManager" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- printf "%s-%s" "scanManager" .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- else if contains .Release.Name $name -}}
-{{- printf "%s-%s" "job-manager" $name | trunc 63 | trimSuffix "-" -}}
+{{- printf "%s-%s" "scan-manager" $name | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
-{{- printf "%s-%s-%s" "job-manager" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- printf "%s-%s-%s" "scan-manager" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}
@@ -287,6 +335,46 @@ If release name contains chart name it will be used as a full name.
 {{- printf "%s-%s" "scout" $name | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
 {{- printf "%s-%s-%s" "scout" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create a default fully qualified app name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+If release name contains chart name it will be used as a full name.
+*/}}
+{{- define "workloadOperator.fullname" -}}
+{{- if .Values.workloadOperatorFullnameOverride -}}
+{{- .Values.workloadOperatorFullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default .Chart.Name .Values.workloadOperatorFullnameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- printf "%s-%s" "workload-operator" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else if contains .Release.Name $name -}}
+{{- printf "%s-%s" "workload-operator" $name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s-%s" "workload-operator" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create a default fully qualified app name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+If release name contains chart name it will be used as a full name.
+*/}}
+{{- define "scanner.fullname" -}}
+{{- if .Values.scannerFullnameOverride -}}
+{{- .Values.scannerFullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default .Chart.Name .Values.scannerFullnameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- printf "%s-%s" "scanner" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else if contains .Release.Name $name -}}
+{{- printf "%s-%s" "scanner" $name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s-%s" "scanner" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}
@@ -387,7 +475,7 @@ Provide HTTP proxy environment variables
 {{- end -}}{{/*define*/}}
 
 {{/*
-Oversight service account 
+Oversight service account
 */}}
 {{- define "oversight.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
@@ -398,7 +486,7 @@ Oversight service account
 {{- end }}
 
 {{/*
-Usage Controller service account 
+Usage Controller service account
 */}}
 {{- define "usage.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
@@ -409,7 +497,7 @@ Usage Controller service account
 {{- end }}
 
 {{/*
-Scout Controller service account 
+Scout Controller service account
 */}}
 {{- define "scout.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
@@ -420,13 +508,24 @@ Scout Controller service account
 {{- end }}
 
 {{/*
-Job Manager service account
+Scan Manager service account
 */}}
-{{- define "jobManager.serviceAccountName" -}}
+{{- define "scanManager.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "jobManager.fullname" .) .Values.serviceAccount.jobManager.name }}
+{{- default (include "scanManager.fullname" .) .Values.serviceAccount.scanManager.name }}
 {{- else }}
-{{- default "default" .Values.serviceAccount.jobManager.name }}
+{{- default "default" .Values.serviceAccount.scanManager.name }}
+{{- end }}
+{{- end }}
+
+{{/*
+Workload Operator service account
+*/}}
+{{- define "workloadOperator.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "workloadOperator.fullname" .) .Values.serviceAccount.workloadOperator.name }}
+{{- else }}
+{{- default "default" .Values.serviceAccount.workloadOperator.name }}
 {{- end }}
 {{- end }}
 

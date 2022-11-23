@@ -1,18 +1,16 @@
-{{- if eq true .Values.cloudOne.jobManager.enabled }}
 {{- if eq true .Values.cloudOne.vulnerabilityScanning.enabled }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   creationTimestamp: null
-  name: job-manager-role
+  name: workload-operator-role
   labels:
-    {{- include "jobManager.labels" . | nindent 4 }}
+    {{- include "workloadOperator.labels" . | nindent 4 }}
 rules:
 - apiGroups:
   - ""
   - batch
   resources:
-  - pods
   - secrets
   verbs:
   - get
@@ -20,27 +18,46 @@ rules:
   - watch
 - apiGroups:
   - batch
+  - ""
+  - apps
   resources:
+  - cronjobs
   - jobs
+  - pods
+  - replicationcontrollers
+  - replicasets
+  - daemonsets
+  - statefulsets
+  - deployments
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - cloudone.trendmicro.com
+  resources:
+  - workloadimages
   verbs:
   - get
   - list
   - watch
   - create
+  - update
+  - patch
+  - delete
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: job-manager-rolebinding
+  name: workload-operator-rolebinding
   labels:
-    {{- include "jobManager.labels" . | nindent 4 }}
+    {{- include "workloadOperator.labels" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: job-manager-role
+  name: workload-operator-role
 subjects:
 - kind: ServiceAccount
-  name: {{ include "jobManager.serviceAccountName" . }}
+  name: {{ include "workloadOperator.serviceAccountName" . }}
   namespace: {{ .Release.Namespace }}
-{{- end }}
 {{- end }}

@@ -94,17 +94,20 @@ cloudOne:
     ##
     enableNetworkPolicyCreation: true
 
-  jobManager:
-    enabled: true
+  scanManager:
+    ## Maximum number of scan jobs running at once.
+    ##
+    ## Default value: 5
+    ## Maximum value: 100
+    ## Minimum value: 3
+    ##
+    maxJobCount: 5
 
   runtimeSecurity:
     enabled: false
 
   vulnerabilityScanning:
     enabled: false
-    ## Vulnerabilities scan cache expiry duration
-    ## Default value: 24h
-    cacheExpiryTime: 24h
 
 
 securityContextConstraints:
@@ -169,7 +172,15 @@ serviceAccount:
     ## Annotations to add to the service account
     annotations: {}
 
-  jobManager:
+  scanManager:
+    ## The name of the service account to use.
+    ## If not set and create is true, a name is generated using the fullname of scanManager template
+    name: ''
+
+    ## Annotations to add to the service account
+    annotations: {}
+
+  workloadOperator:
     ## The name of the service account to use.
     ## If not set and create is true, a name is generated using the fullname of jobManager template
     name: ''
@@ -338,13 +349,27 @@ resources:
     limits:
       cpu: 1000m
       memory: 1024Mi
-  jobManager:
+  scanManager:
     requests:
       cpu: 100m
       memory: 20Mi
     limits:
       cpu: 800m
       memory: 1Gi
+  workloadOperator:
+    requests:
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1024Mi
+  scanner:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      ## no cpu limits specified because it can cause cpu throttle
+      memory: 128Mi
 
 
 nodeSelector:
@@ -513,14 +538,17 @@ images:
     repository: scout
     digest: sha256:7fe06471f6dfdc2f712ef47437b4a9c68625526083ce97e2e669bcd11c79e4e8
 
-  jobManager:
-    repository: job-manager
-    digest: sha256:1962a2455bad9425377552a4edd3606043e18db6e613f94ee710166954d49b48
+  scanManager:
+    repository: scan-manager
+    digest:
 
   scanJob:
     repository: scan-job
     digest: sha256:9f011ff889d9ef1ad2d24401d33f6ad5bd2e4c2336e0dd934390569a461d920c
 
+  workloadOperator:
+    repository: workload-operator
+    digest: sha256:ee964512e14a99ec9dc1f50fd359c73d9388cb92c0206fe475a52c7bf2d1af0d
 ##
 ## Determine whether to use existing secrets in the target namespace rather than
 ## specifying in overrides.yaml. Useful if you want to manage secrets on your own, e.g., in argocd.

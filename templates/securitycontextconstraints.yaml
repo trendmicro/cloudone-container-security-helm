@@ -34,6 +34,10 @@ supplementalGroups:
 users: 
 - system:serviceaccount:{{ .Release.Namespace }}:default
 - system:serviceaccount:{{ .Release.Namespace }}:{{ include "usage.serviceAccountName" . }}
+{{- if eq true .Values.cloudOne.vulnerabilityScanning.enabled }}
+- system:serviceaccount:{{ .Release.Namespace }}:{{ include "workloadOperator.serviceAccountName" . }}
+- system:serviceaccount:{{ .Release.Namespace }}:{{ include "scanManager.serviceAccountName" . }}
+{{- end }}
 volumes:
 - configMap
 - downwardAPI

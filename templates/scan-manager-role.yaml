@@ -1,18 +1,34 @@
-{{- if eq true .Values.cloudOne.admissionController.enabled }}
 {{- if eq true .Values.cloudOne.vulnerabilityScanning.enabled }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   creationTimestamp: null
-  name: admission-controller-role
+  name: scan-manager-role
   labels:
-    {{- include "admissionController.labels" . | nindent 4 }}
+    {{- include "scanManager.labels" . | nindent 4 }}
 rules:
+- apiGroups:
+  - cloudone.trendmicro.com
+  resources:
+  - workloadimages
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+- apiGroups:
+  - ""
+  - batch
+  resources:
+  - secrets
+  verbs:
+  - get
+  - list
+  - watch
 - apiGroups:
   - ""
   resources:
   - pods
-  - secrets
   verbs:
   - get
   - list
@@ -22,21 +38,23 @@ rules:
   resources:
   - jobs
   verbs:
+  - get
+  - list
+  - watch
   - create
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: admission-controller-rolebinding
+  name: scan-manager-rolebinding
   labels:
-    {{- include "jobManager.labels" . | nindent 4 }}
+    {{- include "scanManager.labels" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: admission-controller-role
+  name: scan-manager-role
 subjects:
 - kind: ServiceAccount
-  name: default
+  name: {{ include "scanManager.serviceAccountName" . }}
   namespace: {{ .Release.Namespace }}
-{{- end }}
 {{- end }}
