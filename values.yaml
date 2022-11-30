@@ -41,6 +41,13 @@ cloudOne:
     ## Default value: Ignore
     failurePolicy: Ignore
 
+    ## List of K8s usernames that admission-controller will let handle scan jobs pods
+    ##
+    ## Default value:
+    ##  - aksService
+    trustedScanOperators:
+    - aksService
+
     certificate:
       ## commonName is the common name to use in the default signed certificate.
       ##

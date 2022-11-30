@@ -110,6 +110,9 @@ spec:
             - --excluded-namespaces
             {{- $excludeNS := (default (list) .Values.cloudOne.exclusion.namespaces) }}
             - {{ $excludeNS | join "," | quote }}
+            - --trusted-scan-operators
+            {{- $trustedOperators := (default (list) .Values.cloudOne.admissionController.trustedScanOperators) }}
+            - {{ $trustedOperators | join "," | quote }}
             - --application-version=$(APPLICATION_VERSION)
             {{- if .Values.telemetry.enabled }}
             - --telemetry-endpoint={{ .Values.telemetry.endpoint }}
