@@ -8,15 +8,6 @@ metadata:
     {{- include "workloadOperator.labels" . | nindent 4 }}
 rules:
 - apiGroups:
-  - ""
-  - batch
-  resources:
-  - secrets
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
   - batch
   - ""
   - apps

@@ -18,15 +18,6 @@ rules:
   - update
 - apiGroups:
   - ""
-  - batch
-  resources:
-  - secrets
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - ""
   resources:
   - pods
   verbs:
