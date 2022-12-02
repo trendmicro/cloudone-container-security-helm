@@ -71,6 +71,8 @@ spec:
         - --workload-controller-instance-name={{ .Release.Name }}
         - --log-level
         - debug
+        - --rescan-interval
+        - 30m
         command:
         - /app/workload-operator
         env:
