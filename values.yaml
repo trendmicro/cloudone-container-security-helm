@@ -508,7 +508,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.3.6
+    tag: 2.3.7
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -523,7 +523,7 @@ images:
     # imagePullSecret:
   admissionController:
     repository: admission-controller
-    digest: sha256:dae83b967119c3aa8510c8255b52b434b5d6be2f0dc43fea3fbec142c40059dd
+    digest: sha256:f4400eb108419c5137b88d5616e6f4699548930ef587867198226bc766c08079
 
   oversight:
     repository: oversight-controller
@@ -547,7 +547,7 @@ images:
 
   scanManager:
     repository: scan-manager
-    digest: sha256:7bc1972f0573ce4238c5cc8bfea81efaba4c9be6488f4d926e9eca8428de1cd2
+    digest: sha256:f6691b2419219f3f850275b1c2d8da0da6c02210383775382660ac0c0870a54d
 
   scanJob:
     repository: scan-job
@@ -555,7 +555,7 @@ images:
 
   workloadOperator:
     repository: workload-operator
-    digest: sha256:417c21098f381c7b18b719490cf70c472cd9e845f532dc16b5ad14c237c5ada1
+    digest: sha256:5e7b9f2d06da46e3e0dfad95d5ea04fa49ea4a9332d1446268bc5379e55d1ccd
 ##
 ## Determine whether to use existing secrets in the target namespace rather than
 ## specifying in overrides.yaml. Useful if you want to manage secrets on your own, e.g., in argocd.
