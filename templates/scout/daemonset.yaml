@@ -85,7 +85,7 @@ spec:
             - -K
             - /var/run/secrets/kubernetes.io/serviceaccount/token
             - -k
-            - "https://$(KUBERNETES_SERVICE_HOST)"
+            - {{ default "https://$(KUBERNETES_SERVICE_HOST)" .Values.scout.falco.apiUrl }}
             - --k8s-node
             - $(NODE_NAME)
             - -p

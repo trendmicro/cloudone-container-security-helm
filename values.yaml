@@ -430,6 +430,11 @@ scout:
   excludeSameNamespace: true
 
   falco:
+    ## apiUrl, provide the URL Falco should use to connect to the Kubernetes API.
+    ##
+    ## Default Value: https://$(KUBERNETES_SERVICE_HOST)
+    apiUrl: "https://$(KUBERNETES_SERVICE_HOST)"
+
     ## extraArgs, if set will apply additional arguments to falco container
     ##
     ## Default Value: []
