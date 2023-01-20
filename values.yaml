@@ -433,7 +433,7 @@ scout:
     ## apiUrl, provide the URL Falco should use to connect to the Kubernetes API.
     ##
     ## Default Value: https://$(KUBERNETES_SERVICE_HOST)
-    apiUrl: "https://$(KUBERNETES_SERVICE_HOST)"
+    apiUrl: https://$(KUBERNETES_SERVICE_HOST)
 
     ## extraArgs, if set will apply additional arguments to falco container
     ##
@@ -513,7 +513,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.3.8
+    tag: 2.3.9
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -532,7 +532,7 @@ images:
 
   oversight:
     repository: oversight-controller
-    digest: sha256:277c3a5ba6d9f035ed5b0673a103892b12c8da7d47191f69abe904cae77cc8e6
+    digest: sha256:34cb93245c34620af97e111f0c5fb3a93b2166a52d99a99474f3c25a744fa2c5
 
   usage:
     repository: usage-controller
@@ -544,7 +544,7 @@ images:
 
   falco:
     repository: falco
-    digest: sha256:af5257f3d0b383e7e77d78aa5f9fc02b94403e7d577302ede5a94160b29961b9
+    digest: sha256:78876c8ad8060398227016d03312469d33e001ba10b33b70f7f6f5be7c33a16d
 
   scout:
     repository: scout
@@ -552,11 +552,11 @@ images:
 
   scanManager:
     repository: scan-manager
-    digest: sha256:8555788d846344192f2976703d2d67a4a5b9501c78a52c866f126e3c03f46210
+    digest: sha256:867cd161c7747b8aecc911ad92b8878ef408c76b2a1470a20e5d4d85f056e276
 
   scanJob:
     repository: scan-job
-    digest: sha256:6e7e891a36e86f0b5f21ce18a031783a8fe969560730676a6bf58ed2390cbbc6
+    digest: sha256:ed81412033541e80d640a513442ddc49950b79a51b1e8cd7a65d6739ecfd9ab7
 
   workloadOperator:
     repository: workload-operator
