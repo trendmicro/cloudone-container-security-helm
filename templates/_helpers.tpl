@@ -310,7 +310,7 @@ If release name contains chart name it will be used as a full name.
 {{- else -}}
 {{- $name := default .Chart.Name .Values.scanManagerFullnameOverride -}}
 {{- if contains $name .Release.Name -}}
-{{- printf "%s-%s" "scanManager" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- printf "%s-%s" "scan-manager" .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- else if contains .Release.Name $name -}}
 {{- printf "%s-%s" "scan-manager" $name | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
