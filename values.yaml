@@ -257,6 +257,27 @@ securityContext:
       runAsNonRoot: true
       # seLinuxOptions: "If unspecified, the container runtime will allocate a random SELinux context for each container": this seems appropriate.
       runAsUser: 65532  # nonroot user
+  scanner:
+    pod:
+      runAsNonRoot: true
+    target:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: false
+      runAsUser: 0  #root user
+    init:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 65532  # nonroot user
   scout:
     pod:
       runAsNonRoot: true
