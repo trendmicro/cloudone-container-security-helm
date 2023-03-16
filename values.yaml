@@ -534,7 +534,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.3.10
+    tag: 2.3.11
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -549,15 +549,15 @@ images:
     # imagePullSecret:
   admissionController:
     repository: admission-controller
-    digest: sha256:f4400eb108419c5137b88d5616e6f4699548930ef587867198226bc766c08079
+    digest: sha256:9e4d1b59e1c337164302c212b58acc7682bc0131056f56ba3f2b4161cf308241
 
   oversight:
     repository: oversight-controller
-    digest: sha256:7fec53e45bbe2eb9995b7358936033c3d1690c53b898c762a1ce798ace0fdfee
+    digest: sha256:2389cebba822838c39f231ae5ea2da9368b9138e1240f4415f0d0b5470c33512
 
   usage:
     repository: usage-controller
-    digest: sha256:c5046c280d00cfe71115060a2541c87adafc22c95f7fe5e13fe96b7bec293b5f
+    digest: sha256:0c08546c12b0736ffb23bbe05c5256cd6399e4669a842a90f3a9a1a905bac3d5
 
   rbacProxy:
     repository: rbac-proxy
@@ -573,7 +573,7 @@ images:
 
   scanManager:
     repository: scan-manager
-    digest: sha256:867cd161c7747b8aecc911ad92b8878ef408c76b2a1470a20e5d4d85f056e276
+    digest: sha256:9ac391b887fde7d47eb46c2b72d04819d90d7a190c2f489ac7aafb7248c9a02e
 
   scanJob:
     repository: scan-job
@@ -581,7 +581,7 @@ images:
 
   workloadOperator:
     repository: workload-operator
-    digest: sha256:aa5c389ba40920733b4c397456da3ea27cf71a77184b7f4daa79da875e8b6a78
+    digest: sha256:450c8aa79cc9e2645617ee5a127c924527bb43983bc15b866ae813248fc8e76d
 ##
 ## Determine whether to use existing secrets in the target namespace rather than
 ## specifying in overrides.yaml. Useful if you want to manage secrets on your own, e.g., in argocd.
