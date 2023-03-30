@@ -125,15 +125,8 @@ spec:
             - 2>&1
           env:
             {{- include "container.security.proxy.env" . | nindent 12 }}
-            {{- $scanJobImageDefaults := .Values.images.defaults }}
-            {{- with .Values.images.scanJob }}
-            {{- $scanJobProject := (default (default "trendmicrocloudone" $scanJobImageDefaults.project) .project) }}
-            {{- $scanJobRepository := printf "%s/%s" $scanJobProject (required ".repository is required!" .repository) }}
-            {{- $scanJobTag := (default $scanJobImageDefaults.tag .tag) }}
-            {{- $scanJobImage := include "image.source" (dict "repository" $scanJobRepository "registry" .registry "tag" $scanJobTag "imageDefaults" $scanJobImageDefaults "digest" .digest)}}
-            - name: SCAN_JOB_IMAGE
-              value: {{ $scanJobImage }}
-            {{- end}} {{/* - with .Values.images.scanJob */}}
+            - name: SCAN_MANAGER_SERVICE_ACCOUNT
+              value: {{ include "scanManager.serviceAccountName" . }}
             - name: APPLICATION_VERSION
               value: {{ .Chart.Version | quote }}
             - name: NAMESPACE

@@ -41,6 +41,12 @@ cloudOne:
     ## Default value: Ignore
     failurePolicy: Ignore
 
+    ## When scannerValidation is enabled, admission-controller validates the user who handle scan jobs for runtime vulnerability scanning feature.
+    ## After enabling this, only default scan-manager service account, kube-system components and usernames in the below trustedScanOperators list can handle scan jobs.
+    ##
+    ## Default value: false
+    scannerValidation: false
+
     ## List of K8s usernames that admission-controller will let handle scan jobs pods
     ##
     ## Default value:
