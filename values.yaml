@@ -109,6 +109,11 @@ cloudOne:
     ## Minimum value: 3
     ##
     maxJobCount: 5
+    ## activeDeadlineSeconds is the maximum duration a scan job can run before timing out.
+    ##
+    ## Default value: 300
+    ##    
+    activeDeadlineSeconds: 300
 
   runtimeSecurity:
     enabled: false

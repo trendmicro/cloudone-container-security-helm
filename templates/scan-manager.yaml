@@ -66,6 +66,7 @@ spec:
         - debug
         - --job-template-path
         - /etc/config/scan-job-template.yaml
+        - --job-active-deadline={{ printf "%ds" (int .Values.cloudOne.scanManager.activeDeadlineSeconds) }}
         env:
         {{- include "container.security.proxy.env" . | nindent 8 }}
         {{- $scanJobImageDefaults := .Values.images.defaults }}
@@ -197,7 +198,7 @@ data:
         sidecar.istio.io/inject: "false"
     spec:
       backoffLimit: 2
-      activeDeadlineSeconds: 300
+      activeDeadlineSeconds: {{ .Values.cloudOne.scanManager.activeDeadlineSeconds }}
       ttlSecondsAfterFinished: 60
       template:
         metadata:
