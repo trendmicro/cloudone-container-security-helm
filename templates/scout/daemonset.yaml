@@ -284,6 +284,10 @@ spec:
             - debug
             - --componentdir
             - {{ .Values.scout.downloader.componentDir }}
+{{- if .Values.scout.falco.modernBpf }}
+            - --btfpath
+            - /sys/kernel/btf/vmlinux
+{{- end }}{{/* if */}}
         {{- if .Values.scout.downloader.extraArgs }}
 {{ toYaml .Values.scout.downloader.extraArgs | indent 12 }}
         {{- end }}{{/* if */}}

@@ -503,6 +503,12 @@ scout:
       ## socket, determines which socket to mount for enabling dockershim based runtimes.
       ## Default value: (determined by platform)
       socket:
+    
+    ## modernBpf, determine if falco uses ebpf CO-RE if kernel supports. 
+    ## If it is false or kernel doesn't support ebpf CO-RE, the ebpf driver will be downloaded from Trend Micro Cloud One Container Security service.
+    ## Default value: true
+    modernBpf: true
+
   scout:
     ## extraArgs, if set will apply additional arguments to scout container
     ##
