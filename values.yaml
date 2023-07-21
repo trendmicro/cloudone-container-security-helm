@@ -503,7 +503,6 @@ scout:
       ## socket, determines which socket to mount for enabling dockershim based runtimes.
       ## Default value: (determined by platform)
       socket:
-    
     ## modernBpf, determine if falco uses ebpf CO-RE if kernel supports. 
     ## If it is false or kernel doesn't support ebpf CO-RE, the ebpf driver will be downloaded from Trend Micro Cloud One Container Security service.
     ## Default value: true
@@ -551,7 +550,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.3.13
+    tag: 2.3.14
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -566,15 +565,15 @@ images:
     # imagePullSecret:
   admissionController:
     repository: admission-controller
-    digest: sha256:edfdaf72cee5a4c8b23fe7a2ccce441089a5df6d3907d5852ff44b4904d14d66
+    digest: sha256:a6bc0befed21995dfe6ed56e0d64e266aa40f5ba01e0e648a7cf56056fb43300
 
   oversight:
     repository: oversight-controller
-    digest: sha256:37892ce12f39ebcde97f182d9f9935c02ab1016d87382bfb2ecf7679907d77ad
+    digest: sha256:ba6caf899508a2f645a16a487e5636918b16f2a25dcda2d0d58553c6fabe486a
 
   usage:
     repository: usage-controller
-    digest: sha256:84d9228048d27151f5f8b160183c9b19ed7b4a68d2a5a9b37144300f8cbb0b27
+    digest: sha256:1fc16a928609ca36fefbca18a0560101058e86f454598ef4c377434968ab3120
 
   rbacProxy:
     repository: rbac-proxy
@@ -582,23 +581,23 @@ images:
 
   falco:
     repository: falco
-    digest: sha256:7897f01c7dab055327dd39de8261e394fcde082ec119f4e9987f46d4c2a9ac1b
+    digest: sha256:5530332741753f5dc9ae647ed6270e363b083209a4a10848d59cf6682d8384b5
 
   scout:
     repository: scout
-    digest: sha256:dbc72179a9af8a3c68657ca70b4d31996f6c26d6dfd8d6bf8a1c4528ac145a37
+    digest: sha256:7f7df551e2a47d8dd53de8a133a70c84742e2e3e2296f40496e46f55b58c5777
 
   scanManager:
     repository: scan-manager
-    digest: sha256:433a59118f6295e99872b96c39187f8daa007d09bd182423f152994d39f19617
+    digest: sha256:7ef47a30fdcbae5c8e3fd53c75f3e092aedabf4a43bb84ab89034d48eea620f4
 
   scanJob:
     repository: scan-job
-    digest: sha256:5bd1afcedc9975f0cea7cae1b3cc48439037911d51283af3cb435d409cff020c
+    digest: sha256:b69591830856ca592bb2e32fd639f14e691b4ab28ce562c592930c96331ad20b
 
   workloadOperator:
     repository: workload-operator
-    digest: sha256:ddb71e3d9b8884234e4d1fcddd18560ddff430e85aef9b1d9f6b2b749d2b1e14
+    digest: sha256:6afa374a77949d28b18fcef8c34f97097cbf5ec22e6812d4e41d2eff8ebcee1b
 ##
 ## Determine whether to use existing secrets in the target namespace rather than
 ## specifying in overrides.yaml. Useful if you want to manage secrets on your own, e.g., in argocd.
