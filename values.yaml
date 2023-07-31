@@ -118,7 +118,7 @@ cloudOne:
     ## activeDeadlineSeconds is the maximum duration a scan job can run before timing out.
     ##
     ## Default value: 300
-    ##    
+    ##
     activeDeadlineSeconds: 300
 
   runtimeSecurity:
@@ -127,6 +127,12 @@ cloudOne:
   vulnerabilityScanning:
     enabled: false
 
+  inventoryCollection:
+    ## enable the inventory collection feature
+    enabled: false
+    ## Minimum value: 5m
+    ## Maximum value: 1d
+    period: 5m
 
 securityContextConstraints:
   # enable the Security Context Constraints creation in Openshift
@@ -503,7 +509,7 @@ scout:
       ## socket, determines which socket to mount for enabling dockershim based runtimes.
       ## Default value: (determined by platform)
       socket:
-    ## modernBpf, determine if falco uses ebpf CO-RE if kernel supports. 
+    ## modernBpf, determine if falco uses ebpf CO-RE if kernel supports.
     ## If it is false or kernel doesn't support ebpf CO-RE, the ebpf driver will be downloaded from Trend Micro Cloud One Container Security service.
     ## Default value: true
     modernBpf: true

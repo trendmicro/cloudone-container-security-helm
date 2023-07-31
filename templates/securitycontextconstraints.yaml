@@ -8,7 +8,7 @@ metadata:
   name: {{ template "container.security.name" . }}-default
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "container.security.labels" . | nindent 4 }} 
+    {{- include "container.security.labels" . | nindent 4 }}
 allowHostDirVolumePlugin: false
 allowHostIPC: false
 allowHostNetwork: false
@@ -19,7 +19,7 @@ allowPrivilegedContainer: false
 allowedCapabilities: []
 allowedUnsafeSysctls: []
 defaultAddCapabilities: []
-fsGroup: 
+fsGroup:
   type: MustRunAs
 groups: []
 priority: 0
@@ -31,11 +31,13 @@ seLinuxContext:
   type: MustRunAs
 supplementalGroups:
   type: RunAsAny
-users: 
+users:
 - system:serviceaccount:{{ .Release.Namespace }}:default
 - system:serviceaccount:{{ .Release.Namespace }}:{{ include "usage.serviceAccountName" . }}
-{{- if eq true .Values.cloudOne.vulnerabilityScanning.enabled }}
+{{- if or (eq true .Values.cloudOne.vulnerabilityScanning.enabled) (eq true .Values.cloudOne.inventoryCollection.enabled) }}
 - system:serviceaccount:{{ .Release.Namespace }}:{{ include "workloadOperator.serviceAccountName" . }}
+{{- end }}
+{{- if eq true .Values.cloudOne.vulnerabilityScanning.enabled }}
 - system:serviceaccount:{{ .Release.Namespace }}:{{ include "scanManager.serviceAccountName" . }}
 {{- end }}
 volumes:

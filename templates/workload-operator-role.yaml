@@ -1,4 +1,4 @@
-{{- if eq true .Values.cloudOne.vulnerabilityScanning.enabled }}
+{{- if or (eq true .Values.cloudOne.vulnerabilityScanning.enabled) (eq true .Values.cloudOne.inventoryCollection.enabled) }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -11,6 +11,7 @@ rules:
   - batch
   - ""
   - apps
+  - networking.k8s.io
   resources:
   - cronjobs
   - jobs
@@ -20,6 +21,9 @@ rules:
   - daemonsets
   - statefulsets
   - deployments
+  - nodes
+  - services
+  - ingresses
   verbs:
   - get
   - list

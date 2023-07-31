@@ -1,4 +1,4 @@
-{{- if eq true .Values.cloudOne.vulnerabilityScanning.enabled }}
+{{- if or (eq true .Values.cloudOne.vulnerabilityScanning.enabled) (eq true .Values.cloudOne.inventoryCollection.enabled) }}
 {{ if .Values.serviceAccount.create }}
 apiVersion: v1
 kind: ServiceAccount
@@ -73,6 +73,11 @@ spec:
         - debug
         - --rescan-interval
         - 30m
+        - --vulnerability-scanning={{ default "false" .Values.cloudOne.vulnerabilityScanning.enabled }}
+        - --inventory-collection={{ default "false" .Values.cloudOne.inventoryCollection.enabled }}
+        - --inventory-collection-period={{ default "5m" .Values.cloudOne.inventoryCollection.period }}
+        - --chart-version={{ default "unknown" .Chart.Version }}
+        - --runtime-security={{ default "false" .Values.cloudOne.runtimeSecurity.enabled }}
         command:
         - /app/workload-operator
         env:
