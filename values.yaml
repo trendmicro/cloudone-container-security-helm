@@ -556,7 +556,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.3.16
+    tag: 2.3.17
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -591,7 +591,7 @@ images:
 
   scout:
     repository: scout
-    digest: sha256:83985c4c566fb7ce3196aaa9ab0573e9f04be0f3d39eac16f502ff47171be56e
+    digest: sha256:d99603c53209a135b0b9bc22268d035f4d425cd56af6bc13855ccb33069b5d98
 
   scanManager:
     repository: scan-manager
