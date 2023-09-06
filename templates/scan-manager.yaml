@@ -216,6 +216,9 @@ data:
           securityContext:
 {{ toYaml $podSecurityContext | indent 12 }}
 {{- end }}
+{{- if and .Values.securityContextConstraints.create (.Capabilities.APIVersions.Has "security.openshift.io/v1") }}
+          serviceAccountName: {{ include "scanJob.serviceAccountName" . }}
+{{- end}}
           restartPolicy: Never
           volumes:
           - name: utility-volume

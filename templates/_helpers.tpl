@@ -519,6 +519,17 @@ Scan Manager service account
 {{- end }}
 
 {{/*
+Scan Job service account
+*/}}
+{{- define "scanJob.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "scanner.fullname" .) .Values.serviceAccount.scanJob.name }}
+{{- else }}
+{{- default "default" .Values.serviceAccount.scanJob.name }}
+{{- end }}
+{{- end }}
+
+{{/*
 Workload Operator service account
 */}}
 {{- define "workloadOperator.serviceAccountName" -}}
