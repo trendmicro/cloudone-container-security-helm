@@ -335,7 +335,7 @@ securityContext:
 proxy:
   ## httpProxy, if set, will be used as the proxy for outbound HTTP traffic.
   ##
-  ## The value may be either a complete URL, a `host[:port]`, or `socks5://host[:port]` when using a socks proxy
+  ## The value may be either a complete URL, a `http://host[:port]` when using a http proxy, or `socks5://host[:port]` when using a socks proxy
   ##
   ## Default value: (none)
   httpProxy:
@@ -344,7 +344,7 @@ proxy:
   ## If `httpsProxy` is not set, `httpProxy`
   ## is also checked and will be used if set.
   ##
-  ## The value may be either a complete URL, a `host[:port]`, or `socks5://host[:port]` when using a socks proxy
+  ## The value may be either a complete URL, a `http://host[:port]` when using a http proxy, or `socks5://host[:port]` when using a socks proxy
   ##
   ## Default value: (none)
   httpsProxy:

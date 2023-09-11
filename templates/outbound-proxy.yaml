@@ -24,8 +24,10 @@ data:
   {{if .Values.proxy.username}}
   {{if .Values.proxy.httpsProxy | hasPrefix "socks5://"}}
   allProxy: {{printf "socks5://%s:%s@%s" .Values.proxy.username .Values.proxy.password (.Values.proxy.httpsProxy | trimPrefix "socks5://") | b64enc | quote}}
+  {{else if .Values.proxy.httpsProxy | hasPrefix "http://"}}
+  allProxy: {{printf "http://%s:%s@%s" .Values.proxy.username .Values.proxy.password (.Values.proxy.httpsProxy | trimPrefix "http://") | b64enc | quote}}
   {{else}}
-  allProxy: {{printf "%s:%s@%s" .Values.proxy.username .Values.proxy.password .Values.proxy.httpsProxy | b64enc | quote}}
+  allProxy: {{printf "http://%s:%s@%s" .Values.proxy.username .Values.proxy.password .Values.proxy.httpsProxy | b64enc | quote}}
   {{ end }}
   {{else}}
   allProxy: {{ default "" .Values.proxy.httpsProxy | toString | b64enc | quote }}
