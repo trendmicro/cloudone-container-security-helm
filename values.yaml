@@ -127,6 +127,39 @@ cloudOne:
   vulnerabilityScanning:
     enabled: false
 
+  fargateInjector:
+    enabled: false
+    logLevel: error
+    certificate:
+      ## commonName is the common name to use in the default signed certificate.
+      ##
+      ## Default value:
+      commonName:
+
+      ## ipAlternativeNames is a list of IP addresses to include as alternate names.
+      ## in the default signed certificate.
+      ##
+      ## Default value: []
+      ipAlternativeNames: []
+
+      ## dnsAlternativeNames is a list of DNS names to include as alternate names
+      ## in the default signed certificate.
+      ##
+      ## Default value: []
+      dnsAlternativeNames: []
+
+      ## lifetime is the lifetime in days of the default signed certificate.
+      ##
+      ## Default value: 3650
+      lifetime: 3650
+
+    ## failurePolicy defines the bahaviour if an unreconized error or timeout occurs. Enabling
+    ## this while not tagging kube-system to be ignored can easily cause the cluster to be
+    ## unresponsive.
+    ##
+    ## Default value: Ignore
+    failurePolicy: Ignore
+
   inventoryCollection:
     ## enable the inventory collection feature
     enabled: false
@@ -215,6 +248,14 @@ serviceAccount:
   workloadOperator:
     ## The name of the service account to use.
     ## If not set and create is true, a name is generated using the fullname of jobManager template
+    name: ''
+
+    ## Annotations to add to the service account
+    annotations: {}
+
+  fargateInjector:
+    ## The name of the service account to use.
+    ## If not set and create is true, a name is generated using the fullname of scout template
     name: ''
 
     ## Annotations to add to the service account
@@ -423,6 +464,13 @@ resources:
     limits:
       ## no cpu limits specified because it can cause cpu throttle
       memory: 512Mi
+  fargateInjector:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 512Mi
 
 
 nodeSelector:
@@ -612,6 +660,14 @@ images:
   workloadOperator:
     repository: workload-operator
     digest: sha256:54b3e0de15f3d4110a4bb133ab1edbc40442376690d1e4c7a5cad69c2f4f4d1d
+
+  fargateInjector:
+    repository: fargate-tool
+    digest:
+
+  pdig:
+    repository: pdig
+    digest:
 ##
 ## Determine whether to use existing secrets in the target namespace rather than
 ## specifying in overrides.yaml. Useful if you want to manage secrets on your own, e.g., in argocd.

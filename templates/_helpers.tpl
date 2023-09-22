@@ -141,6 +141,22 @@ app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 
 {{/*
+Fargate Security Common labels
+*/}}
+{{- define "fargateInjector.labels" -}}
+helm.sh/chart: {{ include "container.security.chart" . }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/part-of: {{ include "container.security.name" . }}
+{{ include "fargateInjector.selectorLabels" . }}
+{{- range $k, $v := (default (dict) .Values.extraLabels) }}
+    {{ $k }}: {{ quote $v }}
+{{- end }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+{{- end }}
+
+{{/*
 Admission Control Selector labels
 */}}
 {{- define "admissionController.selectorLabels" -}}
@@ -202,6 +218,15 @@ Scanner Job Selector labels
 app.kubernetes.io/name: {{ include "scanner.fullname" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/component: trendmicro-scanner
+{{- end }}
+
+{{/*
+Fargate Security Selector labels
+*/}}
+{{- define "fargateInjector.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "fargateInjector.fullname" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: trendmicro-fargate-injector
 {{- end }}
 
 {{/*
@@ -380,6 +405,25 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 
 {{/*
+Create a default fully qualified app name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+*/}}
+{{- define "fargateInjector.fullname" -}}
+{{- if .Values.fargateInjectorFullnameOverride -}}
+{{- .Values.fargateInjectorFullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default .Chart.Name .Values.fargateInjectorNameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- printf "%s-%s" "fargate-injector" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else if contains .Release.Name $name -}}
+{{- printf "%s-%s" "fargate-injector" $name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s-%s" "fargate-injector" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Create an image source.
 */}}
 {{- define "image.source" -}}
@@ -537,6 +581,17 @@ Workload Operator service account
 {{- default (include "workloadOperator.fullname" .) .Values.serviceAccount.workloadOperator.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.workloadOperator.name }}
+{{- end }}
+{{- end }}
+
+{{/*
+Fargate Injector service account
+*/}}
+{{- define "fargateInjector.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "fargateInjector.fullname" .) .Values.serviceAccount.fargateInjector.name }}
+{{- else }}
+{{- default "default" .Values.serviceAccount.fargateInjector.name }}
 {{- end }}
 {{- end }}
 
