@@ -612,7 +612,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.3.19
+    tag: 2.3.20
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -643,7 +643,7 @@ images:
 
   falco:
     repository: falco
-    digest: sha256:8f9ddd19d0a0c71ab8eb6957546e3829576ea3c33bb928dd27b5455e800379e9
+    digest: sha256:c4e8cfca9750e125a26f57f9c3e84463b68e952649b18ba67e3ce18aa4a1476e
 
   scout:
     repository: scout
@@ -663,11 +663,11 @@ images:
 
   fargateInjector:
     repository: fargate-tool
-    digest:
+    digest: sha256:3a5059fab3345c780f42d7a861d9382dfb2479c79b9f1e23cbcca0d7bc80d1fa
 
   pdig:
     repository: pdig
-    digest:
+    digest: sha256:9b7fe3e1d80750961540caa8d70f9008ff5b3c16031409301927cd4b6396dc1b
 ##
 ## Determine whether to use existing secrets in the target namespace rather than
 ## specifying in overrides.yaml. Useful if you want to manage secrets on your own, e.g., in argocd.
