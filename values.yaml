@@ -612,7 +612,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.3.22
+    tag: 2.3.23
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -631,15 +631,15 @@ images:
 
   oversight:
     repository: oversight-controller
-    digest: sha256:bbe7ea23ac3987d222bfc29fbb2e1f36d1cbe5a162d377242b67b2542473f274
+    digest: sha256:715e62a4a68ef934b9254705d88ac73e2a61ad1d855e269313377c4784e1d571
 
   usage:
     repository: usage-controller
-    digest: sha256:4a4452c98f4d2559fc0be6a6e015981c2c3ff25ed1381e458c1a34567c641a84
+    digest: sha256:3c3271a14f49643a44b1b4d5195f8609802752294a84154714431fe7c2f78653
 
   rbacProxy:
     repository: rbac-proxy
-    digest: sha256:e49bc2115bfa401106b1456ed406626c2921404d5cf5aa96e6d8db73dac99ad6
+    digest: sha256:313f1fb2b046aa9247ca4eed7068ff3b18ba762c28de543d7b92cd0ebe1cb38d
 
   falco:
     repository: falco
@@ -651,7 +651,7 @@ images:
 
   scanManager:
     repository: scan-manager
-    digest: sha256:f4f5c3b0befc7037b650449e7904d7fab756db45940a4b0773a3a7eaa44f704d
+    digest: sha256:71c711d2477d63053d3b069510a0d23abef3cda631b4db2db5746546d44e18d8
 
   scanJob:
     repository: scan-job
@@ -659,7 +659,7 @@ images:
 
   workloadOperator:
     repository: workload-operator
-    digest: sha256:bd589986abb0397deb125a3150496e711b57c867aba5f608f56ed1fc0424d466
+    digest: sha256:0350671d7fd6445549033b1a384970cdea95f1ab25f568ed4aa332fbfd20754b
 
   fargateInjector:
     repository: fargate-tool
