@@ -7,7 +7,7 @@ metadata:
 data:
   httpProxy: {{ quote (default "" .Values.proxy.httpProxy) }}
   httpsProxy: {{ quote (default "" .Values.proxy.httpsProxy) }}
-  noProxy: {{ (default (list) .Values.proxy.noProxy) | join "," | quote }}
+  noProxy: ".cluster.local"
 
 ---
 {{if not .Values.useExistingSecrets }}

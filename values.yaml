@@ -390,14 +390,6 @@ proxy:
   ## Default value: (none)
   httpsProxy:
 
-  ## noProxy, if set, is a list of hosts or `host:port` combinations which
-  ## should not be accessed through the proxy.
-  ##
-  ## Default value:
-  ## .cluster.local
-  noProxy:
-  - .cluster.local
-
   ## username, if set, is the user name to provide to the outbound proxy when making requests.
   ##
   ## Default value: (none)
