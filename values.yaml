@@ -604,7 +604,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.3.23
+    tag: 2.3.24
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -623,7 +623,7 @@ images:
 
   oversight:
     repository: oversight-controller
-    digest: sha256:715e62a4a68ef934b9254705d88ac73e2a61ad1d855e269313377c4784e1d571
+    digest: sha256:d987fc2df3be9f8b1b21989764087bee076dafd4c94da609fc6820da9bbb57c6
 
   usage:
     repository: usage-controller
@@ -635,15 +635,15 @@ images:
 
   falco:
     repository: falco
-    digest: sha256:0d0bc586acc92ea21e4766000b7178b24938079f36c05b24b599c4195bb57ac5
+    digest: sha256:179dd198caccf8d0dd760f511a3cc6a36ed873b6a959af49ee01d2926e8fbc1f
 
   scout:
     repository: scout
-    digest: sha256:2e294599c4c1f9bf7f88e14661b950dee0361e22c0788cf054d88d9a6be227d8
+    digest: sha256:6018599e03c627238b74f04ed835564fe5b5840916fdcfca487ce0cce75aa7b6
 
   scanManager:
     repository: scan-manager
-    digest: sha256:71c711d2477d63053d3b069510a0d23abef3cda631b4db2db5746546d44e18d8
+    digest: sha256:9a5575434fa3a962841e5755f4fa51b1140fbecf5ea6f7ca88f257f9a0401688
 
   scanJob:
     repository: scan-job
@@ -651,7 +651,7 @@ images:
 
   workloadOperator:
     repository: workload-operator
-    digest: sha256:0350671d7fd6445549033b1a384970cdea95f1ab25f568ed4aa332fbfd20754b
+    digest: sha256:c6ab891be0dc8853238e9ce497a7e680f04474b7185dc57f7ea1d078172b27a0
 
   fargateInjector:
     repository: fargate-tool
@@ -659,7 +659,7 @@ images:
 
   pdig:
     repository: pdig
-    digest: sha256:9b7fe3e1d80750961540caa8d70f9008ff5b3c16031409301927cd4b6396dc1b
+    digest: sha256:b27a226193922ba18a7404b30dab956748be24cdecf7bec1e097ab55acc70a76
 ##
 ## Determine whether to use existing secrets in the target namespace rather than
 ## specifying in overrides.yaml. Useful if you want to manage secrets on your own, e.g., in argocd.
