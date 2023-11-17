@@ -22,6 +22,7 @@ spec:
 {{- with (default .Values.podAnnotations.defaults .Values.podAnnotations.scout) }}
 {{- toYaml . | nindent 8 }}
 {{- end }}{{/* with */}}
+        customrules/enabled: {{ and .Values.cloudOne.runtimeSecurity.enabled .Values.cloudOne.runtimeSecurity.customRules.enabled | quote }}
 
     spec:
       serviceAccountName: {{ include "scout.serviceAccountName" . }}

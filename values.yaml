@@ -123,6 +123,9 @@ cloudOne:
 
   runtimeSecurity:
     enabled: false
+    customRules:
+      ## enable custom rules feature
+      enabled: false
 
   vulnerabilityScanning:
     enabled: false
