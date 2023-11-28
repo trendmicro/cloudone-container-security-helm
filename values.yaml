@@ -607,7 +607,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.3.26-this.is.a.test.release
+    tag: 2.3.26
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -622,47 +622,47 @@ images:
     # imagePullSecret:
   admissionController:
     repository: admission-controller
-    digest: sha256:973b1aeaba8460556f3aa2c227bf32e848a31567292d794220e4e02f0805d208
+    digest: sha256:179c73017b566e268504ca0b427560be7c76229276ac5e2e01aa6214eeab5d76
 
   oversight:
     repository: oversight-controller
-    digest: sha256:973b1aeaba8460556f3aa2c227bf32e848a31567292d794220e4e02f0805d208
+    digest: sha256:179c73017b566e268504ca0b427560be7c76229276ac5e2e01aa6214eeab5d76
 
   usage:
     repository: usage-controller
-    digest: sha256:973b1aeaba8460556f3aa2c227bf32e848a31567292d794220e4e02f0805d208
+    digest: sha256:179c73017b566e268504ca0b427560be7c76229276ac5e2e01aa6214eeab5d76
 
   rbacProxy:
     repository: rbac-proxy
-    digest: sha256:973b1aeaba8460556f3aa2c227bf32e848a31567292d794220e4e02f0805d208
+    digest: sha256:179c73017b566e268504ca0b427560be7c76229276ac5e2e01aa6214eeab5d76
 
   falco:
     repository: falco
-    digest: sha256:973b1aeaba8460556f3aa2c227bf32e848a31567292d794220e4e02f0805d208
+    digest: sha256:179c73017b566e268504ca0b427560be7c76229276ac5e2e01aa6214eeab5d76
 
   scout:
     repository: scout
-    digest: sha256:973b1aeaba8460556f3aa2c227bf32e848a31567292d794220e4e02f0805d208
+    digest: sha256:179c73017b566e268504ca0b427560be7c76229276ac5e2e01aa6214eeab5d76
 
   scanManager:
     repository: scan-manager
-    digest: sha256:973b1aeaba8460556f3aa2c227bf32e848a31567292d794220e4e02f0805d208
+    digest: sha256:179c73017b566e268504ca0b427560be7c76229276ac5e2e01aa6214eeab5d76
 
   scanJob:
     repository: scan-job
-    digest: sha256:973b1aeaba8460556f3aa2c227bf32e848a31567292d794220e4e02f0805d208
+    digest: sha256:179c73017b566e268504ca0b427560be7c76229276ac5e2e01aa6214eeab5d76
 
   workloadOperator:
     repository: workload-operator
-    digest: sha256:973b1aeaba8460556f3aa2c227bf32e848a31567292d794220e4e02f0805d208
+    digest: sha256:179c73017b566e268504ca0b427560be7c76229276ac5e2e01aa6214eeab5d76
 
   fargateInjector:
     repository: fargate-tool
-    digest: sha256:973b1aeaba8460556f3aa2c227bf32e848a31567292d794220e4e02f0805d208
+    digest: sha256:179c73017b566e268504ca0b427560be7c76229276ac5e2e01aa6214eeab5d76
 
   pdig:
     repository: pdig
-    digest: sha256:973b1aeaba8460556f3aa2c227bf32e848a31567292d794220e4e02f0805d208
+    digest: sha256:179c73017b566e268504ca0b427560be7c76229276ac5e2e01aa6214eeab5d76
 ##
 ## Determine whether to use existing secrets in the target namespace rather than
 ## specifying in overrides.yaml. Useful if you want to manage secrets on your own, e.g., in argocd.
