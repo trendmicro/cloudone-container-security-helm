@@ -622,19 +622,19 @@ images:
     # imagePullSecret:
   admissionController:
     repository: admission-controller
-    digest: sha256:118bb14aa402d423675179d8fb6a5669fa9aa457d7c15f43269866dcb246c4b7
+    digest: sha256:e6d2c680bd127f0e565fe1bc626054522134b4d79d3902950dd4ba518f7c1460
 
   oversight:
     repository: oversight-controller
-    digest: sha256:118bb14aa402d423675179d8fb6a5669fa9aa457d7c15f43269866dcb246c4b7
+    digest: sha256:5b85312b64d8845921dfa35ee0d4123744b87bbdeea27423c9259d5ca68b3979
 
   usage:
     repository: usage-controller
-    digest: sha256:118bb14aa402d423675179d8fb6a5669fa9aa457d7c15f43269866dcb246c4b7
+    digest: sha256:2054e1127dbebd8967f40cb2660dc279ce5ff76e927adb8f1b1ff868d35e660a
 
   rbacProxy:
     repository: rbac-proxy
-    digest: sha256:118bb14aa402d423675179d8fb6a5669fa9aa457d7c15f43269866dcb246c4b7
+    digest: sha256:179c73017b566e268504ca0b427560be7c76229276ac5e2e01aa6214eeab5d76
 
   falco:
     repository: falco
@@ -642,27 +642,27 @@ images:
 
   scout:
     repository: scout
-    digest: sha256:118bb14aa402d423675179d8fb6a5669fa9aa457d7c15f43269866dcb246c4b7
+    digest: sha256:4660b70915a3a2c3be352f4f92a5b99c33c8ec6fb902c9efb29bc5692fb7fc44
 
   scanManager:
     repository: scan-manager
-    digest: sha256:118bb14aa402d423675179d8fb6a5669fa9aa457d7c15f43269866dcb246c4b7
+    digest: sha256:719410653a48083da21d9edae844c0409349e08184b317ac4cee47071c7cf930
 
   scanJob:
     repository: scan-job
-    digest: sha256:118bb14aa402d423675179d8fb6a5669fa9aa457d7c15f43269866dcb246c4b7
+    digest: sha256:9e3150be6f114682ea74f61dbd8dcf648e643718b91abf0d01fa821f1721f096
 
   workloadOperator:
     repository: workload-operator
-    digest: sha256:118bb14aa402d423675179d8fb6a5669fa9aa457d7c15f43269866dcb246c4b7
+    digest: sha256:43c5a7283781a3f8fdbfd90b180163f954ca0f6f38c10b66bccfd69e0c27194b
 
   fargateInjector:
     repository: fargate-tool
-    digest: sha256:118bb14aa402d423675179d8fb6a5669fa9aa457d7c15f43269866dcb246c4b7
+    digest: sha256:a5b6b5283cc9400230fc1dc21edbd83f46f9a05518c07217fb140d7a0898c7d6
 
   pdig:
     repository: pdig
-    digest: sha256:118bb14aa402d423675179d8fb6a5669fa9aa457d7c15f43269866dcb246c4b7
+    digest: sha256:973b1aeaba8460556f3aa2c227bf32e848a31567292d794220e4e02f0805d208
 ##
 ## Determine whether to use existing secrets in the target namespace rather than
 ## specifying in overrides.yaml. Useful if you want to manage secrets on your own, e.g., in argocd.
