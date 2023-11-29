@@ -122,8 +122,6 @@ spec:
 {{ toYaml .Values.scout.falco.extraArgs | indent 12 }}
         {{- end }}{{/* if */}}
           env:
-            - name: FALCO_BPF_PROBE
-              value:
             - name: SKIP_DRIVER_LOADER
               value: "true"
             - name: TZ
