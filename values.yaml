@@ -124,8 +124,15 @@ cloudOne:
   runtimeSecurity:
     enabled: false
     customRules:
-      ## enable custom rules feature
       enabled: false
+      output:
+        json: true
+        splunk:
+          url: https://splunkserver/services/collector/raw
+          headers:
+            - ""
+      ruleFilePaths:
+        - /path/to/file.yaml
 
   vulnerabilityScanning:
     enabled: false
