@@ -131,8 +131,6 @@ cloudOne:
           url: https://splunkserver/services/collector/raw
           headers:
             - ""
-      ruleFilePaths:
-        - /path/to/file.yaml
 
   vulnerabilityScanning:
     enabled: false
