@@ -1,3 +1,40 @@
+#####################
+# Falco rules files #
+#####################
+
+# [Stable] `rules_file`
+#
+# Falco rules can be specified using files or directories, which are loaded at
+# startup. The name "rules_file" is maintained for backwards compatibility. If
+# the entry is a file, it will be read directly. If the entry is a directory,
+# all files within that directory will be read in alphabetical order.
+#
+# The falco_rules.yaml file ships with the Falco package and is overridden with
+# every new software version. falco_rules.local.yaml is only created if it
+# doesn't already exist.
+#
+# To customize the set of rules, you can add your modifications to any file.
+# It's important to note that the files or directories are read in the order
+# specified here. In addition, rules are loaded by Falco in the order they
+# appear within each rule file.
+#
+# If you have any customizations intended to override a previous configuration,
+# make sure they appear in later files to take precedence. On the other hand, if
+# the conditions of rules with the same event type(s) have the potential to
+# overshadow each other, ensure that the more important rule appears first. This
+# is because rules are evaluated on a "first match wins" basis, where the first
+# rule that matches the conditions will be applied, and subsequent rules will
+# not be evaluated for the same event type.
+#
+# By arranging the order of files and rules thoughtfully, you can ensure that
+# desired customizations and rule behaviors are prioritized and applied as
+# intended.
+#
+# With Falco 0.36 and beyond, it's now possible to apply multiple rules that match
+# the same event type, eliminating concerns about rule prioritization based on the
+# "first match wins" principle. However, enabling the `all` matching option may result
+# in a performance penalty. We recommend carefully testing this alternative setting
+# before deploying it in production. Read more under the `rule_matching` configuration.
 rules_file:
   - /etc/falco/default_rules.yaml
   - /etc/falco/rules.d
@@ -30,84 +67,114 @@ plugins:
 # Falco config files #
 ######################
 
-watch_config_files: true
+# [Stable] `watch_config_files`
+#
+# Falco monitors configuration and rule files for changes and automatically
+# reloads itself to apply the updated configuration when any modifications are
+# detected. This feature is particularly useful when you want to make real-time
+# changes to the configuration or rules of Falco without interrupting its
+# operation or losing its state. For more information about Falco's state
+# engine, please refer to the `base_syscalls` section.
+watch_config_files: false
 
 ##########################
 # Falco outputs settings #
 ##########################
 
+# [Stable] `time_format_iso_8601`
+#
+# When enabled, Falco will display log and output messages with times in the ISO
+# 8601 format. By default, times are shown in the local time zone determined by
+# the /etc/localtime configuration.
 time_format_iso_8601: false
 
-priority: debug
-
+# [Stable] `json_include_output_property`
+#
+# When using JSON output in Falco, you have the option to include the "output"
+# property itself in the generated JSON output. The "output" property provides
+# additional information about the purpose of the rule. To reduce the logging
+# volume, it is recommended to turn it off if it's not necessary for your use
+# case.
 json_include_output_property: true
 
+# [Stable] `json_include_tags_property`
+#
+# When using JSON output in Falco, you have the option to include the "tags"
+# field of the rules in the generated JSON output. The "tags" field provides
+# additional metadata associated with the rule. To reduce the logging volume,
+# if the tags associated with the rule are not needed for your use case or can
+# be added at a later stage, it is recommended to turn it off.
 json_include_tags_property: true
 
+# [Stable] `priority`
+#
+# Any rule with a priority level more severe than or equal to the specified
+# minimum level will be loaded and run by Falco. This allows you to filter and
+# control the rules based on their severity, ensuring that only rules of a
+# certain priority or higher are active and evaluated by Falco. Supported
+# levels: "emergency", "alert", "critical", "error", "warning", "notice",
+# "info", "debug"
+priority: debug
+
+# [Stable] `buffered_outputs`
+#
+# Enabling buffering for the output queue can offer performance optimization,
+# efficient resource usage, and smoother data flow, resulting in a more reliable
+# output mechanism. By default, buffering is disabled (false).
 buffered_outputs: false
 
+# [Stable] `outputs`
+#
+# A throttling mechanism implemented as a token bucket limits the
+# rate of falco notifications. This throttling is controlled by the following configuration
+# options:
+#  - rate: the number of tokens (i.e. right to send a notification)
+#    gained per second. Defaults to 1.
+#  - max_burst: the maximum number of tokens outstanding. Defaults to 1000.
+#
+# With these defaults, falco could send up to 1000 notifications after
+# an initial quiet period, and then up to 1 notification per second
+# afterward. It would gain the full burst back after 1000 seconds of
+# no activity.
 outputs:
   rate: 0
   max_burst: 1000
-
-rule_matching: first
-
-outputs_queue:
-  capacity: 0
-
-##########################
-# Falco outputs channels #
-##########################
-
-stdout_output:
-  enabled: true
-
-syslog_output:
-  enabled: false
-
-file_output:
-  enabled: false
-  keep_alive: false
-  filename: ./events.txt
-
-program_output:
-  enabled: false
-  keep_alive: false
-  program: "jq '{text: .output}' | curl -d @- -X POST https://hooks.slack.com/services/XXX"
-
-grpc_output:
-  enabled: false
-
-##########################
-# Falco exposed services #
-##########################
-
-grpc:
-  enabled: false
-  bind_address: "unix:///run/falco/falco.sock"
-  # When the `threadiness` value is set to 0, Falco will automatically determine
-  # the appropriate number of threads based on the number of online cores in the system.
-  threadiness: 0
-
-webserver:
-  enabled: true
-  # When the `threadiness` value is set to 0, Falco will automatically determine
-  # the appropriate number of threads based on the number of online cores in the system.
-  threadiness: 0
-  listen_port: 8765
-  k8s_healthz_endpoint: /healthz
-  ssl_enabled: false
-  ssl_certificate: /etc/falco/falco.pem
 
 ##############################################################################
 # Falco logging / alerting / metrics related to software functioning (basic) #
 ##############################################################################
 
+# [Stable] `log_stderr` and `log_syslog`
+#
+# Falco's logs related to the functioning of the software, which are not related
+# to Falco alert outputs but rather its lifecycle, settings and potential
+# errors, can be directed to stderr and/or syslog.
 log_stderr: true
 log_syslog: true
 
+# [Stable] `log_level`
+#
+# The `log_level` setting determines the minimum log level to include in Falco's
+# logs related to the functioning of the software. This setting is separate from
+# the `priority` field of rules and specifically controls the log level of
+# Falco's operational logging. By specifying a log level, you can control the
+# verbosity of Falco's operational logs. Only logs of a certain severity level
+# or higher will be emitted. Supported levels: "emergency", "alert", "critical",
+# "error", "warning", "notice", "info", "debug".
 log_level: info
 
+# [Stable] `libs_logger`
+#
+# The `libs_logger` setting in Falco determines the minimum log level to include
+# in the logs related to the functioning of the software of the underlying
+# `libs` library, which Falco utilizes. This setting is independent of the
+# `priority` field of rules and the `log_level` setting that controls Falco's
+# operational logs. It allows you to specify the desired log level for the `libs`
+# library specifically, providing more granular control over the logging
+# behavior of the underlying components used by Falco. Only logs of a certain
+# severity level or higher will be emitted. Supported levels: "fatal",
+# "critical", "error", "warning", "notice", "info", "debug", "trace". It is not
+# recommended for production use.
 libs_logger:
   enabled: false
   severity: debug
@@ -115,12 +182,88 @@ libs_logger:
 #################################################################################
 # Falco logging / alerting / metrics related to software functioning (advanced) #
 #################################################################################
-
+# [Stable] `output_timeout`
+#
+# Generates Falco operational logs when `log_level=notice` at minimum
+#
+# A timeout error occurs when a process or operation takes longer to complete
+# than the allowed or expected time limit. In the context of Falco, an output
+# timeout error refers to the situation where an output channel fails to deliver
+# an alert within a specified deadline. Various reasons, such as network issues,
+# resource constraints, or performance bottlenecks can cause timeouts.
+#
+# The `output_timeout` parameter specifies the duration, in milliseconds, to
+# wait before considering the deadline exceeded. By default, the timeout is set
+# to 2000ms (2 seconds), meaning that the consumer of Falco outputs can block
+# the Falco output channel for up to 2 seconds without triggering a timeout
+# error.
+#
+# Falco actively monitors the performance of output channels. With this setting
+# the timeout error can be logged, but please note that this requires setting
+# Falco's operational logs `log_level` to a minimum of `notice`.
+#
+# It's important to note that Falco outputs will not be discarded from the
+# output queue. This means that if an output channel becomes blocked
+# indefinitely, it indicates a potential issue that needs to be addressed by the
+# user.
 output_timeout: 2000
 
+# [Stable] `syscall_event_timeouts`
+#
+# Generates Falco operational logs when `log_level=notice` at minimum
+#
+# Falco utilizes a shared buffer between the kernel and userspace to receive
+# events, such as system call information, in userspace. However, there may be
+# cases where timeouts occur in the underlying libraries due to issues in
+# reading events or the need to skip a particular event. While it is uncommon
+# for Falco to experience consecutive event timeouts, it has the capability to
+# detect such situations. You can configure the maximum number of consecutive
+# timeouts without an event after which Falco will generate an alert, but please
+# note that this requires setting Falco's operational logs `log_level` to a
+# minimum of `notice`. The default value is set to 1000 consecutive timeouts
+# without receiving any events. The mapping of this value to a time interval
+# depends on the CPU frequency.
 syscall_event_timeouts:
   max_consecutives: 1000
 
+# [Stable] `syscall_event_drops`
+#
+# Generates "Falco internal: syscall event drop" rule output when `priority=debug` at minimum
+#
+# --- [Description]
+#
+# Falco uses a shared buffer between the kernel and userspace to pass system
+# call information. When Falco detects that this buffer is full and system calls
+# have been dropped, it can take one or more of the following actions:
+#   - ignore: do nothing (default when list of actions is empty)
+#   - log: log a DEBUG message noting that the buffer was full
+#   - alert: emit a Falco alert noting that the buffer was full
+#   - exit: exit Falco with a non-zero rc
+#
+# Notice it is not possible to ignore and log/alert messages at the same time.
+#
+# The rate at which log/alert messages are emitted is governed by a token
+# bucket. The rate corresponds to one message every 30 seconds with a burst of
+# one message (by default).
+#
+# The messages are emitted when the percentage of dropped system calls with
+# respect the number of events in the last second is greater than the given
+# threshold (a double in the range [0, 1]). If you want to be alerted on any
+# drops, set the threshold to 0.
+#
+# For debugging/testing it is possible to simulate the drops using the
+# `simulate_drops: true`. In this case the threshold does not apply.
+#
+# --- [Usage]
+#
+# Enabled by default, but requires Falco rules config `priority` set to `debug`.
+# Emits a Falco rule named "Falco internal: syscall event drop" as many times in
+# a given time period as dictated by the settings. Statistics here reflect the
+# delta in a 1s time period.
+#
+# If instead you prefer periodic metrics of monotonic counters at a regular
+# interval, which include syscall drop statistics and additional metrics,
+# explore the `metrics` configuration option.
 syscall_event_drops:
   threshold: .1
   actions:
@@ -130,39 +273,52 @@ syscall_event_drops:
   max_burst: 1
   simulate_drops: false
 
-metrics:
-  enabled: false
-  interval: 1h
-  # Typically, in production, you only use `output_rule` or `output_file`, but not both.
-  # However, if you have a very unique use case, you can use both together.
-  output_rule: true
-  # output_file: /tmp/falco_stats.jsonl
-  resource_utilization_enabled: true
-  kernel_event_counters_enabled: true
-  libbpf_stats_enabled: true
-  convert_memory_to_mb: true
-  include_empty_values: false
-
-#######################################
-# Falco performance tuning (advanced) #
-#######################################
-
-syscall_buf_size_preset: 4
-
-syscall_drop_failed_exit: false
-
-base_syscalls:
-  custom_set: []
-  repair: false
-
-modern_bpf:
-  cpus_for_each_syscall_buffer: 2
-
 #################################################
 # Falco cloud orchestration systems integration #
 #################################################
 
+# [Stable] `metadata_download`
+#
+# When connected to an orchestrator like Kubernetes, Falco has the capability to
+# collect metadata and enrich system call events with contextual data. The
+# parameters mentioned here control the downloading process of this metadata.
+#
+# Please note that support for Mesos is deprecated, so these parameters
+# currently apply only to Kubernetes. When using Falco with Kubernetes, you can
+# enable this functionality by using the `-k` or `-K` command-line flag.
+#
+# However, it's worth mentioning that for important Kubernetes metadata fields
+# such as namespace or pod name, these fields are automatically extracted from
+# the container runtime, providing the necessary enrichment for common use cases
+# of syscall-based threat detection.
+#
+# In summary, the `-k` flag is typically not required for most scenarios involving
+# Kubernetes workload owner enrichment. The `-k` flag is primarily used when
+# additional metadata is required beyond the standard fields, catering to more
+# specific use cases, see https://falco.org/docs/reference/rules/supported-fields/#field-class-k8s.
 metadata_download:
   max_mb: 100
   chunk_wait_us: 1000
   watch_freq_sec: 1
+
+#########################
+# Falco outputs channels #
+##########################
+
+# Falco supports various output channels, such as syslog, stdout, file, gRPC,
+# webhook, and more. You can enable or disable these channels as needed to
+# control where Falco alerts and log messages are directed. This flexibility
+# allows seamless integration with your preferred logging and alerting systems.
+
+# Multiple outputs can be enabled simultaneously.
+# [Stable] `stdout_output`
+#
+# Redirect logs to standard output.
+syslog_output:
+  enabled: true
+
+# [Stable] `stdout_output`
+#
+# Redirect logs to standard output.
+stdout_output:
+  enabled: true
