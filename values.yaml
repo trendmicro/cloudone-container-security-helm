@@ -130,7 +130,7 @@ cloudOne:
         splunk:
           url: https://splunkserver/services/collector/raw
           headers:
-            - ""
+          - ''
 
   vulnerabilityScanning:
     enabled: false
@@ -612,7 +612,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.3.26
+    tag: 2.3.27
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -627,47 +627,47 @@ images:
     # imagePullSecret:
   admissionController:
     repository: admission-controller
-    digest: sha256:e6d2c680bd127f0e565fe1bc626054522134b4d79d3902950dd4ba518f7c1460
+    digest: sha256:5ed0b35c7becaf03ecdd4197bdfc82422d4a92763caba42e53c0cdf4dfc1cd1f
 
   oversight:
     repository: oversight-controller
-    digest: sha256:5b85312b64d8845921dfa35ee0d4123744b87bbdeea27423c9259d5ca68b3979
+    digest: sha256:42cf68b11efc40951cc210f60f4faa9a7477f624e1f8fe86f85ccd6ab995a881
 
   usage:
     repository: usage-controller
-    digest: sha256:6706b9cd33621c6fd8aa61d1a6443ab0ac6051d75694076a1f6964892cc6cfdb
+    digest: sha256:a6110a19d0f118266bd62ae65664f39e82762b02073d4ae7e278f50b00320ecd
 
   rbacProxy:
     repository: rbac-proxy
-    digest: sha256:179c73017b566e268504ca0b427560be7c76229276ac5e2e01aa6214eeab5d76
+    digest: sha256:c55b0fcf04bb25cded60a4b016a72dccab272075d338fb418e026a07ee6a81f9
 
   falco:
     repository: falco
-    digest: sha256:118bb14aa402d423675179d8fb6a5669fa9aa457d7c15f43269866dcb246c4b7
+    digest: sha256:609fbbfa3117a82fa3d36b8a00e432f09d642bff0c6d98dd65cd1394d9f3d819
 
   scout:
     repository: scout
-    digest: sha256:260d0304a31744219235ad6af5bb3dce1e18bbb4509cfde6dc08582991e93741
+    digest: sha256:0f8dae4319216ad4c027ede50df484fbe85873829f8da91345f111d9441a3c03
 
   scanManager:
     repository: scan-manager
-    digest: sha256:edc36cc43d39b973ee31fd9f2df1e35cda94fba3425bdb1429d8da88792548ef
+    digest: sha256:544150dc8773e2007b994b61fcfc393eb8d4955be55a24c80626fc38167f3d89
 
   scanJob:
     repository: scan-job
-    digest: sha256:4f0a2b1d796cc81d277b195531d5e712d91be5f7340ade600d54002e2f6c6a12
+    digest: sha256:3e47ccccc09e7e10283ae799f518ec585f2a9953a882ef1727b4fece5399948b
 
   workloadOperator:
     repository: workload-operator
-    digest: sha256:3ccc2a7d585ef303881500c5f54351831adccfe083a6f7212a709239d95ad423
+    digest: sha256:3419420231f1eddef3e48b65e1883bf4d3c6a3b314b3a5dbebd7e43b44e80d14
 
   fargateInjector:
     repository: fargate-tool
-    digest: sha256:a5b6b5283cc9400230fc1dc21edbd83f46f9a05518c07217fb140d7a0898c7d6
+    digest: sha256:9eb96d5b1aa908e3dbcf474e26c5ed0821369a7a788e82b5d28a16dc65a988e6
 
   pdig:
     repository: pdig
-    digest: sha256:973b1aeaba8460556f3aa2c227bf32e848a31567292d794220e4e02f0805d208
+    digest: sha256:579c366be2589aa34b5945827ba53d13434ce123effc47a1c347daf31d301160
 ##
 ## Determine whether to use existing secrets in the target namespace rather than
 ## specifying in overrides.yaml. Useful if you want to manage secrets on your own, e.g., in argocd.
