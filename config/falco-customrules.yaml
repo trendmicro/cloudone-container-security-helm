@@ -176,8 +176,8 @@ log_level: info
 # "critical", "error", "warning", "notice", "info", "debug", "trace". It is not
 # recommended for production use.
 libs_logger:
-  enabled: false
-  severity: debug
+  enabled: true
+  severity: error
 
 #################################################################################
 # Falco logging / alerting / metrics related to software functioning (advanced) #
