@@ -23,7 +23,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 app.kubernetes.io/name: {{ include "container.security.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- range $k, $v := (default (dict) .Values.extraLabels) }}
-    {{ $k }}: {{ quote $v }}
+{{ $k }}: {{ quote $v }}
 {{- end }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
@@ -39,7 +39,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 app.kubernetes.io/part-of: {{ include "container.security.name" . }}
 {{ include "admissionController.selectorLabels" . }}
 {{- range $k, $v := (default (dict) .Values.extraLabels) }}
-    {{ $k }}: {{ quote $v }}
+{{ $k }}: {{ quote $v }}
 {{- end }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
@@ -55,7 +55,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 app.kubernetes.io/part-of: {{ include "container.security.name" . }}
 {{ include "oversight.selectorLabels" . }}
 {{- range $k, $v := (default (dict) .Values.extraLabels) }}
-    {{ $k }}: {{ quote $v }}
+{{ $k }}: {{ quote $v }}
 {{- end }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
@@ -71,7 +71,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 app.kubernetes.io/part-of: {{ include "container.security.name" . }}
 {{ include "usage.selectorLabels" . }}
 {{- range $k, $v := (default (dict) .Values.extraLabels) }}
-    {{ $k }}: {{ quote $v }}
+{{ $k }}: {{ quote $v }}
 {{- end }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
@@ -87,7 +87,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 app.kubernetes.io/part-of: {{ include "container.security.name" . }}
 {{ include "scanManager.selectorLabels" . }}
 {{- range $k, $v := (default (dict) .Values.extraLabels) }}
-    {{ $k }}: {{ quote $v }}
+{{ $k }}: {{ quote $v }}
 {{- end }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
@@ -103,7 +103,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 app.kubernetes.io/part-of: {{ include "container.security.name" . }}
 {{ include "scout.selectorLabels" . }}
 {{- range $k, $v := (default (dict) .Values.extraLabels) }}
-    {{ $k }}: {{ quote $v }}
+{{ $k }}: {{ quote $v }}
 {{- end }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
@@ -119,7 +119,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 app.kubernetes.io/part-of: {{ include "container.security.name" . }}
 {{ include "workloadOperator.selectorLabels" . }}
 {{- range $k, $v := (default (dict) .Values.extraLabels) }}
-    {{ $k }}: {{ quote $v }}
+{{ $k }}: {{ quote $v }}
 {{- end }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
@@ -133,7 +133,7 @@ Scanner Common labels
 app.kubernetes.io/part-of: {{ include "container.security.name" . }}
 {{ include "scanner.selectorLabels" . }}
 {{- range $k, $v := (default (dict) .Values.extraLabels) }}
-    {{ $k }}: {{ quote $v }}
+{{ $k }}: {{ quote $v }}
 {{- end }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
@@ -149,7 +149,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 app.kubernetes.io/part-of: {{ include "container.security.name" . }}
 {{ include "fargateInjector.selectorLabels" . }}
 {{- range $k, $v := (default (dict) .Values.extraLabels) }}
-    {{ $k }}: {{ quote $v }}
+{{ $k }}: {{ quote $v }}
 {{- end }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
