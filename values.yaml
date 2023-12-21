@@ -612,7 +612,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.3.27
+    tag: 2.3.28
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -631,7 +631,7 @@ images:
 
   oversight:
     repository: oversight-controller
-    digest: sha256:42cf68b11efc40951cc210f60f4faa9a7477f624e1f8fe86f85ccd6ab995a881
+    digest: sha256:399e8767a2fd4a1ce84669220f1bd00275f1182d4af98d9b56f793c8acb0f62f
 
   usage:
     repository: usage-controller
@@ -643,19 +643,19 @@ images:
 
   falco:
     repository: falco
-    digest: sha256:609fbbfa3117a82fa3d36b8a00e432f09d642bff0c6d98dd65cd1394d9f3d819
+    digest: sha256:18090777ddcf1bd9e8f97248e17cfe6fae5ba4ff48611be085baaaf3ed2eb1aa
 
   scout:
     repository: scout
-    digest: sha256:0f8dae4319216ad4c027ede50df484fbe85873829f8da91345f111d9441a3c03
+    digest: sha256:420e4ff79aa2a52593829749b8ceab3c41faa9a09f57381a91182e2dd2472559
 
   scanManager:
     repository: scan-manager
-    digest: sha256:544150dc8773e2007b994b61fcfc393eb8d4955be55a24c80626fc38167f3d89
+    digest: sha256:1d8ad0f0d3bace20623d2ca08e0c252a54b64afd1913b5195ffb9b50c00cce9b
 
   scanJob:
     repository: scan-job
-    digest: sha256:3e47ccccc09e7e10283ae799f518ec585f2a9953a882ef1727b4fece5399948b
+    digest: sha256:73aa31a659700f41db999d47c7046596c86c7cfe8934a58bc78b8cdffd0421e1
 
   workloadOperator:
     repository: workload-operator
@@ -667,7 +667,7 @@ images:
 
   pdig:
     repository: pdig
-    digest: sha256:579c366be2589aa34b5945827ba53d13434ce123effc47a1c347daf31d301160
+    digest: sha256:58e618a6ec1b16eca2b5230642215d504866537230506502a219062ea9ad7f94
 ##
 ## Determine whether to use existing secrets in the target namespace rather than
 ## specifying in overrides.yaml. Useful if you want to manage secrets on your own, e.g., in argocd.
