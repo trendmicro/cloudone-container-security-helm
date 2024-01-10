@@ -612,7 +612,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.3.28
+    tag: 2.3.29
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -627,7 +627,7 @@ images:
     # imagePullSecret:
   admissionController:
     repository: admission-controller
-    digest: sha256:5ed0b35c7becaf03ecdd4197bdfc82422d4a92763caba42e53c0cdf4dfc1cd1f
+    digest: sha256:0318386a95267f4d8b3aeb71a4f475258a332469cf9ce77c3dc0086c2026b807
 
   oversight:
     repository: oversight-controller
@@ -647,7 +647,7 @@ images:
 
   scout:
     repository: scout
-    digest: sha256:420e4ff79aa2a52593829749b8ceab3c41faa9a09f57381a91182e2dd2472559
+    digest: sha256:f8e45017973c382fe3ed2da99ca51c40105a45b6c015e16fa926709473f60921
 
   scanManager:
     repository: scan-manager
