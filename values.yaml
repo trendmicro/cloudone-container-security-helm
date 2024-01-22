@@ -571,6 +571,11 @@ scout:
     modernBpf: true
 
   scout:
+    ## falcoInternalEvent, determines how to deal with falco internal event
+    ## sysevent: send the internal events as system events to container security backend
+    ## log: log the internal events into scout's log
+    falcoInternalEvent: [log]
+
     ## extraArgs, if set will apply additional arguments to scout container
     ##
     ## Default Value: []
