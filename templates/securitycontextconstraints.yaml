@@ -31,6 +31,8 @@ seLinuxContext:
   type: MustRunAs
 supplementalGroups:
   type: RunAsAny
+seccompProfiles:
+- '*'
 users:
 - system:serviceaccount:{{ .Release.Namespace }}:default
 - system:serviceaccount:{{ .Release.Namespace }}:{{ include "usage.serviceAccountName" . }}

@@ -220,6 +220,8 @@ serviceAccount:
         type: MustRunAs
       supplementalGroups:
         type: RunAsAny
+      seccompProfiles:
+      - '*'
 
   usage:
     ## The name of the service account to use.
