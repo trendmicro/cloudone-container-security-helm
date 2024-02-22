@@ -82,6 +82,12 @@ for command in "${COMMANDS[@]}"; do
     $VALUE >> "$MASTER_DIR/$KEY.log" 2>&1
 done
 
+# get values file for current RELEASE and NAMESPACE
+VALUES=$($HELM get values $RELEASE -n $NAMESPACE -o yaml)
+VALUES=$(echo "$VALUES" | sed 's/apikey: .*/apiKey: xxxxxx/I') # redacting any exposed API keys
+VALUES=$(echo "$VALUES" | sed 's/password: .*/password: xxxxxx/I') # redacting any plain-text proxy password
+echo "$VALUES" > $MASTER_DIR/$RELEASE-$NAMESPACE-values.yaml
+
 #####
 # application logs
 #####
