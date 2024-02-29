@@ -107,6 +107,8 @@ For more information about `helm install`, see the [Helm installation documentat
 
 **Note**: If you are running Container Security in a **Red Hat OpenShift** environment, the Helm Chart creates a [Security Context Constraint](https://docs.openshift.com/container-platform/4.7/authentication/managing-security-context-constraints.html) to allow Container Security components to have the minimum security context requirements to run.
 
+**Note**: If you are running Container Security in a cluster where Pod Security Admission is available and you have runtime security enabled, ensure the namespace where Container Security is installed is using the [privileged Pod Security Standards policy](https://kubernetes.io/docs/concepts/security/pod-security-standards/#privileged).
+
 ### Upgrade a Trend Micro Cloud One Container Security deployment
 
 To upgrade an existing installation in the default Kubernetes namespace to the latest version:
