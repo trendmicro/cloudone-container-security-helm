@@ -576,7 +576,7 @@ scout:
     ## falcoInternalEvent, determines how to deal with falco internal event
     ## sysevent: send the internal events as system events to container security backend
     ## log: log the internal events into scout's log
-    falcoInternalEvent: [log]
+    falcoInternalEvent: [log,sysevent]
 
     ## extraArgs, if set will apply additional arguments to scout container
     ##
