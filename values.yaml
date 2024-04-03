@@ -584,7 +584,7 @@ scout:
     ## falcoInternalEvent, determines how to deal with falco internal event
     ## sysevent: send the internal events as system events to container security backend
     ## log: log the internal events into scout's log
-    falcoInternalEvent: [log,sysevent]
+    falcoInternalEvent: [log, sysevent]
 
     ## extraArgs, if set will apply additional arguments to scout container
     ##
@@ -627,7 +627,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.3.31
+    tag: 2.3.32
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -642,15 +642,15 @@ images:
     # imagePullSecret:
   admissionController:
     repository: admission-controller
-    digest: sha256:e87ed51c3ab5f0ae0839ff54ebd22794b71b8aa2ed2c47c2bd2694f0f16842d3
+    digest: sha256:372ade829366890a6b8e383ebd87cf4cfc2c79d1dfcee49475b40a4078d16f5c
 
   oversight:
     repository: oversight-controller
-    digest: sha256:d78be90efeef9b5b53de68d71a9649c76b2192916a14150d455c89421ee751fc
+    digest: sha256:c67d1836339b92bcc815b1fc9f016362e04f24c37ac3dec077623e5ed6f11451
 
   usage:
     repository: usage-controller
-    digest: sha256:8d035fdf909b6c69b7b8c0aa5826853fcc97f745d1797c60c09f4d3406d4ead6
+    digest: sha256:0c622890c0b25266f95a7af24ae9c3f3e721c9dce243926c20f3cbaa3e11fd40
 
   rbacProxy:
     repository: rbac-proxy
@@ -658,15 +658,15 @@ images:
 
   falco:
     repository: falco
-    digest: sha256:9e9cb5b1a37b9397de2c716e98771a352bbc56db3a6af10312fe5f50c115f531
+    digest: sha256:aad59b28aa379208c025d5932610b0e55109ff2b7294d3dd7fccb695775ae65e
 
   scout:
     repository: scout
-    digest: sha256:7871bb146a0e63f3e84ec9d377a9710c11993c24f649c8c4f999c824cabb0b37
+    digest: sha256:47e7fa282b8e239072ca7c6ceeaa5aace526d1bc121a7ecd2c4311cc1fc87ac1
 
   scanManager:
     repository: scan-manager
-    digest: sha256:d017afc420abd0bd4640d34fc7a0834f0b790baa2519b4007217b60f345b3883
+    digest: sha256:42e8ff2f69e466d48233434f2d501357776626a10831cc1ef04cdaefd80c7e33
 
   scanJob:
     repository: scan-job
@@ -674,15 +674,15 @@ images:
 
   workloadOperator:
     repository: workload-operator
-    digest: sha256:9903cecea04510e016d8ef7da13a46b1c24c3853cfbdfcf619f1124ac27c157a
+    digest: sha256:f60e9a88095d7f439fc7ede0fa8889630d31f21e6762ac3e42d71e60e0e890c1
 
   fargateInjector:
     repository: fargate-tool
-    digest: sha256:9eb96d5b1aa908e3dbcf474e26c5ed0821369a7a788e82b5d28a16dc65a988e6
+    digest: sha256:9b7bdedf8bdea312816e6d7d631b0ddb1cbe151971b98e21f701a44a7e3247fc
 
   pdig:
     repository: pdig
-    digest: sha256:58e618a6ec1b16eca2b5230642215d504866537230506502a219062ea9ad7f94
+    digest: sha256:366213b17b70fc03cd954dac0af5f666eae144fb28c2a0f4236c1cab4aff1698
 ##
 ## Determine whether to use existing secrets in the target namespace rather than
 ## specifying in overrides.yaml. Useful if you want to manage secrets on your own, e.g., in argocd.
