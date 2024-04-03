@@ -109,6 +109,10 @@ spec:
             {{- $tag := (default $imageDefaults.tag .tag) }}
             - {{ include "image.source" (dict "repository" $repository "registry" .registry "tag" $tag "imageDefaults" $imageDefaults "digest" .digest) }}
             {{- end }}
+            {{- if ne (len .Values.scout.scout.falcoInternalEvent) 0 }}
+            - --falco-internal-event
+            - {{ join "," .Values.scout.scout.falcoInternalEvent }}
+            {{- end}}{{/* if */}}    
             - --pull-image-auth
             {{- $imageDefaults := .Values.images.defaults }}
             {{- with .Values.images.fargateInjector }}
