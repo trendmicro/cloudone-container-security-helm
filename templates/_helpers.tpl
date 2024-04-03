@@ -519,6 +519,17 @@ Provide HTTP proxy environment variables
 {{- end -}}{{/*define*/}}
 
 {{/*
+Admission Controller Service Account
+*/}}
+{{- define "admissionController.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "admissionController.fullname" .) .Values.serviceAccount.admissionController.name }}
+{{- else }}
+{{- default "default" .Values.serviceAccount.admissionController.name }}
+{{- end }}
+{{- end }}
+
+{{/*
 Oversight service account
 */}}
 {{- define "oversight.serviceAccountName" -}}

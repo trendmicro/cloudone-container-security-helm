@@ -44,6 +44,7 @@ spec:
       labels:
         {{- include "admissionController.selectorLabels" . | nindent 8 }}
     spec:
+      serviceAccountName: {{ include "admissionController.serviceAccountName" . }}
       automountServiceAccountToken: true
 {{- $securityContextEnabled := .Values.securityContext.enabled }}
 {{- $securityContext := default .Values.securityContext.default .Values.securityContext.admissionController }}
@@ -164,4 +165,17 @@ spec:
       priorityClassName: "{{ $classname }}"
 {{- end }}
       restartPolicy: Always
+---
+{{ if .Values.serviceAccount.create }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "admissionController.serviceAccountName" . }}
+  labels:
+    {{- include "admissionController.labels" . | nindent 4 }}
+  {{- with .Values.serviceAccount.admissionController.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}
 {{- end }}

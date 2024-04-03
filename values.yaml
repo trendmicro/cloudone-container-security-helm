@@ -186,6 +186,14 @@ serviceAccount:
   ## Default value: true
   create: true
 
+  admissionController:
+    ## The name of the service account to use.
+    ## If not set and create is true, a name is generated using the fullname of admissionController template
+    name: ''
+
+    ## Annotations to add to the service account
+    annotations: {}
+
   oversight:
     ## The name of the service account to use.
     ## If not set and create is true, a name is generated using the fullname of oversight template
@@ -225,7 +233,7 @@ serviceAccount:
 
   usage:
     ## The name of the service account to use.
-    ## If not set and create is true, a name is generated using the fullname of oversight template
+    ## If not set and create is true, a name is generated using the fullname of usage template
     name: ''
 
     ## Annotations to add to the service account
