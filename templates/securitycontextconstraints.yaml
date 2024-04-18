@@ -35,12 +35,17 @@ seccompProfiles:
 - '*'
 users:
 - system:serviceaccount:{{ .Release.Namespace }}:default
+{{ if .Values.serviceAccount.create }}
+{{- if eq true .Values.cloudOne.admissionController.enabled }}
+- system:serviceaccount:{{ .Release.Namespace }}:{{ include "admissionController.serviceAccountName" . }}
+{{- end }}
 - system:serviceaccount:{{ .Release.Namespace }}:{{ include "usage.serviceAccountName" . }}
 {{- if or (eq true .Values.cloudOne.vulnerabilityScanning.enabled) (eq true .Values.cloudOne.inventoryCollection.enabled) }}
 - system:serviceaccount:{{ .Release.Namespace }}:{{ include "workloadOperator.serviceAccountName" . }}
 {{- end }}
 {{- if eq true .Values.cloudOne.vulnerabilityScanning.enabled }}
 - system:serviceaccount:{{ .Release.Namespace }}:{{ include "scanManager.serviceAccountName" . }}
+{{- end }}
 {{- end }}
 volumes:
 - configMap
