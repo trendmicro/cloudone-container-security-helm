@@ -346,6 +346,14 @@ serviceAccount:
 
     ## Annotations to add to the service account
     annotations: {}
+    
+  policyOperator:
+    ## The name of the service account to use.
+    ## If not set and create is true, a name is generated using the fullname of policyOperator template
+    name: ''
+
+    ## Annotations to add to the service account
+    annotations: {}
 
 rbac:
   # Create and use rbac resources
@@ -600,6 +608,13 @@ resources:
     limits:
       cpu: 1000m
       memory: 1024Mi
+  policyOperator:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 1000m
+      memory: 1024Mi
 
 nodeSelector:
   ## nodeSelector if set, ensures pods are only assigned to a particular set of nodes.
@@ -822,6 +837,10 @@ images:
   k8sMetaCollector:
     repository: k8s-metacollector
     digest: sha256:c19b86eea4af2ae9878d84cb25a35b9b1d7f4013f1f732e0cfd3a3bba9fc5cf8
+
+  policyOperator:
+    repository: policy-operator
+    digest:
 
 ##
 ## Determine whether to use existing secrets in the target namespace rather than

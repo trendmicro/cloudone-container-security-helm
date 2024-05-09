@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trendmicro-policy-operator
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "policyOperator.labels" . | nindent 4 }}
+spec:
+  replicas: {{ default 1 .Values.replicas.policyOperator }}
+  selector:
+    matchLabels:
+      {{- include "policyOperator.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/auth: {{ include "container.security.auth.secret" . | sha256sum }}
+{{- with (default .Values.podAnnotations.defaults .Values.podAnnotations.policyOperator) }}
+{{- toYaml . | nindent 8 }}
+{{- end }}
+      labels:
+        {{- include "policyOperator.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "policyOperator.serviceAccountName" . }}
+{{- $securityContextEnabled := .Values.securityContext.enabled }}
+{{- $securityContext := default .Values.securityContext.default .Values.securityContext.policyOperator }}
+{{- $podSecurityContext := default .Values.securityContext.default.pod $securityContext.pod }}
+{{- $containerSecurityContext := default .Values.securityContext.default.container $securityContext.container.policyOperator }}
+{{- if $securityContextEnabled }}
+      securityContext:
+{{ toYaml $podSecurityContext | indent 8 }}
+{{- end }}
+      {{- $imageDefaults := .Values.images.defaults }}
+      {{- with .Values.images.policyOperator }}
+      {{- $secret := (default (default "" $imageDefaults.imagePullSecret) .imagePullSecret) }}
+      {{- if not (eq "" $secret) }}
+      imagePullSecrets:
+        - name: {{ $secret | quote }}
+      {{- end }}
+      containers:
+      - name: trendmicro-policy-operator
+{{- if $securityContextEnabled }}
+        securityContext:
+{{ toYaml $containerSecurityContext | indent 12 }}
+{{- end }}
+        {{- $project := (default (default "trendmicrocloudone" $imageDefaults.project) .project) }}
+        {{- $repository := printf "%s/%s" $project (required ".repository is required!" .repository) }}
+        {{- $tag := (default $imageDefaults.tag .tag) }}
+        image: {{ include "image.source" (dict "repository" $repository "registry" .registry "tag" $tag "imageDefaults" $imageDefaults "digest" .digest) }}
+        imagePullPolicy: {{ default (default "Always" $imageDefaults.pullPolicy) .pullPolicy }}
+        {{- end }}
+        args:
+        - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
+        - --zap-devel=false
+        - --zap-log-level=debug
+        command:
+        - /app/policy-operator
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        {{- include "container.security.proxy.env" . | nindent 8 }}
+        volumeMounts:
+        - mountPath: /secrets
+          name: api-key
+      volumes:
+        - name: api-key
+          secret:
+            secretName: {{ template "container.security.fullname" . }}-auth
+      terminationGracePeriodSeconds: 10
+      nodeSelector:
+{{ toYaml (default .Values.nodeSelector.defaults .Values.nodeSelector.policyOperator) | indent 8 }}
+      tolerations:
+{{ toYaml (default .Values.tolerations.defaults .Values.tolerations.policyOperator) | indent 8 }}
+      affinity:
+{{ toYaml (default .Values.affinity.defaults .Values.affinity.policyOperator) | indent 8 }}
+{{- $classname := (default (default "" .Values.priorityClassName.default ) .Values.priorityClassName.policyOperator) }}
+{{- if not (eq "" $classname) }}
+      priorityClassName: "{{ $classname }}"
+{{- end }}
+      restartPolicy: Always
+{{ if .Values.serviceAccount.create }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "policyOperator.serviceAccountName" . }}
+  labels:
+    {{- include "policyOperator.labels" . | nindent 4 }}
+  {{- with .Values.serviceAccount.policyOperator.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}

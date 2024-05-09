@@ -191,6 +191,22 @@ app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 
 {{/*
+Policy Operator Common Labels
+*/}}
+{{- define "policyOperator.labels" -}}
+helm.sh/chart: {{ include "container.security.chart" . }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/part-of: {{ include "container.security.name" . }}
+{{ include "policyOperator.selectorLabels" . }}
+{{- range $k, $v := (default (dict) .Values.extraLabels) }}
+{{ $k }}: {{ quote $v }}
+{{- end }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+{{- end }}
+
+{{/*
 Admission Control Selector labels
 */}}
 {{- define "admissionController.selectorLabels" -}}
@@ -270,6 +286,14 @@ k8s-metacollector Selector labels
 app.kubernetes.io/name: {{ include "k8sMetaCollector.fullname" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/component: trendmicro-k8s-metacollector
+
+{{/*
+Policy Operator Selector labels
+*/}}
+{{- define "policyOperator.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "policyOperator.fullname" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: trendmicro-policy-operator
 {{- end }}
 
 {{/*
@@ -511,6 +535,18 @@ If release name contains chart name it will be used as a full name.
 {{- printf "%s-%s" "k8s-metacollector" $name | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
 {{- printf "%s-%s-%s" "k8s-metacollector" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+
+{{- define "policyOperator.fullname" -}}
+{{- if .Values.policyOperatorFullnameOverride -}}
+{{- .Values.policyOperatorFullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default .Chart.Name .Values.policyOperatorFullnameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- printf "%s-%s" "policy-operator" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else if contains .Release.Name $name -}}
+{{- printf "%s-%s" "policy-operator" $name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s-%s" "policy-operator" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}
@@ -765,6 +801,15 @@ k8s-collector service account
 {{- default (include "k8sMetaCollector.fullname" .) .Values.serviceAccount.k8sMetaCollector.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.k8sMetaCollector.name }}
+
+{{/*
+Policy Operator service account
+*/}}
+{{- define "policyOperator.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "policyOperator.fullname" .) .Values.serviceAccount.policyOperator.name }}
+{{- else }}
+{{- default "default" .Values.serviceAccount.policyOperator.name }}
 {{- end }}
 {{- end }}
 

@@ -49,6 +49,7 @@ users:
 {{- if eq true .Values.cloudOne.runtimeSecurity.enabled }}
 - system:serviceaccount:{{ .Release.Namespace }}:{{ include "k8sMetaCollector.serviceAccountName" . }}
 {{- end }}
+- system:serviceaccount:{{ .Release.Namespace }}:{{ include "policyOperator.serviceAccountName" . }}
 {{- end }}
 volumes:
 - configMap
