@@ -627,7 +627,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.3.34
+    tag: 2.3.35
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -646,7 +646,7 @@ images:
 
   oversight:
     repository: oversight-controller
-    digest: sha256:c67d1836339b92bcc815b1fc9f016362e04f24c37ac3dec077623e5ed6f11451
+    digest: sha256:21ea3b81a2b3ba0b6b60b31e3e4fff9800aadfaed04ff7544a3d55489d86f8ac
 
   usage:
     repository: usage-controller
@@ -654,15 +654,15 @@ images:
 
   rbacProxy:
     repository: rbac-proxy
-    digest: sha256:c55b0fcf04bb25cded60a4b016a72dccab272075d338fb418e026a07ee6a81f9
+    digest: sha256:71c366f028f4f24653aa02f623fd6788c4190b24fdd3fefe8bfed06b6a8c0a86
 
   falco:
     repository: falco
-    digest: sha256:aad59b28aa379208c025d5932610b0e55109ff2b7294d3dd7fccb695775ae65e
+    digest: sha256:ea16a3999ad5d14687a0663716219dd8d452348852a005dd207333288fcf4156
 
   scout:
     repository: scout
-    digest: sha256:6c5399ea7f1049a0d67e5bd32c2258f4b625852ab028c8ba2eb0bfcf8ef85a31
+    digest: sha256:c96bab1df467d8bc262fb5c4291370b305c02ab6b192ba20b4160579873a6453
 
   scanManager:
     repository: scan-manager
@@ -670,11 +670,11 @@ images:
 
   scanJob:
     repository: scan-job
-    digest: sha256:e1078be6630b75c6c043688167350ed959f8212154e8d8cf28744c6d42b0d8dd
+    digest: sha256:dd89981bbbc6ec5ddeea53647080ebea15c40ede75cde4dfb5e85a73c6299269
 
   workloadOperator:
     repository: workload-operator
-    digest: sha256:b5c8cabca56e319f5b0ecccfe5782de9dc380adb5e6a88c3f0f811e48a32af34
+    digest: sha256:b339f851e72b28a529d18b4d30a2147af9d3b620a7f4d6c16a72f6feaf02f50f
 
   fargateInjector:
     repository: fargate-tool
@@ -682,7 +682,7 @@ images:
 
   pdig:
     repository: pdig
-    digest: sha256:366213b17b70fc03cd954dac0af5f666eae144fb28c2a0f4236c1cab4aff1698
+    digest: sha256:5a7d322787c68ff3fe85cd8bdb0367070ce65533a0292fe8f0e4297927cc6f7b
 ##
 ## Determine whether to use existing secrets in the target namespace rather than
 ## specifying in overrides.yaml. Useful if you want to manage secrets on your own, e.g., in argocd.
