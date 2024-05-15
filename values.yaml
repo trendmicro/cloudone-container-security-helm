@@ -646,7 +646,7 @@ images:
 
   oversight:
     repository: oversight-controller
-    digest: sha256:21ea3b81a2b3ba0b6b60b31e3e4fff9800aadfaed04ff7544a3d55489d86f8ac
+    digest: sha256:623f6bb65f3dbe144b29e302d8dbc90d51c366799a92e27c1e6f5662c87411ea
 
   usage:
     repository: usage-controller
@@ -662,7 +662,7 @@ images:
 
   scout:
     repository: scout
-    digest: sha256:c96bab1df467d8bc262fb5c4291370b305c02ab6b192ba20b4160579873a6453
+    digest: sha256:7b0ccddfab963a2fc60019fbe3fa3eafe07e6ab4853548a0c3f4ead572240f82
 
   scanManager:
     repository: scan-manager
@@ -674,7 +674,7 @@ images:
 
   workloadOperator:
     repository: workload-operator
-    digest: sha256:b339f851e72b28a529d18b4d30a2147af9d3b620a7f4d6c16a72f6feaf02f50f
+    digest: sha256:0e07b141e6a029aba971b6aa7d0e64801cf2d49891602468d3402a8ff1f01439
 
   fargateInjector:
     repository: fargate-tool
