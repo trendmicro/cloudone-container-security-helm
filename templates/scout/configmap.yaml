@@ -14,7 +14,9 @@ data:
       output: none
       priority: NOTICE
 {{ (.Files.Glob "config/falco.yaml").AsConfig | indent 2 }}
+{{- if .Values.scout.falco.config }}
 {{ toYaml .Values.scout.falco.config | indent 4 }}
+{{- end }}
 {{- if .Values.cloudOne.runtimeSecurity.customRules.enabled }}
 {{ (.Files.Glob "config/falco-customrules.yaml").AsConfig | indent 2 }}
     json_output: {{.Values.cloudOne.runtimeSecurity.customRules.output.json}}

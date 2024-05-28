@@ -157,6 +157,22 @@ app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 
 {{/*
+k8s-metacollector Common labels
+*/}}
+{{- define "k8sMetaCollector.labels" -}}
+helm.sh/chart: {{ include "container.security.chart" . }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/part-of: {{ include "container.security.name" . }}
+{{ include "k8sMetaCollector.selectorLabels" . }}
+{{- range $k, $v := (default (dict) .Values.extraLabels) }}
+{{ $k }}: {{ quote $v }}
+{{- end }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+{{- end }}
+
+{{/*
 Admission Control Selector labels
 */}}
 {{- define "admissionController.selectorLabels" -}}
@@ -227,6 +243,15 @@ Fargate Security Selector labels
 app.kubernetes.io/name: {{ include "fargateInjector.fullname" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/component: trendmicro-fargate-injector
+{{- end }}
+
+{{/*
+k8s-metacollector Selector labels
+*/}}
+{{- define "k8sMetaCollector.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "k8sMetaCollector.fullname" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: trendmicro-k8s-metacollector
 {{- end }}
 
 {{/*
@@ -424,6 +449,33 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{/*
+Create a default fully qualified app name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+If release name contains chart name it will be used as a full name.
+*/}}
+{{- define "k8sMetaCollector.fullname" -}}
+{{- if .Values.k8sMetacollectorFullnameOverride -}}
+{{- .Values.k8sMetacollectorFullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default .Chart.Name .Values.k8sMetacollectorFullnameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- printf "%s-%s" "k8s-metacollector" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else if contains .Release.Name $name -}}
+{{- printf "%s-%s" "k8s-metacollector" $name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s-%s" "k8s-metacollector" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Service name of k8s-metacollector
+*/}}
+{{- define "k8sMetaCollector.svc.url" -}}
+{{- printf "%s.%s.svc.cluster.local:45000" (include "k8sMetaCollector.fullname" .) .Release.Namespace -}}
+{{- end -}}
+
+{{/*
 Create an image source.
 */}}
 {{- define "image.source" -}}
@@ -603,6 +655,17 @@ Fargate Injector service account
 {{- default (include "fargateInjector.fullname" .) .Values.serviceAccount.fargateInjector.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.fargateInjector.name }}
+{{- end }}
+{{- end }}
+
+{{/*
+k8s-collector service account
+*/}}
+{{- define "k8sMetaCollector.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "k8sMetaCollector.fullname" .) .Values.serviceAccount.k8sMetaCollector.name }}
+{{- else }}
+{{- default "default" .Values.serviceAccount.k8sMetaCollector.name }}
 {{- end }}
 {{- end }}
 

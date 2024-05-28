@@ -46,6 +46,9 @@ users:
 {{- if eq true .Values.cloudOne.vulnerabilityScanning.enabled }}
 - system:serviceaccount:{{ .Release.Namespace }}:{{ include "scanManager.serviceAccountName" . }}
 {{- end }}
+{{- if eq true .Values.cloudOne.runtimeSecurity.enabled }}
+- system:serviceaccount:{{ .Release.Namespace }}:{{ include "k8sMetaCollector.serviceAccountName" . }}
+{{- end }}
 {{- end }}
 volumes:
 - configMap

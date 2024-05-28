@@ -175,6 +175,20 @@ cloudOne:
     ## Maximum value: 1d
     period: 5m
 
+  k8sMetaCollector:
+    ## grpc authentication settings
+    grpcAuth:
+      ## authentication mode, insecure or tls
+      type: "tls"
+      ## certificate settings
+      certificate:
+        ## lifetime is the lifetime in days of the default signed certificate.
+        ##
+        ## Default value: 3650
+        lifetime: 3650
+    ## log verbosity level
+    vLevel: 5
+
 securityContextConstraints:
   # enable the Security Context Constraints creation in Openshift
   create: true
@@ -279,6 +293,14 @@ serviceAccount:
     ## Annotations to add to the service account
     annotations: {}
 
+  k8sMetaCollector:
+    ## The name of the service account to use.
+    ## If not set and create is true, a name is generated using the fullname of k8sMetaCollector template
+    name: ''
+
+    ## Annotations to add to the service account
+    annotations: {}
+
 rbac:
   # Create and use rbac resources
   create: true
@@ -288,6 +310,9 @@ networkPolicy:
   ##
   ## Default value: true
   enabled: true
+  ## k8s-metacollector network policy, default false
+  k8sMetaCollector:
+    enabled: false
 
 telemetry:
   ## enabled controls whether telemetry events will be sent.
@@ -481,6 +506,13 @@ resources:
     limits:
       cpu: 1000m
       memory: 512Mi
+  k8sMetaCollector:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 1000m
+      memory: 1024Mi
 
 
 nodeSelector:
@@ -549,10 +581,7 @@ scout:
     env: {}
 
     ## extra configs applied to falco container
-    config:
-      evt_queue:
-        enabled: true
-        timeout_sec: 2
+    config: {}
 
     docker:
       ## Determines if the docker socket is mounted in the falco container.
@@ -683,6 +712,11 @@ images:
   pdig:
     repository: pdig
     digest: sha256:5a7d322787c68ff3fe85cd8bdb0367070ce65533a0292fe8f0e4297927cc6f7b
+
+  k8sMetaCollector:
+    repository: k8s-metacollector
+    digest:
+
 ##
 ## Determine whether to use existing secrets in the target namespace rather than
 ## specifying in overrides.yaml. Useful if you want to manage secrets on your own, e.g., in argocd.

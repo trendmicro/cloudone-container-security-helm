@@ -19,6 +19,9 @@ spec:
         container.apparmor.security.beta.kubernetes.io/falco: unconfined
         container.apparmor.security.beta.kubernetes.io/scout: unconfined
         checksum/config: {{ include (print $.Template.BasePath "/scout/configmap.yaml") . | sha256sum }}
+{{- if eq "tls" .Values.cloudOne.k8sMetaCollector.grpcAuth.type }}
+        checksum/metacollector: {{ include (print $.Template.BasePath "/k8s-metacollector-secret.yaml") . | sha256sum }}
+{{- end }}
 {{- with (default .Values.podAnnotations.defaults .Values.podAnnotations.scout) }}
 {{- toYaml . | nindent 8 }}
 {{- end }}{{/* with */}}
@@ -85,8 +88,6 @@ spec:
             {{- end }}{{/* if */}}
             - -K
             - /var/run/secrets/kubernetes.io/serviceaccount/token
-            - -k
-            - {{ default "https://$(KUBERNETES_SERVICE_HOST)" .Values.scout.falco.apiUrl }}
             - --k8s-node
             - $(NODE_NAME)
             - -p
@@ -319,7 +320,13 @@ spec:
             {{- if ne (len .Values.scout.scout.falcoInternalEvent) 0 }}
             - --falco-internal-event
             - {{ join "," .Values.scout.scout.falcoInternalEvent }}
-            {{- end}}{{/* if */}}            
+            {{- end}}{{/* if */}}
+            - --k8s-metacollector
+            - {{ include "k8sMetaCollector.svc.url" . }}
+            {{- if eq "tls" .Values.cloudOne.k8sMetaCollector.grpcAuth.type }}
+            - --k8s-metacollector-cert
+            - /etc/scout/metacollector-ca-cert.pem
+            {{- end}}
         {{- if .Values.scout.scout.extraArgs }}
 {{ toYaml .Values.scout.scout.extraArgs | indent 12 }}
         {{- end }}{{/* if */}}
@@ -360,6 +367,12 @@ spec:
             - mountPath: /secrets
               name: api-key
               readOnly: true
+{{- if eq "tls" .Values.cloudOne.k8sMetaCollector.grpcAuth.type }}
+            - mountPath: /etc/scout/metacollector-ca-cert.pem
+              name: metacollector-grpc-certs
+              subPath: ca-cert.pem
+              readOnly: true
+{{- end }}
           resources:
 {{ toYaml (default .Values.resources.defaults .Values.resources.scout) | indent 12 }}
       initContainers:
@@ -521,6 +534,11 @@ spec:
         - name: components-dir
           emptyDir:
             sizeLimit: 50Mi
+{{- if eq "tls" .Values.cloudOne.k8sMetaCollector.grpcAuth.type }}
+        - name: metacollector-grpc-certs
+          secret:
+            secretName: {{ template "k8sMetaCollector.fullname" . }}-tls-certificate
+{{- end }}
   updateStrategy:
     type: RollingUpdate
 {{- end }}{{/* if eq true .Values.cloudOne.runtimeSecurity.enabled */}}

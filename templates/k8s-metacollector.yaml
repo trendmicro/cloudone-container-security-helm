@@ -1,0 +1,188 @@
+{{- if eq true .Values.cloudOne.runtimeSecurity.enabled }}
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "k8sMetaCollector.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "k8sMetaCollector.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: "metrics"
+      port: 8080
+      targetPort: "metrics"
+      protocol: "TCP"
+    - name: "health-probe"
+      port: 8081
+      targetPort: "health-probe"
+      protocol: "TCP"
+    - name: "broker-grpc"
+      port: 45000
+      targetPort: "broker-grpc"
+      protocol: "TCP"
+  selector:
+    {{- include "k8sMetaCollector.selectorLabels" . | nindent 4 }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trendmicro-metacollector
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "k8sMetaCollector.labels" . | nindent 4 }}
+spec:
+  replicas: {{ default 1 .Values.replicas.k8sMetaCollector }}
+  selector:
+    matchLabels:
+      {{- include "k8sMetaCollector.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+{{- if eq "tls" .Values.cloudOne.k8sMetaCollector.grpcAuth.type }}
+        checksum/config: {{ include (print $.Template.BasePath "/k8s-metacollector-secret.yaml") . | sha256sum }}
+{{- end }}
+{{- with (default .Values.podAnnotations.defaults .Values.podAnnotations.k8sMetaCollector) }}
+{{- toYaml . | nindent 8 }}
+{{- end }}
+      labels:
+        {{- include "k8sMetaCollector.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "k8sMetaCollector.serviceAccountName" . }}
+{{- $securityContextEnabled := .Values.securityContext.enabled }}
+{{- $securityContext := default .Values.securityContext.default .Values.securityContext.k8sMetaCollector }}
+{{- $podSecurityContext := default .Values.securityContext.default.pod $securityContext.pod }}
+{{- $containerSecurityContext := default .Values.securityContext.default.container $securityContext.container.k8sMetaCollector }}
+{{- if $securityContextEnabled }}
+      securityContext:
+{{ toYaml $podSecurityContext | indent 8 }}
+{{- end }}
+      {{- $imageDefaults := .Values.images.defaults }}
+      {{- with .Values.images.k8sMetaCollector }}
+      {{- $secret := (default (default "" $imageDefaults.imagePullSecret) .imagePullSecret) }}
+      {{- if not (eq "" $secret) }}
+      imagePullSecrets:
+        - name: {{ $secret | quote }}
+      {{- end }}
+      containers:
+        - name: k8s-metacollector
+{{- if $securityContextEnabled }}
+          securityContext:
+{{ toYaml $containerSecurityContext | indent 12 }}
+{{- end }}
+          {{- $project := (default (default "trendmicrocloudone" $imageDefaults.project) .project) }}
+          {{- $repository := printf "%s/%s" $project (required ".repository is required!" .repository) }}
+          {{- $tag := (default $imageDefaults.tag .tag) }}
+          image: {{ include "image.source" (dict "repository" $repository "registry" .registry "tag" $tag "imageDefaults" $imageDefaults "digest" .digest) }}
+          imagePullPolicy: {{ default (default "Always" $imageDefaults.pullPolicy) .pullPolicy }}
+          {{- end }}
+          command:
+            - /meta-collector
+          args:
+            - run
+{{- if eq "tls" .Values.cloudOne.k8sMetaCollector.grpcAuth.type }}
+            - --broker-server-cert
+            - /etc/metacollector/certs/cert.pem
+            - --broker-server-key
+            - /etc/metacollector/certs/key.pem
+{{- end }}
+            - --zap-log-level
+            - {{ quote .Values.cloudOne.k8sMetaCollector.vLevel }}
+          ports:
+            - name: "broker-grpc"
+              containerPort: 45000
+          livenessProbe:
+            # -- httpGet specifies that the liveness probe will make an HTTP GET request to check the health of the container.
+            httpGet:
+              # -- path is the specific endpoint on which the HTTP GET request will be made.
+              path: /healthz
+              # -- port is the port on which the container exposes the "/healthz" endpoint.
+              port: 8081
+            # -- initialDelaySeconds tells the kubelet that it should wait X seconds before performing the first probe.
+            initialDelaySeconds: 15
+            # -- timeoutSeconds is the number of seconds after which the probe times out.
+            timeoutSeconds: 5
+            # -- periodSeconds specifies the interval at which the liveness probe will be repeated.
+            periodSeconds: 15          
+          readinessProbe:
+            # -- httpGet specifies that the readiness probe will make an HTTP GET request to check whether the container is ready.
+            httpGet:
+              # -- path is the specific endpoint on which the HTTP GET request will be made.
+              path: /readyz
+              # -- port is the port on which the container exposes the "/readyz" endpoint.
+              port: 8081
+            # -- initialDelaySeconds tells the kubelet that it should wait X seconds before performing the first probe.
+            initialDelaySeconds: 15
+            # -- timeoutSeconds is the number of seconds after which the probe times out.
+            timeoutSeconds: 5
+            # -- periodSeconds specifies the interval at which the readiness probe will be repeated.
+            periodSeconds: 15
+{{- if eq "tls" .Values.cloudOne.k8sMetaCollector.grpcAuth.type }}
+          volumeMounts:
+            - name: grpc-certs
+              mountPath: /etc/metacollector/certs
+              readOnly: true
+{{- end }}
+          resources:
+{{ toYaml (default .Values.resources.defaults .Values.resources.k8sMetaCollector) | indent 12 }}
+      volumes:
+{{- if eq "tls" .Values.cloudOne.k8sMetaCollector.grpcAuth.type }}
+        - name: grpc-certs
+          secret:
+            secretName: {{ template "k8sMetaCollector.fullname" . }}-tls-certificate
+{{- end }}
+      nodeSelector:
+{{ toYaml (default .Values.nodeSelector.defaults .Values.nodeSelector.k8sMetaCollector) | indent 8 }}
+      affinity:
+{{ toYaml (default .Values.affinity.defaults .Values.affinity.admissionController) | indent 8 }}
+      tolerations:
+{{ toYaml (default .Values.tolerations.defaults .Values.tolerations.admissionController) | indent 8 }}
+
+---
+{{ if .Values.serviceAccount.create }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "k8sMetaCollector.serviceAccountName" . }}
+  labels:
+    {{- include "k8sMetaCollector.labels" . | nindent 4 }}
+  {{- with .Values.serviceAccount.k8sMetaCollector.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}
+{{- end }}
+
+---
+{{- $networkpolicyEnabled := and (hasKey .Values.networkPolicy "k8sMetaCollector") (hasKey .Values.networkPolicy.k8sMetaCollector "enabled") | ternary .Values.networkPolicy.k8sMetaCollector.enabled .Values.networkPolicy.enabled }}
+{{ if $networkpolicyEnabled }}
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: k8s-metacollector-networkpolicy
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "k8sMetaCollector.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "k8sMetaCollector.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from: # this is for grpc client
+      - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 45000
+    - from: # any -- this is for metrics
+      ports:
+        - protocol: TCP
+          port: 8080
+    - from: # any -- this should just be kubelet for health probes
+      ports:
+        - protocol: TCP
+          port: 8081
+{{- end }}
