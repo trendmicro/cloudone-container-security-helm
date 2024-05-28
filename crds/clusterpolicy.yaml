@@ -1,8 +1,6 @@
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  annotations:
-    controller-gen.kubebuilder.io/version: v0.14.0
   name: clusterpolicies.visionone.trendmicro.com
 spec:
   group: visionone.trendmicro.com
@@ -11,7 +9,8 @@ spec:
     listKind: ClusterPolicyList
     plural: clusterpolicies
     singular: clusterpolicy
-  scope: Namespaced
+  scope: Cluster
+  preserveUnknownFields: false # Structural schema validation https://kubernetes.io/docs/tasks/access-kubernetes-api/custom-resources/custom-resource-definitions/#specifying-a-structural-schema
   versions:
   - name: v1
     schema:
@@ -34,12 +33,334 @@ spec:
               More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
             type: string
           metadata:
+            properties:
+              name:
+                type: string
+                pattern: "^trendmicro-cluster-policy$"
             type: object
           spec:
             description: ClusterPolicySpec defines the desired state of ClusterPolicy
+            properties:
+              xdrEnabled:
+                description: Enable XDR Telemetry. Requires runtime security to be enabled.
+                default: false
+                type: boolean
+              rules:
+                description: List of policy rules
+                items:
+                  properties:
+                    rule:
+                      description: Policy rule specification
+                      minProperties: 1
+                      properties:
+                        type:
+                          description: Type of rule
+                          enum:
+                          - hostIPC
+                          - hostNetwork
+                          - hostPID
+                          - runAsNonRoot
+                          - privileged
+                          - allowPrivilegeEscalation
+                          - readOnlyRootFilesystem
+                          - podPortForward
+                          - podExec
+                          - containerCapabilities
+                          - imageRegistry
+                          - imageName
+                          - imageTag
+                          - imagePath
+                          - imagesNotScanned
+                          - imagesWithMalware
+                          - imagesWithSecrets
+                          - imagesWithVulnerabilities
+                          - imagesWithCVSSAttackVector
+                          - imagesWithCVSSAttackComplexity
+                          - imagesWithCVSSAvailabilityImpact
+                          type: string
+                        operator:
+                          description: Conditional operator to apply to the values
+                          enum:
+                          - equals
+                          - notEquals
+                          - contains
+                          - notContains
+                          - startsWith
+                          type: string
+                        values:
+                          description: Values to match for the rule type
+                          items:
+                            type: string
+                          minItems: 1
+                          type: array
+                        capabilityRestriction:
+                          description: Type of container capability restriction to enforce
+                          enum:
+                          - restrict-nondefaults
+                          - restrict-all
+                          - baseline
+                          - restricted
+                          type: string
+                        scanType:
+                          description: Type of artifact scan
+                          enum:
+                          - vulnerability
+                          - malware
+                          - secret
+                          type: string
+                        maxScanAge:
+                          description: Maximum age of the scan result in days
+                          minimum: 0
+                          maximum: 30
+                          type: integer
+                        severity:
+                          description: Severity of the vulnerability
+                          enum:
+                          - critical
+                          - high
+                          - medium
+                          - low
+                          - any
+                          type: string
+                        attackVector:
+                          description: CVSS attack vector
+                          enum:
+                          - network
+                          - physical
+                          - adjacent
+                          type: string
+                        attackComplexity:
+                          description: CVSS attack complexity
+                          enum:
+                          - low
+                          - high
+                          type: string
+                        availabilityImpact:
+                          description: CVSS availability impact
+                          enum:
+                          - low
+                          - high
+                          type: string
+                      oneOf:
+                        - properties:
+                            type:
+                              enum:
+                              - hostIPC
+                              - hostNetwork
+                              - hostPID
+                              - runAsNonRoot
+                              - privileged
+                              - allowPrivilegeEscalation
+                              - readOnlyRootFilesystem
+                              - podPortForward
+                              - podExec
+                              - imagesWithMalware
+                              - imagesWithSecrets
+                          maxProperties: 1
+                          required:
+                            - type
+                        - properties:
+                            type:
+                              enum:
+                              - containerCapabilities
+                          maxProperties: 2
+                          required:
+                          - type
+                          - capabilityRestriction
+                        - properties:
+                            type:
+                              enum:
+                              - imageRegistry
+                              - imageName
+                              - imageTag
+                              - imagePath
+                          maxProperties: 3
+                          required:
+                          - type
+                          - operator
+                          - values
+                        - properties:
+                            type:
+                              enum:
+                              - imagesNotScanned
+                          maxProperties: 3
+                          required:
+                          - type
+                          - scanType
+                          - maxScanAge
+                        - properties:
+                            type:
+                              enum:
+                              - imagesWithVulnerabilities
+                          maxProperties: 2
+                          required:
+                          - type
+                          - severity
+                        - properties:
+                            type:
+                              enum:
+                              - imagesWithCVSSAttackVector
+                          maxProperties: 3
+                          required:
+                          - type
+                          - attackVector
+                          - severity
+                        - properties:
+                            type:
+                              enum:
+                              - imagesWithCVSSAttackComplexity
+                          maxProperties: 3
+                          required:
+                            - type
+                            - attackComplexity
+                            - severity
+                        - properties:
+                            type:
+                              enum:
+                              - imagesWithCVSSAvailabilityImpact
+                          maxProperties: 3
+                          required:
+                          - type
+                          - availabilityImpact
+                          - severity     
+                      type: object
+                    action:
+                      description: Action to take when the rule fails during the admission control
+                      default: log
+                      enum:
+                      - log
+                      - block
+                      type: string
+                    mitigation:
+                      description: Mitigation to take when the rule fails during continuous compliance
+                      default: log
+                      enum:
+                      - log
+                      - isolate
+                      - terminate
+                      type: string
+                    namespaces:
+                      description: List of namespaces to apply the rule to. The rule will be applied to all namespaces by default.
+                      items:
+                        type: string
+                      type: array
+                  required:
+                  - rule
+                  - action
+                  type: object
+                  x-kubernetes-validations:
+                  - message: "Continuous mitigation can only be isolate if deployment action is block"
+                    rule: "self.mitigation == 'isolate' ? self.action == 'block' : true"
+                  - message: "Continuous mitigation can only be terminate if deployment action is block"
+                    rule: "self.mitigation == 'terminate' ? self.action == 'block' : true"
+                type: array
+              exceptions:
+                description: List of exceptions for the policy. The policy will not be enforced for workloads matching exception rules.
+                items:
+                  properties:
+                    type:
+                      description: Type of the exception
+                      enum:
+                      - imageRegistry
+                      - imageName
+                      - imageTag
+                      - imagePath
+                      type: string
+                    operator:
+                      description: Conditional operator to apply for the exception values
+                      enum:
+                      - equals
+                      - notEquals
+                      - contains
+                      - notContains 
+                      type: string                       
+                    values:
+                      description: Values to match for the exception type
+                      items:
+                        type: string
+                      minItems: 1
+                      type: array
+                    namespaces:
+                      description: List of namespaces to apply the exception to. The exception will be applied to all namespaces by default.
+                      items:
+                        type: string
+                      type: array
+                  type: object  
+                  required:
+                  - type
+                  - operator
+                  - values
+                type: array
             type: object
           status:
             description: ClusterPolicyStatus defines the observed state of ClusterPolicy
+            properties:
+              conditions:
+                description: Represents the observations of ClusterPolicy current
+                  state.
+                items:
+                  description: Condition contains details for one aspect of the current
+                    state of this API Resource.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        lastTransitionTime is the last time the condition transitioned from one status to another.
+                        This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        message is a human readable message indicating details about the transition.
+                        This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        observedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: |-
+                        reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                        Producers of specific condition types may define expected values and meanings for this field,
+                        and whether the values are considered a guaranteed API.
+                        The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: |-
+                        type of condition in CamelCase or in foo.example.com/CamelCase.
+                        ---
+                        Many .condition.type values are consistent across resources like Available, but because arbitrary conditions can be
+                        useful (see .node.status.conditions), the ability to deconflict is important.
+                        The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+                x-kubernetes-list-map-keys:
+                - type
+                x-kubernetes-list-type: map
             type: object
         type: object
     served: true
