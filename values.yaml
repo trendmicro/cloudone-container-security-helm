@@ -179,7 +179,7 @@ cloudOne:
     ## grpc authentication settings
     grpcAuth:
       ## authentication mode, insecure or tls
-      type: "tls"
+      type: tls
       ## certificate settings
       certificate:
         ## lifetime is the lifetime in days of the default signed certificate.
@@ -656,7 +656,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.3.35
+    tag: 2.3.36
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -675,7 +675,7 @@ images:
 
   oversight:
     repository: oversight-controller
-    digest: sha256:623f6bb65f3dbe144b29e302d8dbc90d51c366799a92e27c1e6f5662c87411ea
+    digest: sha256:c3e4054bfee8525315d0dc39b50123c17247309cdb16fd822ffa8fabfe1bd52e
 
   usage:
     repository: usage-controller
@@ -687,15 +687,15 @@ images:
 
   falco:
     repository: falco
-    digest: sha256:ea16a3999ad5d14687a0663716219dd8d452348852a005dd207333288fcf4156
+    digest: sha256:3dd6bae732ee3b7ebb884fed3b5cf9e660fedcb09c3efddff78417d7693bff8a
 
   scout:
     repository: scout
-    digest: sha256:7b0ccddfab963a2fc60019fbe3fa3eafe07e6ab4853548a0c3f4ead572240f82
+    digest: sha256:7a10d8abe3bea34cbb88fe95f4e2389c38a810d72785a3608a705e9b7df6ba87
 
   scanManager:
     repository: scan-manager
-    digest: sha256:405d172302297c1f1e7c726e42242d819201988c07abcbe427861d78815d83eb
+    digest: sha256:15314ceb95ace36220848d010e2f42c21894e975a4accdc0bf071777a99c1f08
 
   scanJob:
     repository: scan-job
@@ -715,7 +715,7 @@ images:
 
   k8sMetaCollector:
     repository: k8s-metacollector
-    digest:
+    digest: sha256:7bc7641d452fbb39d12c2c29da3ce4f280424a13be6ed45b8c05cce583aaaf5d
 
 ##
 ## Determine whether to use existing secrets in the target namespace rather than
