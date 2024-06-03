@@ -1,0 +1,15 @@
+{{- $cn := printf "%s.%s.svc" "trendmicro-kube-rbac-proxy" .Release.Namespace }}
+{{- $ca := genCA (printf "%s-ca" "trendmicro-kube-rbac-proxy") (default 3650 (int .Values.cloudOne.kubeRbacProxy.certificate.lifetime)) -}}
+{{- $cert := genSignedCert (default $cn .Values.cloudOne.kubeRbacProxy.certificate.commonName) (default nil .Values.cloudOne.kubeRbacProxy.certificate.ipAlternativeNames) (default (list $cn) .Values.cloudOne.kubeRbacProxy.certificate.dnsAlternativeNames) (default 3650 (int .Values.cloudOne.kubeRbacProxy.certificate.lifetime)) $ca -}}
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name:  {{ template "kubeRbacProxy.fullname" . }}-tls-certificate
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "container.security.labels" . | nindent 4 }}
+type: Opaque
+data:
+  key.pem: {{ $cert.Key | b64enc | quote }}
+  cert.pem: {{ $cert.Cert | b64enc | quote }}

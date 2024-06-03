@@ -189,6 +189,30 @@ cloudOne:
     ## log verbosity level
     vLevel: 5
 
+  kubeRbacProxy:
+    certificate:
+      ## commonName is the common name to use in the default signed certificate.
+      ##
+      ## Default value:
+      commonName:
+
+      ## ipAlternativeNames is a list of IP addresses to include as alternate names.
+      ## in the default signed certificate.
+      ##
+      ## Default value: []
+      ipAlternativeNames: [ ]
+
+      ## dnsAlternativeNames is a list of DNS names to include as alternate names
+      ## in the default signed certificate.
+      ##
+      ## Default value: []
+      dnsAlternativeNames: [ ]
+
+      ## lifetime is the lifetime in days of the default signed certificate.
+      ##
+      ## Default value: 3650
+      lifetime: 3650
+
 securityContextConstraints:
   # enable the Security Context Constraints creation in Openshift
   create: true

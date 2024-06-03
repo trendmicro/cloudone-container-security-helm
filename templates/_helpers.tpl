@@ -469,6 +469,25 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 
 {{/*
+Create a default fully qualified app name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+*/}}
+{{- define "kubeRbacProxy.fullname" -}}
+{{- if .Values.kubeRbacProxyFullnameOverride -}}
+{{- .Values.kubeRbacProxyFullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default .Chart.Name .Values.kubeRbacProxyNameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- printf "%s-%s" "kube-rbac-proxy" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else if contains .Release.Name $name -}}
+{{- printf "%s-%s" "kube-rbac-proxy" $name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s-%s" "kube-rbac-proxy" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Service name of k8s-metacollector
 */}}
 {{- define "k8sMetaCollector.svc.url" -}}
@@ -691,9 +710,14 @@ imagePullPolicy: {{ default (default "Always" $imageDefaults.pullPolicy) .pullPo
 args:
 - --secure-listen-address=0.0.0.0:8443
 - --upstream=http://127.0.0.1:8080/
-- --logtostderr=true
+- --tls-cert-file=/etc/rbac-proxy/certs/cert.pem
+- --tls-private-key-file=/etc/rbac-proxy/certs/key.pem
 ports:
 - containerPort: 8443
   name: https
+volumeMounts:
+- name: rbac-proxy-certs
+  mountPath: /etc/rbac-proxy/certs
+  readOnly: true
 resources: {{ toYaml (default .resources.defaults .resources.rbacProxy) | nindent 2 }}
 {{- end -}}{{/* define */}}
