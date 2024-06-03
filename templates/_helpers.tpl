@@ -590,6 +590,28 @@ Provide HTTP proxy environment variables
 {{- end -}}{{/*define*/}}
 
 {{/*
+TLS configuration - TLS min version
+*/}}
+{{- define "tlsConfig.minTLSVersion" -}}
+{{- if .minTLSVersion }}
+{{- .minTLSVersion }}
+{{- else }}
+{{- "VersionTLS12" }}
+{{- end }}
+{{- end }}
+
+{{/*
+TLS configuration - TLS cipher suites
+*/}}
+{{- define "tlsConfig.cipherSuites" -}}
+{{- if .cipherSuites }}
+{{- join "," .cipherSuites }}
+{{- else }}
+{{- "" }}
+{{- end }}
+{{- end }}
+
+{{/*
 Admission Controller Service Account
 */}}
 {{- define "admissionController.serviceAccountName" -}}
@@ -712,6 +734,8 @@ args:
 - --upstream=http://127.0.0.1:8080/
 - --tls-cert-file=/etc/rbac-proxy/certs/cert.pem
 - --tls-private-key-file=/etc/rbac-proxy/certs/key.pem
+- --tls-min-version={{ include "tlsConfig.minTLSVersion" .tlsConfig }}
+- --tls-cipher-suites={{ include "tlsConfig.cipherSuites" .tlsConfig }}
 ports:
 - containerPort: 8443
   name: https
