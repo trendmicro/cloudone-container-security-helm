@@ -200,13 +200,13 @@ cloudOne:
       ## in the default signed certificate.
       ##
       ## Default value: []
-      ipAlternativeNames: [ ]
+      ipAlternativeNames: []
 
       ## dnsAlternativeNames is a list of DNS names to include as alternate names
       ## in the default signed certificate.
       ##
       ## Default value: []
-      dnsAlternativeNames: [ ]
+      dnsAlternativeNames: []
 
       ## lifetime is the lifetime in days of the default signed certificate.
       ##
@@ -484,19 +484,19 @@ tlsConfig:
   ##
   ## Default value: List of secure cipher suites
   cipherSuites:
-    - TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA
-    - TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA
-    - TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA
-    - TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA
-    - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
-    - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
-    - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-    - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-    - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
-    - TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256
-    - TLS_AES_128_GCM_SHA256
-    - TLS_AES_256_GCM_SHA384
-    - TLS_CHACHA20_POLY1305_SHA256
+  - TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA
+  - TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA
+  - TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA
+  - TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA
+  - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+  - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+  - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+  - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+  - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
+  - TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256
+  - TLS_AES_128_GCM_SHA256
+  - TLS_AES_256_GCM_SHA384
+  - TLS_CHACHA20_POLY1305_SHA256
 
 resources:
   defaults: {}
@@ -712,7 +712,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.3.36
+    tag: 2.3.37
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -727,11 +727,11 @@ images:
     # imagePullSecret:
   admissionController:
     repository: admission-controller
-    digest: sha256:372ade829366890a6b8e383ebd87cf4cfc2c79d1dfcee49475b40a4078d16f5c
+    digest: sha256:659126ea8a72ebe264b70ae3f90465eff093f5a90439bd74a431e9b89a7dc94f
 
   oversight:
     repository: oversight-controller
-    digest: sha256:c3e4054bfee8525315d0dc39b50123c17247309cdb16fd822ffa8fabfe1bd52e
+    digest: sha256:aef759e11116e1e71a00c2908d2be2c735b82b58e6d820037d78ee10cc8cb524
 
   usage:
     repository: usage-controller
@@ -751,7 +751,7 @@ images:
 
   scanManager:
     repository: scan-manager
-    digest: sha256:15314ceb95ace36220848d010e2f42c21894e975a4accdc0bf071777a99c1f08
+    digest: sha256:a5cf5f01e797b7030351961d2be47e8564cbc71694279018951870dbd9abde3c
 
   scanJob:
     repository: scan-job
@@ -759,7 +759,7 @@ images:
 
   workloadOperator:
     repository: workload-operator
-    digest: sha256:0e07b141e6a029aba971b6aa7d0e64801cf2d49891602468d3402a8ff1f01439
+    digest: sha256:db6f51e7941368afefe6def6eeb6a381137e2c74e877c8c42324895e74d28cae
 
   fargateInjector:
     repository: fargate-tool
