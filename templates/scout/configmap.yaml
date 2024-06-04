@@ -39,6 +39,6 @@ metadata:
   labels:
     {{- include "scout.labels" . | nindent 4 }}
 data:
-{{ (.Files.Glob "config/customrules/*.{yaml,yml}").AsConfig | indent 2 }}
+{{ (tpl (.Files.Glob "config/customrules/*.{yaml,yml}").AsConfig .) | indent 2 }}
 {{- end }}
 {{- end }}
