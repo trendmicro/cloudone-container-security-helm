@@ -18,7 +18,7 @@ cloudOne:
     ## Default Value:
     ##  - kube-system
     namespaces:
-    - kube-system
+      - kube-system
 
   admissionController:
     enabled: true
@@ -31,8 +31,8 @@ cloudOne:
     ## https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-namespaceselector
     validationNamespaceSelector:
       matchExpressions:
-      - key: ignoreAdmissionControl
-        operator: DoesNotExist
+        - key: ignoreAdmissionControl
+          operator: DoesNotExist
 
     ## failurePolicy defines the bahaviour if an unreconized error or timeout occurs. Enabling
     ## this while not tagging kube-system to be ignored can easily cause the cluster to be
@@ -52,7 +52,7 @@ cloudOne:
     ## Default value:
     ##  - aksService
     trustedScanOperators:
-    - aksService
+      - aksService
 
     certificate:
       ## commonName is the common name to use in the default signed certificate.
@@ -130,7 +130,15 @@ cloudOne:
         splunk:
           url: https://splunkserver/services/collector/raw
           headers:
-          - ''
+            - ""
+
+  complianceScan:
+    enabled: true
+    ## activeDeadlineSeconds is the maximum duration a compliance scan job can run before timing out.
+    ##
+    ## Default value: 600
+    ##
+    activeDeadlineSeconds: 600
 
   vulnerabilityScanning:
     enabled: false
@@ -235,7 +243,7 @@ serviceAccount:
   oversight:
     ## The name of the service account to use.
     ## If not set and create is true, a name is generated using the fullname of oversight template
-    name: ''
+    name: ""
 
     ## Annotations to add to the service account
     annotations: {}
@@ -267,7 +275,7 @@ serviceAccount:
       supplementalGroups:
         type: RunAsAny
       seccompProfiles:
-      - '*'
+        - "*"
 
   usage:
     ## The name of the service account to use.
@@ -280,7 +288,7 @@ serviceAccount:
   scout:
     ## The name of the service account to use.
     ## If not set and create is true, a name is generated using the fullname of scout template
-    name: ''
+    name: ""
 
     ## Annotations to add to the service account
     annotations: {}
@@ -288,7 +296,7 @@ serviceAccount:
   scanManager:
     ## The name of the service account to use.
     ## If not set and create is true, a name is generated using the fullname of scanManager template
-    name: ''
+    name: ""
 
     ## Annotations to add to the service account
     annotations: {}
@@ -296,7 +304,15 @@ serviceAccount:
   scanJob:
     ## The name of the service account to use.
     ## If not set and create is true, a name is generated using the fullname of scanJob template
-    name: ''
+    name: ""
+
+    ## Annotations to add to the service account
+    annotations: {}
+
+  complianceScanJob:
+    ## The name of the service account to use.
+    ## If not set and create is true, a name is generated using the fullname of complianceScanJob template
+    name: ""
 
     ## Annotations to add to the service account
     annotations: {}
@@ -304,7 +320,7 @@ serviceAccount:
   workloadOperator:
     ## The name of the service account to use.
     ## If not set and create is true, a name is generated using the fullname of jobManager template
-    name: ''
+    name: ""
 
     ## Annotations to add to the service account
     annotations: {}
@@ -312,7 +328,7 @@ serviceAccount:
   fargateInjector:
     ## The name of the service account to use.
     ## If not set and create is true, a name is generated using the fullname of scout template
-    name: ''
+    name: ""
 
     ## Annotations to add to the service account
     annotations: {}
@@ -384,12 +400,12 @@ securityContext:
       allowPrivilegeEscalation: false
       capabilities:
         drop:
-        - ALL
+          - ALL
       privileged: false
       readOnlyRootFilesystem: true
       runAsNonRoot: true
       # seLinuxOptions: "If unspecified, the container runtime will allocate a random SELinux context for each container": this seems appropriate.
-      runAsUser: 65532  # nonroot user
+      runAsUser: 65532 # nonroot user
   scanner:
     pod:
       runAsNonRoot: true
@@ -397,20 +413,20 @@ securityContext:
       allowPrivilegeEscalation: false
       capabilities:
         drop:
-        - ALL
+          - ALL
       privileged: false
       readOnlyRootFilesystem: true
       runAsNonRoot: false
-      runAsUser: 0  #root user
+      runAsUser: 0 #root user
     init:
       allowPrivilegeEscalation: false
       capabilities:
         drop:
-        - ALL
+          - ALL
       privileged: false
       readOnlyRootFilesystem: true
       runAsNonRoot: true
-      runAsUser: 65532  # nonroot user
+      runAsUser: 65532 # nonroot user
   scout:
     pod:
       runAsNonRoot: true
@@ -418,9 +434,9 @@ securityContext:
       allowPrivilegeEscalation: false
       capabilities:
         drop:
-        - ALL
+          - ALL
         add:
-        - SYS_PTRACE
+          - SYS_PTRACE
       privileged: false
       readOnlyRootFilesystem: true
       runAsNonRoot: false
@@ -429,7 +445,7 @@ securityContext:
       allowPrivilegeEscalation: false
       capabilities:
         drop:
-        - ALL
+          - ALL
       privileged: false
       readOnlyRootFilesystem: true
       runAsNonRoot: false
@@ -556,6 +572,13 @@ resources:
     limits:
       cpu: 1000m
       memory: 512Mi
+  complianceScanner:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      ## no cpu limits specified because it can cause cpu throttle
+      memory: 512Mi
   k8sMetaCollector:
     requests:
       cpu: 100m
@@ -563,7 +586,6 @@ resources:
     limits:
       cpu: 1000m
       memory: 1024Mi
-
 
 nodeSelector:
   ## nodeSelector if set, ensures pods are only assigned to a particular set of nodes.
@@ -756,6 +778,10 @@ images:
   scanJob:
     repository: scan-job
     digest: sha256:dd89981bbbc6ec5ddeea53647080ebea15c40ede75cde4dfb5e85a73c6299269
+
+  complianceScanJob:
+    repository: compliance-scan-job
+    digest: ""
 
   workloadOperator:
     repository: workload-operator

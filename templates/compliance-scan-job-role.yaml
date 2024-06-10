@@ -1,0 +1,44 @@
+{{- if and (eq true .Values.cloudOne.complianceScan.enabled) }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "complianceScanJob.serviceAccountName" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "complianceScanJob.labels" . | nindent 4 }}
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: compliance-scan-job-role
+  labels:
+    {{- include "complianceScanJob.labels" $ | nindent 4 }}
+rules:
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - clusterroles
+  - roles
+  verbs:
+  - list
+  - get
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: compliance-scan-job-rolebinding
+  labels:
+    {{- include "complianceScanJob.labels" $ | nindent 4 }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "complianceScanJob.serviceAccountName" . }}
+    namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: ClusterRole
+  name: compliance-scan-job-role
+  apiGroup: rbac.authorization.k8s.io
+  {{- end }}

@@ -141,6 +141,29 @@ app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 
 {{/*
+Compliance Scan Job Common labels
+*/}}
+{{- define "complianceScanJob.labels" -}}
+app.kubernetes.io/part-of: {{ include "container.security.name" . }}
+{{ include "complianceScanJob.selectorLabels" . }}
+{{- range $k, $v := (default (dict) .Values.extraLabels) }}
+{{ $k }}: {{ quote $v }}
+{{- end }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+{{- end }}
+
+{{/*
+Compliance Scan Job Selector labels
+*/}}
+{{- define "complianceScanJob.selectorLabels" -}}
+app.kubernetes.io/name: compliance-scan-job
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: trendmicro-compliance-scan-job
+{{- end }}
+
+{{/*
 Fargate Security Common labels
 */}}
 {{- define "fargateInjector.labels" -}}
@@ -432,6 +455,26 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+If release name contains chart name it will be used as a full name.
+*/}}
+{{- define "complianceScanner.fullname" -}}
+{{- if .Values.complianceScannerFullnameOverride -}}
+{{- .Values.complianceScannerFullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default .Chart.Name .Values.complianceScannerFullnameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- printf "%s-%s" "compliance-scanner" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else if contains .Release.Name $name -}}
+{{- printf "%s-%s" "compliance-scanner" $name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s-%s" "compliance-scanner" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create a default fully qualified app name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
 {{- define "fargateInjector.fullname" -}}
 {{- if .Values.fargateInjectorFullnameOverride -}}
@@ -674,6 +717,17 @@ Scan Job service account
 {{- default (include "scanner.fullname" .) .Values.serviceAccount.scanJob.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.scanJob.name }}
+{{- end }}
+{{- end }}
+
+{{/*
+Compliance Scan Job service account
+*/}}
+{{- define "complianceScanJob.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "complianceScanner.fullname" .) .Values.serviceAccount.complianceScanJob.name }}
+{{- else }}
+{{- default "default" .Values.serviceAccount.complianceScanJob.name }}
 {{- end }}
 {{- end }}
 

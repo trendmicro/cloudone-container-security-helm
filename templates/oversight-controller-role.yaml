@@ -50,8 +50,10 @@ metadata:
 rules:
 - apiGroups:
   - coordination.k8s.io
+  - ""
   resources:
   - leases
+  - nodes
   verbs:
   - get
   - list
@@ -115,6 +117,15 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+  - batch
+  resources:
+  - jobs
+  verbs:
+  - get
+  - list
+  - watch
+  - create
 {{- end }}
 
 ---
