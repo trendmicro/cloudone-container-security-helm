@@ -18,7 +18,7 @@ cloudOne:
     ## Default Value:
     ##  - kube-system
     namespaces:
-      - kube-system
+    - kube-system
 
   admissionController:
     enabled: true
@@ -31,8 +31,8 @@ cloudOne:
     ## https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-namespaceselector
     validationNamespaceSelector:
       matchExpressions:
-        - key: ignoreAdmissionControl
-          operator: DoesNotExist
+      - key: ignoreAdmissionControl
+        operator: DoesNotExist
 
     ## failurePolicy defines the bahaviour if an unreconized error or timeout occurs. Enabling
     ## this while not tagging kube-system to be ignored can easily cause the cluster to be
@@ -52,7 +52,7 @@ cloudOne:
     ## Default value:
     ##  - aksService
     trustedScanOperators:
-      - aksService
+    - aksService
 
     certificate:
       ## commonName is the common name to use in the default signed certificate.
@@ -130,7 +130,7 @@ cloudOne:
         splunk:
           url: https://splunkserver/services/collector/raw
           headers:
-            - ""
+          - ''
 
   complianceScan:
     enabled: true
@@ -243,7 +243,7 @@ serviceAccount:
   oversight:
     ## The name of the service account to use.
     ## If not set and create is true, a name is generated using the fullname of oversight template
-    name: ""
+    name: ''
 
     ## Annotations to add to the service account
     annotations: {}
@@ -275,7 +275,7 @@ serviceAccount:
       supplementalGroups:
         type: RunAsAny
       seccompProfiles:
-        - "*"
+      - '*'
 
   usage:
     ## The name of the service account to use.
@@ -288,7 +288,7 @@ serviceAccount:
   scout:
     ## The name of the service account to use.
     ## If not set and create is true, a name is generated using the fullname of scout template
-    name: ""
+    name: ''
 
     ## Annotations to add to the service account
     annotations: {}
@@ -296,7 +296,7 @@ serviceAccount:
   scanManager:
     ## The name of the service account to use.
     ## If not set and create is true, a name is generated using the fullname of scanManager template
-    name: ""
+    name: ''
 
     ## Annotations to add to the service account
     annotations: {}
@@ -304,7 +304,7 @@ serviceAccount:
   scanJob:
     ## The name of the service account to use.
     ## If not set and create is true, a name is generated using the fullname of scanJob template
-    name: ""
+    name: ''
 
     ## Annotations to add to the service account
     annotations: {}
@@ -312,7 +312,7 @@ serviceAccount:
   complianceScanJob:
     ## The name of the service account to use.
     ## If not set and create is true, a name is generated using the fullname of complianceScanJob template
-    name: ""
+    name: ''
 
     ## Annotations to add to the service account
     annotations: {}
@@ -320,7 +320,7 @@ serviceAccount:
   workloadOperator:
     ## The name of the service account to use.
     ## If not set and create is true, a name is generated using the fullname of jobManager template
-    name: ""
+    name: ''
 
     ## Annotations to add to the service account
     annotations: {}
@@ -328,7 +328,7 @@ serviceAccount:
   fargateInjector:
     ## The name of the service account to use.
     ## If not set and create is true, a name is generated using the fullname of scout template
-    name: ""
+    name: ''
 
     ## Annotations to add to the service account
     annotations: {}
@@ -400,7 +400,7 @@ securityContext:
       allowPrivilegeEscalation: false
       capabilities:
         drop:
-          - ALL
+        - ALL
       privileged: false
       readOnlyRootFilesystem: true
       runAsNonRoot: true
@@ -413,7 +413,7 @@ securityContext:
       allowPrivilegeEscalation: false
       capabilities:
         drop:
-          - ALL
+        - ALL
       privileged: false
       readOnlyRootFilesystem: true
       runAsNonRoot: false
@@ -422,7 +422,7 @@ securityContext:
       allowPrivilegeEscalation: false
       capabilities:
         drop:
-          - ALL
+        - ALL
       privileged: false
       readOnlyRootFilesystem: true
       runAsNonRoot: true
@@ -434,9 +434,9 @@ securityContext:
       allowPrivilegeEscalation: false
       capabilities:
         drop:
-          - ALL
+        - ALL
         add:
-          - SYS_PTRACE
+        - SYS_PTRACE
       privileged: false
       readOnlyRootFilesystem: true
       runAsNonRoot: false
@@ -445,7 +445,7 @@ securityContext:
       allowPrivilegeEscalation: false
       capabilities:
         drop:
-          - ALL
+        - ALL
       privileged: false
       readOnlyRootFilesystem: true
       runAsNonRoot: false
@@ -734,7 +734,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.3.37
+    tag: 2.3.38
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -773,15 +773,15 @@ images:
 
   scanManager:
     repository: scan-manager
-    digest: sha256:a5cf5f01e797b7030351961d2be47e8564cbc71694279018951870dbd9abde3c
+    digest: sha256:4e69cc0ee922c9183de893665ad21666f629a005fc8bbfb9580546a695e50a9d
 
   scanJob:
     repository: scan-job
-    digest: sha256:dd89981bbbc6ec5ddeea53647080ebea15c40ede75cde4dfb5e85a73c6299269
+    digest: sha256:f7dbb12e63f6856b40f37cd0d4e354887292a38fc414c65d0594ae5d46e961ea
 
   complianceScanJob:
     repository: compliance-scan-job
-    digest: ""
+    digest: sha256:5391fefa264ebeafae877e3d21ebd2068c7c9c91141133825ae958a00f8d576d
 
   workloadOperator:
     repository: workload-operator
