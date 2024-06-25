@@ -84,7 +84,7 @@ metadata:
     {{- include "workloadOperator.labels" . | nindent 4 }}
   annotations:
     helm.sh/hook: post-delete
-    helm.sh/hook-delete-policy: hook-succeeded,hook-failed
+    helm.sh/hook-delete-policy: hook-succeeded,hook-failed,before-hook-creation
     helm.sh/hook-weight: "-9"
 rules:
 - apiGroups:
@@ -104,7 +104,7 @@ metadata:
     {{- include "workloadOperator.labels" . | nindent 4 }}
   annotations:
     helm.sh/hook: post-delete
-    helm.sh/hook-delete-policy: hook-succeeded,hook-failed
+    helm.sh/hook-delete-policy: hook-succeeded,hook-failed,before-hook-creation
     helm.sh/hook-weight: "-8"
 roleRef:
   apiGroup: rbac.authorization.k8s.io

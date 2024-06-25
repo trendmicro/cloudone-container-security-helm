@@ -127,7 +127,7 @@ metadata:
     {{- include "workloadOperator.labels" . | nindent 4 }}
   annotations:
     helm.sh/hook: post-delete
-    helm.sh/hook-delete-policy: hook-succeeded,hook-failed
+    helm.sh/hook-delete-policy: hook-succeeded,hook-failed,before-hook-creation
     helm.sh/hook-weight: "-10"
 ---
 apiVersion: batch/v1
@@ -142,7 +142,7 @@ metadata:
     helm.sh/hook-delete-policy: hook-succeeded,hook-failed
 spec:
   backoffLimit: 2
-  activeDeadlineSeconds: 30
+  activeDeadlineSeconds: 90
   ttlSecondsAfterFinished: 60
   template:
     metadata:
