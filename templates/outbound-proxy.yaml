@@ -10,7 +10,7 @@ data:
   noProxy: ".cluster.local"
 
 ---
-{{if not .Values.useExistingSecrets }}
+{{ if not .Values.useExistingSecrets.outboundProxy }}
 apiVersion: v1
 kind: Secret
 metadata:

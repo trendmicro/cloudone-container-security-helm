@@ -815,5 +815,17 @@ images:
 ## After deployment, if you update the secret after deployment, you will need to restart pods of
 ## container security to make changes take effect.
 ##
-## Default Value: false
-useExistingSecrets: false
+useExistingSecrets:
+  ## containerSecurityAuth, if set to true, will use the existing secret for container security authentication.
+  ## The secret should be named trendmicro-container-security-auth in the target namespace if this is enabled.
+  ## The secret should contain base64 encoded cloud one api key in the api.key field.
+  ##
+  ## Default value: false
+  containerSecurityAuth: false
+
+  ## outboundProxy, if set to true, will use the existing secret for outbound proxy.
+  ## The secret should be named trendmicro-container-security-outbound-proxy-credentials in the target namespace if this is enabled.
+  ## For secret format, see templates/outbound-proxy.yaml
+  ##
+  ## Default value: false
+  outboundProxy: false
