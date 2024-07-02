@@ -734,7 +734,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.3.39
+    tag: 2.3.40
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -769,7 +769,7 @@ images:
 
   scout:
     repository: scout
-    digest: sha256:7a10d8abe3bea34cbb88fe95f4e2389c38a810d72785a3608a705e9b7df6ba87
+    digest: sha256:05ded8e64880a517f730c0f51085dee79f5b64ec653fa7f4dad8a09ff494fd9a
 
   scanManager:
     repository: scan-manager
@@ -785,7 +785,7 @@ images:
 
   workloadOperator:
     repository: workload-operator
-    digest: sha256:749fd570bc9ef46e2698c2fef08ad955b526c4f1aa6fb590d41633ad1a1db87b
+    digest: sha256:e31d92386c7843067b5fb84ab28e22a7b7f0972dc98e945b5fb1b30ffe654fad
 
   fargateInjector:
     repository: fargate-tool
