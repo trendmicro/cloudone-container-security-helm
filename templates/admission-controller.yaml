@@ -42,7 +42,7 @@ spec:
 {{- toYaml . | nindent 8 }}
 {{- end }}
       labels:
-        {{- include "admissionController.selectorLabels" . | nindent 8 }}
+        {{- include "admissionController.labels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "admissionController.serviceAccountName" . }}
       automountServiceAccountToken: true

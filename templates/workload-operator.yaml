@@ -33,7 +33,7 @@ spec:
 {{- toYaml . | nindent 8 }}
 {{- end }}
       labels:
-        {{- include "workloadOperator.selectorLabels" . | nindent 8 }}
+        {{- include "workloadOperator.labels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "workloadOperator.serviceAccountName" . }}
 {{- $securityContextEnabled := .Values.securityContext.enabled }}

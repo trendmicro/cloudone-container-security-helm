@@ -47,7 +47,7 @@ spec:
 {{- toYaml . | nindent 8 }}
 {{- end }}
       labels:
-        {{- include "k8sMetaCollector.selectorLabels" . | nindent 8 }}
+        {{- include "k8sMetaCollector.labels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "k8sMetaCollector.serviceAccountName" . }}
 {{- $securityContextEnabled := .Values.securityContext.enabled }}

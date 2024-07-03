@@ -14,7 +14,7 @@ spec:
     metadata:
       name: trendmicro-scout
       labels:
-      {{- include "scout.selectorLabels" .| nindent 8 }}
+      {{- include "scout.labels" .| nindent 8 }}
       annotations:
         container.apparmor.security.beta.kubernetes.io/falco: unconfined
         container.apparmor.security.beta.kubernetes.io/scout: unconfined

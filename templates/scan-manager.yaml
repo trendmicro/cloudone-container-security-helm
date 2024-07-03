@@ -19,7 +19,7 @@ spec:
 {{- toYaml . | nindent 8 }}
 {{- end }}
       labels:
-        {{- include "scanManager.selectorLabels" . | nindent 8 }}
+        {{- include "scanManager.labels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "scanManager.serviceAccountName" . }}
 {{- $securityContextEnabled := .Values.securityContext.enabled }}

@@ -20,7 +20,7 @@ spec:
 {{- toYaml . | nindent 8 }}
 {{- end }}
       labels:
-        {{- include "oversight.selectorLabels" . | nindent 8 }}
+        {{- include "oversight.labels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "oversight.serviceAccountName" . }}
 {{- $securityContextEnabled := .Values.securityContext.enabled }}

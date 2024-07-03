@@ -19,7 +19,7 @@ spec:
 {{- toYaml . | nindent 8 }}
 {{- end }}
       labels:
-        {{- include "usage.selectorLabels" . | nindent 8 }}
+        {{- include "usage.labels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "usage.serviceAccountName" . }}
 {{- $securityContextEnabled := .Values.securityContext.enabled }}
