@@ -734,7 +734,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.3.40
+    tag: 2.3.41
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -753,7 +753,7 @@ images:
 
   oversight:
     repository: oversight-controller
-    digest: sha256:aef759e11116e1e71a00c2908d2be2c735b82b58e6d820037d78ee10cc8cb524
+    digest: sha256:cad98cb4dd211346ad062fc4d00f66c2a67729f92f2baf76d89f307c2d4dcacc
 
   usage:
     repository: usage-controller
@@ -777,15 +777,15 @@ images:
 
   scanJob:
     repository: scan-job
-    digest: sha256:f7dbb12e63f6856b40f37cd0d4e354887292a38fc414c65d0594ae5d46e961ea
+    digest: sha256:e53c4961794a649bfba4153c7934336156922d5044e36a1434ab22a659bdf8db
 
   complianceScanJob:
     repository: compliance-scan-job
-    digest: sha256:5391fefa264ebeafae877e3d21ebd2068c7c9c91141133825ae958a00f8d576d
+    digest: sha256:b9babfd856e3d3c8539cec2d81d2792d7cfaaf6906662ce0caa5eb11a5fb11d6
 
   workloadOperator:
     repository: workload-operator
-    digest: sha256:e31d92386c7843067b5fb84ab28e22a7b7f0972dc98e945b5fb1b30ffe654fad
+    digest: sha256:1f8a8cbf1ae9e770776e90c3915b2ee1c710ab12ed65ec14f43703bc0648fcc6
 
   fargateInjector:
     repository: fargate-tool
