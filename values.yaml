@@ -414,6 +414,8 @@ securityContext:
       capabilities:
         drop:
         - ALL
+        add:
+        - DAC_READ_SEARCH
       privileged: false
       readOnlyRootFilesystem: true
       runAsNonRoot: false
