@@ -736,7 +736,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.3.41
+    tag: 2.3.42
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -751,7 +751,7 @@ images:
     # imagePullSecret:
   admissionController:
     repository: admission-controller
-    digest: sha256:659126ea8a72ebe264b70ae3f90465eff093f5a90439bd74a431e9b89a7dc94f
+    digest: sha256:7337390b94aac7b3899c2532acc95e161758927adc5be6cf9d87f1c6a579824e
 
   oversight:
     repository: oversight-controller
@@ -759,7 +759,7 @@ images:
 
   usage:
     repository: usage-controller
-    digest: sha256:0c622890c0b25266f95a7af24ae9c3f3e721c9dce243926c20f3cbaa3e11fd40
+    digest: sha256:54a84f8691bcf0e680885e297cdda89d812a4bc1b51b379c90c160d7757424a1
 
   rbacProxy:
     repository: rbac-proxy
@@ -775,7 +775,7 @@ images:
 
   scanManager:
     repository: scan-manager
-    digest: sha256:4e69cc0ee922c9183de893665ad21666f629a005fc8bbfb9580546a695e50a9d
+    digest: sha256:aea4417fb5d3333309f763585bc6ee348a720709833cb13f03976e646cfa302d
 
   scanJob:
     repository: scan-job
@@ -783,7 +783,7 @@ images:
 
   complianceScanJob:
     repository: compliance-scan-job
-    digest: sha256:b9babfd856e3d3c8539cec2d81d2792d7cfaaf6906662ce0caa5eb11a5fb11d6
+    digest: sha256:d7f75f22c65fa62afe1f7f9f9ab95c3d534b2e9240604ff2695ae6e5022f0e29
 
   workloadOperator:
     repository: workload-operator
@@ -799,7 +799,7 @@ images:
 
   k8sMetaCollector:
     repository: k8s-metacollector
-    digest: sha256:7bc7641d452fbb39d12c2c29da3ce4f280424a13be6ed45b8c05cce583aaaf5d
+    digest: sha256:722f7d7e4b2cede3ab228635de2a7ced24aa959327603383df1e5305126d6821
 
 ##
 ## Determine whether to use existing secrets in the target namespace rather than
