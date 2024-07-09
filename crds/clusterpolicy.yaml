@@ -1,6 +1,9 @@
+---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.15.0
   name: clusterpolicies.visionone.trendmicro.com
 spec:
   group: visionone.trendmicro.com
@@ -10,9 +13,8 @@ spec:
     plural: clusterpolicies
     singular: clusterpolicy
   scope: Cluster
-  preserveUnknownFields: false # Structural schema validation https://kubernetes.io/docs/tasks/access-kubernetes-api/custom-resources/custom-resource-definitions/#specifying-a-structural-schema
   versions:
-  - name: v1
+  - name: v1alpha1
     schema:
       openAPIV3Schema:
         description: ClusterPolicy is the Schema for the clusterpolicies API
@@ -33,271 +35,95 @@ spec:
               More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
             type: string
           metadata:
-            properties:
-              name:
-                type: string
-                pattern: "^trendmicro-cluster-policy$"
             type: object
           spec:
             description: ClusterPolicySpec defines the desired state of ClusterPolicy
             properties:
-              xdrEnabled:
-                description: Enable XDR Telemetry. Requires runtime security to be enabled.
-                default: false
-                type: boolean
+              exceptions:
+                description: List of exceptions for the policy. The policy will not
+                  be enforced for workloads matching exception rules.
+                items:
+                  description: PolicyException defines a policy exception
+                  properties:
+                    namespaces:
+                      description: List of namespaces to apply the exception to. The
+                        exception will be applied to all namespaces by default.
+                      items:
+                        type: string
+                      type: array
+                    properties:
+                      description: Exception properties
+                      x-kubernetes-preserve-unknown-fields: true
+                    type:
+                      description: Type of the exception
+                      type: string
+                  required:
+                  - type
+                  type: object
+                type: array
               rules:
                 description: List of policy rules
                 items:
+                  description: PolicyRule defines a policy rule
                   properties:
-                    rule:
-                      description: Policy rule specification
-                      minProperties: 1
-                      properties:
-                        type:
-                          description: Type of rule
-                          enum:
-                          - hostIPC
-                          - hostNetwork
-                          - hostPID
-                          - runAsNonRoot
-                          - privileged
-                          - allowPrivilegeEscalation
-                          - readOnlyRootFilesystem
-                          - podPortForward
-                          - podExec
-                          - containerCapabilities
-                          - imageRegistry
-                          - imageName
-                          - imageTag
-                          - imagePath
-                          - imagesNotScanned
-                          - imagesWithMalware
-                          - imagesWithSecrets
-                          - imagesWithVulnerabilities
-                          - imagesWithCVSSAttackVector
-                          - imagesWithCVSSAttackComplexity
-                          - imagesWithCVSSAvailabilityImpact
-                          type: string
-                        operator:
-                          description: Conditional operator to apply to the values
-                          enum:
-                          - equals
-                          - notEquals
-                          - contains
-                          - notContains
-                          - startsWith
-                          type: string
-                        values:
-                          description: Values to match for the rule type
-                          items:
-                            type: string
-                          minItems: 1
-                          type: array
-                        capabilityRestriction:
-                          description: Type of container capability restriction to enforce
-                          enum:
-                          - restrict-nondefaults
-                          - restrict-all
-                          - baseline
-                          - restricted
-                          type: string
-                        scanType:
-                          description: Type of artifact scan
-                          enum:
-                          - vulnerability
-                          - malware
-                          - secret
-                          type: string
-                        maxScanAge:
-                          description: Maximum age of the scan result in days
-                          minimum: 0
-                          maximum: 30
-                          type: integer
-                        severity:
-                          description: Severity of the vulnerability
-                          enum:
-                          - critical
-                          - high
-                          - medium
-                          - low
-                          - any
-                          type: string
-                        attackVector:
-                          description: CVSS attack vector
-                          enum:
-                          - network
-                          - physical
-                          - adjacent
-                          type: string
-                        attackComplexity:
-                          description: CVSS attack complexity
-                          enum:
-                          - low
-                          - high
-                          type: string
-                        availabilityImpact:
-                          description: CVSS availability impact
-                          enum:
-                          - low
-                          - high
-                          type: string
-                      oneOf:
-                        - properties:
-                            type:
-                              enum:
-                              - hostIPC
-                              - hostNetwork
-                              - hostPID
-                              - runAsNonRoot
-                              - privileged
-                              - allowPrivilegeEscalation
-                              - readOnlyRootFilesystem
-                              - podPortForward
-                              - podExec
-                              - imagesWithMalware
-                              - imagesWithSecrets
-                          maxProperties: 1
-                          required:
-                            - type
-                        - properties:
-                            type:
-                              enum:
-                              - containerCapabilities
-                          maxProperties: 2
-                          required:
-                          - type
-                          - capabilityRestriction
-                        - properties:
-                            type:
-                              enum:
-                              - imageRegistry
-                              - imageName
-                              - imageTag
-                              - imagePath
-                          maxProperties: 3
-                          required:
-                          - type
-                          - operator
-                          - values
-                        - properties:
-                            type:
-                              enum:
-                              - imagesNotScanned
-                          maxProperties: 3
-                          required:
-                          - type
-                          - scanType
-                          - maxScanAge
-                        - properties:
-                            type:
-                              enum:
-                              - imagesWithVulnerabilities
-                          maxProperties: 2
-                          required:
-                          - type
-                          - severity
-                        - properties:
-                            type:
-                              enum:
-                              - imagesWithCVSSAttackVector
-                          maxProperties: 3
-                          required:
-                          - type
-                          - attackVector
-                          - severity
-                        - properties:
-                            type:
-                              enum:
-                              - imagesWithCVSSAttackComplexity
-                          maxProperties: 3
-                          required:
-                            - type
-                            - attackComplexity
-                            - severity
-                        - properties:
-                            type:
-                              enum:
-                              - imagesWithCVSSAvailabilityImpact
-                          maxProperties: 3
-                          required:
-                          - type
-                          - availabilityImpact
-                          - severity     
-                      type: object
                     action:
-                      description: Action to take when the rule fails during the admission control
                       default: log
+                      description: Action to take when the rule fails during the admission
+                        control
                       enum:
                       - log
                       - block
                       type: string
                     mitigation:
-                      description: Mitigation to take when the rule fails during continuous compliance
                       default: log
+                      description: Mitigation to take when the rule fails during continuous
+                        compliance
                       enum:
                       - log
                       - isolate
                       - terminate
                       type: string
                     namespaces:
-                      description: List of namespaces to apply the rule to. The rule will be applied to all namespaces by default.
+                      description: List of namespaces to apply the rule to. The rule
+                        will be applied to all namespaces by default.
                       items:
                         type: string
                       type: array
+                    properties:
+                      description: Policy rule properties
+                      x-kubernetes-preserve-unknown-fields: true
+                    type:
+                      description: Type of the rule
+                      type: string
                   required:
-                  - rule
                   - action
+                  - type
                   type: object
                   x-kubernetes-validations:
-                  - message: "Continuous mitigation can only be isolate if deployment action is block"
-                    rule: "self.mitigation == 'isolate' ? self.action == 'block' : true"
-                  - message: "Continuous mitigation can only be terminate if deployment action is block"
-                    rule: "self.mitigation == 'terminate' ? self.action == 'block' : true"
+                  - message: Continuous mitigation can only be isolate if deployment
+                      action is block
+                    rule: 'self.mitigation == ''isolate'' ? self.action == ''block''
+                      : true'
+                  - message: Continuous mitigation can only be terminate if deployment
+                      action is block
+                    rule: 'self.mitigation == ''terminate'' ? self.action == ''block''
+                      : true'
                 type: array
-              exceptions:
-                description: List of exceptions for the policy. The policy will not be enforced for workloads matching exception rules.
-                items:
-                  properties:
-                    type:
-                      description: Type of the exception
-                      enum:
-                      - imageRegistry
-                      - imageName
-                      - imageTag
-                      - imagePath
-                      type: string
-                    operator:
-                      description: Conditional operator to apply for the exception values
-                      enum:
-                      - equals
-                      - notEquals
-                      - contains
-                      - notContains 
-                      type: string                       
-                    values:
-                      description: Values to match for the exception type
-                      items:
-                        type: string
-                      minItems: 1
-                      type: array
-                    namespaces:
-                      description: List of namespaces to apply the exception to. The exception will be applied to all namespaces by default.
-                      items:
-                        type: string
-                      type: array
-                  type: object  
-                  required:
-                  - type
-                  - operator
-                  - values
-                type: array
+              xdrEnabled:
+                default: false
+                description: Enable XDR Telemetry. Requires runtime security to be
+                  enabled.
+                type: boolean
             type: object
           status:
             description: ClusterPolicyStatus defines the observed state of ClusterPolicy
             properties:
               conditions:
-                description: Represents the observations of ClusterPolicy current
-                  state.
+                description: |-
+                  Represents the observations of ClusterPolicy current state.
+                  "Parsed" to indicate if the policy is able to be parsed successfully
+                  "Applied" to indicate if the policy is applied in VisionOne backend
+                  "InUse" to indicate if the policy is assigned to the cluster
                 items:
                   description: Condition contains details for one aspect of the current
                     state of this API Resource.
@@ -361,8 +187,17 @@ spec:
                 x-kubernetes-list-map-keys:
                 - type
                 x-kubernetes-list-type: map
+              visiononeclusterid:
+                description: Visionone Cluster ID
+                type: string
+              visiononepolicyid:
+                description: Visionone Policy ID
+                type: string
             type: object
         type: object
+        x-kubernetes-validations:
+        - message: The cluster policy name must be trendmicro-cluster-policy
+          rule: self.metadata.name == 'trendmicro-cluster-policy'
     served: true
     storage: true
     subresources:

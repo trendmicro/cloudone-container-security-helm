@@ -1,6 +1,9 @@
+---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.15.0
   name: runtimerulesets.visionone.trendmicro.com
 spec:
   group: visionone.trendmicro.com
@@ -10,9 +13,8 @@ spec:
     plural: runtimerulesets
     singular: runtimeruleset
   scope: Cluster
-  preserveUnknownFields: false # Structural schema validation https://kubernetes.io/docs/tasks/access-kubernetes-api/custom-resources/custom-resource-definitions/#specifying-a-structural-schema
   versions:
-  - name: v1
+  - name: v1alpha1
     schema:
       openAPIV3Schema:
         description: RuntimeRuleset is the Schema for the runtimerulesets API
@@ -33,72 +35,21 @@ spec:
               More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
             type: string
           metadata:
-            properties:
-              name:
-                type: string
-                pattern: "^trendmicro-ruleset-.*$"
             type: object
           spec:
-            description: RuntimeRulesetSpec defines the desired state of RuntimeRuleset
             properties:
-              labels:
-                description: Apply the ruleset to pods with the specified labels
-                type: object
-                additionalProperties:
-                  type: string
-              rules:
-                description: Runtime rules by mitigation type
-                properties:
-                  isolate:
-                    description: List of unique IDs of trendmicro runtime rules with
-                      mitigation isolate
-                    items:
-                      description: The unique ID of trendmicro runtime rule
-                      pattern: ^TM-[0-9]{8}$
-                      type: string
-                    maxItems: 200
-                    minItems: 1
-                    type: array
-                    x-kubernetes-list-type: set
-                  log:
-                    description: List of unique IDs of trendmicro runtime rules with
-                      mitigation log
-                    items:
-                      description: The unique ID of trendmicro runtime rule
-                      pattern: ^TM-[0-9]{8}$
-                      type: string
-                    maxItems: 200
-                    minItems: 1
-                    type: array
-                    x-kubernetes-list-type: set
-                  terminate:
-                    description: List of unique IDs of trendmicro runtime rules with
-                      mitigation terminate
-                    items:
-                      description: The unique ID of trendmicro runtime rule
-                      pattern: ^TM-[0-9]{8}$
-                      type: string
-                    maxItems: 200
-                    minItems: 1
-                    type: array
-                    x-kubernetes-list-type: set
-                type: object
-                x-kubernetes-validations:
-                - message: "At least one mitigation type must be defined"
-                  rule: "has(self.log) || has(self.isolate) || has(self.terminate)"
-                - message: "All rules must be unique and not defined across multiple mitigation types"
-                  rule: "has(self.log) && has(self.isolate) ? self.log.all(e, !(e in self.isolate)) : true"
-                - message: "All rules must be unique and not defined across multiple mitigation types"
-                  rule: "has(self.log) && has(self.terminate) ? self.log.all(e, !(e in self.terminate)) : true"
-                - message: "All rules must be unique and not defined across multiple mitigation types"
-                  rule: "has(self.isolate) && has(self.terminate) ? self.isolate.all(e, !(e in self.terminate)) : true"
+              definition:
+                x-kubernetes-preserve-unknown-fields: true
             type: object
           status:
             description: RuntimeRulesetStatus defines the observed state of RuntimeRuleset
             properties:
               conditions:
-                description: Represents the observations of RuntimeRuleset current
-                  state.
+                description: |-
+                  Represents the observations of RuntimeRuleset current state.
+                  "Parsed" to indicate if the ruleset is able to be parsed successfully
+                  "Applied" to indicate if the ruleset is applied in VisionOne backend
+                  "InUse" to indicate if the ruleset is assigned to a policy
                 items:
                   description: Condition contains details for one aspect of the current
                     state of this API Resource.
@@ -162,6 +113,9 @@ spec:
                 x-kubernetes-list-map-keys:
                 - type
                 x-kubernetes-list-type: map
+              visiononerulesetid:
+                description: Visionone Ruleset ID
+                type: string
             type: object
         type: object
     served: true
