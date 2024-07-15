@@ -736,7 +736,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.3.42
+    tag: 2.3.43
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -755,7 +755,7 @@ images:
 
   oversight:
     repository: oversight-controller
-    digest: sha256:cad98cb4dd211346ad062fc4d00f66c2a67729f92f2baf76d89f307c2d4dcacc
+    digest: sha256:c8d7aa154aa4c4c1abcad758e7ac193d8e7136e3abefe8e23f99c42f692fadad
 
   usage:
     repository: usage-controller
@@ -767,7 +767,7 @@ images:
 
   falco:
     repository: falco
-    digest: sha256:431d035f8cee1184ae21eeb73c9ffa0c99cfcf6be78e0be4fb3577229b0b4b99
+    digest: sha256:d659159c681c299ccaa98971b467b2a68a9c0a2dbe20e7ee4cd119a6f55d5d0b
 
   scout:
     repository: scout
@@ -787,7 +787,7 @@ images:
 
   workloadOperator:
     repository: workload-operator
-    digest: sha256:1f8a8cbf1ae9e770776e90c3915b2ee1c710ab12ed65ec14f43703bc0648fcc6
+    digest: sha256:5c1aa393e8202d6d92dd635578ddd552ac1f423b836359669d8928f704058325
 
   fargateInjector:
     repository: fargate-tool
