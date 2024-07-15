@@ -561,7 +561,7 @@ Cloud One API Key auth
 .Values.cloudOne.admissionController.apiKey is for backwards compatibility with the version <= v.1.0.1
 */}}
 {{- define "container.security.auth.secret" -}}
-{{- if not .Values.useExistingSecrets.containerSecurityAuth }}
+{{- if not (and .Values.useExistingSecrets (eq true .Values.useExistingSecrets.containerSecurityAuth)) }}
 apiVersion: v1
 kind: Secret
 metadata:
