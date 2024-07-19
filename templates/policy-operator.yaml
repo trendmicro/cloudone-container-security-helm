@@ -1,3 +1,4 @@
+{{- if eq true .Values.cloudOne.policyOperator.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -52,6 +53,7 @@ spec:
         - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
         - --zap-devel=false
         - --zap-log-level=debug
+        - --reconciliation-period={{ .Values.cloudOne.policyOperator.reconciliationPeriod }}
         command:
         - /app/policy-operator
         env:
@@ -91,4 +93,5 @@ metadata:
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
+{{- end }}
 {{- end }}

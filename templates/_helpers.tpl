@@ -286,6 +286,7 @@ k8s-metacollector Selector labels
 app.kubernetes.io/name: {{ include "k8sMetaCollector.fullname" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/component: trendmicro-k8s-metacollector
+{{- end }}
 
 {{/*
 Policy Operator Selector labels
@@ -535,7 +536,15 @@ If release name contains chart name it will be used as a full name.
 {{- printf "%s-%s" "k8s-metacollector" $name | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
 {{- printf "%s-%s-%s" "k8s-metacollector" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
 
+{{/*
+Create a default fully qualified app name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+If release name contains chart name it will be used as a full name.
+*/}}
 {{- define "policyOperator.fullname" -}}
 {{- if .Values.policyOperatorFullnameOverride -}}
 {{- .Values.policyOperatorFullnameOverride | trunc 63 | trimSuffix "-" -}}
@@ -801,6 +810,8 @@ k8s-collector service account
 {{- default (include "k8sMetaCollector.fullname" .) .Values.serviceAccount.k8sMetaCollector.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.k8sMetaCollector.name }}
+{{- end }}
+{{- end }}
 
 {{/*
 Policy Operator service account

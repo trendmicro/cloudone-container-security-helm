@@ -1,0 +1,21 @@
+apiVersion: visionone.trendmicro.com/v1alpha1
+kind: RuntimeRuleset
+metadata:
+  labels:
+    app.kubernetes.io/name: init
+    app.kubernetes.io/managed-by: kustomize
+  name: trendmicro-ruleset-sample
+spec:
+  definition:
+    labels:
+      - key: "app"
+        value: "nginx"
+    rules:
+      - ruleID: TM-00000001
+        mitigation: log
+      - ruleID: TM-00000002
+        mitigation: log
+      - ruleID: TM-00000003
+        mitigation: isolate
+      - ruleID: TM-00000004
+        mitigation: terminate

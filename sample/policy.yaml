@@ -1,0 +1,142 @@
+apiVersion: visionone.trendmicro.com/v1alpha1
+kind: ClusterPolicy
+metadata:
+  labels:
+    app.kubernetes.io/name: init
+    app.kubernetes.io/managed-by: kustomize
+  name: trendmicro-cluster-policy
+spec:
+  xdrEnabled: true
+  rules:
+    # Pod properties
+    - type: hostNetwork
+      action: log
+      mitigation: log
+    - type: hostIPC
+      action: log
+      mitigation: log
+    - type: hostPID
+      action: log
+      mitigation: log
+
+    # Container properties
+    - type: runAsNonRoot
+      action: log
+      namespaces:
+        - default
+        - some-namespace
+    - type: privileged
+      action: log
+    - type: privileged
+      action: block
+      namespaces:
+        - secure-namespace
+    - type: allowPrivilegeEscalation
+      action: log
+    - type: readOnlyRootFilesystem
+      action: log
+    - type: containerCapabilities
+      properties:
+        capabilityRestriction: baseline
+      action: log
+
+    # Image properties
+    - type: imageRegistry
+      properties:
+        operator: equals
+        values:
+          - docker.io/some-registry
+      action: log
+      mitigation: log
+    - type: imageName
+      properties:
+        operator: startsWith
+        values:
+          - nginx
+          - alpine
+      action: log
+      mitigation: log
+    - type: imageTag
+      properties:
+        operator: notEquals
+        values:
+          - latest
+      action: log
+      mitigation: log
+    - type: imagePath
+      properties:
+        operator: contains
+        values:
+          - example.com/org/repo
+          - example.com/image
+      action: log
+      mitigation: log
+
+    # Unscanned images
+    - type: imagesNotScanned
+      properties:
+        scanType: vulnerability
+        maxScanAge: 30
+      action: block
+      mitigation: terminate
+    - type: imagesNotScanned
+      properties:
+        scanType: malware
+        maxScanAge: 30
+      action: block
+      mitigation: terminate
+    - type: imagesNotScanned
+      properties:
+        scanType: secret
+        maxScanAge: 10
+      action: block
+      mitigation: terminate
+
+    # Artifact Scanner Scan results
+    - type: imagesWithMalware
+      action: log
+    - type: imagesWithSecrets
+      action: log
+    - type: imagesWithVulnerabilities
+      properties:
+        severity: critical
+      action: log
+    - type: imagesWithCVSSAttackVector
+      properties:
+        attackVector: network
+        severity: high
+      action: log
+    - type: imagesWithCVSSAttackComplexity
+      properties:
+        attackComplexity: high
+        severity: high
+      action: log
+    - type: imagesWithCVSSAvailabilityImpact
+      properties:
+        availabilityImpact: low
+        severity: high
+      action: log
+
+    # Kubectl Access
+    - type: podExec
+      action: block
+      mitigation: isolate
+    - type: podPortForward
+      action: block
+      mitigation: isolate
+
+  # Exceptions
+  exceptions:
+    - type: imageName
+      properties:
+        operator: equals
+        values:
+          - admission-controller
+          - workload-operator
+      namespaces:
+        - trendmicro-system
+    - type: imageRegistry
+      properties:
+        operator: equals
+        values:
+          - docker.io/some-registry

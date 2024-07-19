@@ -227,6 +227,13 @@ cloudOne:
       ## Default value: 3650
       lifetime: 3650
 
+  policyOperator:
+    ## enable the cluster-managed policy feature
+    enabled: true
+    ## Minimum value: 5m
+    ## Maximum value: 1h
+    reconciliationPeriod: 5m
+
 securityContextConstraints:
   # enable the Security Context Constraints creation in Openshift
   create: true
