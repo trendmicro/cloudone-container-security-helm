@@ -99,7 +99,7 @@ spec:
         env:
         {{- include "container.security.proxy.env" . | nindent 8 }}
         - name: APPLICATION_VERSION
-          value: {{ .Chart.Version | quote }}
+          value: {{ .Chart.AppVersion | quote }}
         - name: POD_NAME
           valueFrom:
             fieldRef:

@@ -131,7 +131,7 @@ spec:
             - name: SCAN_MANAGER_SERVICE_ACCOUNT
               value: {{ include "scanManager.serviceAccountName" . }}
             - name: APPLICATION_VERSION
-              value: {{ .Chart.Version | quote }}
+              value: {{ .Chart.AppVersion | quote }}
             - name: NAMESPACE
               valueFrom:
                 fieldRef:
