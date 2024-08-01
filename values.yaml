@@ -736,7 +736,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.3.43
+    tag: 2.3.44
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -775,7 +775,7 @@ images:
 
   scanManager:
     repository: scan-manager
-    digest: sha256:aea4417fb5d3333309f763585bc6ee348a720709833cb13f03976e646cfa302d
+    digest: sha256:915baaa07bf229f2351a474e4a320d3ca762d4d7f0b4ac1729a7ae0f785263bb
 
   scanJob:
     repository: scan-job
@@ -787,11 +787,11 @@ images:
 
   workloadOperator:
     repository: workload-operator
-    digest: sha256:5c1aa393e8202d6d92dd635578ddd552ac1f423b836359669d8928f704058325
+    digest: sha256:a4da77f5edbc73c51701152346fee035579519af172904d61a60099c72b98067
 
   fargateInjector:
     repository: fargate-tool
-    digest: sha256:9b7bdedf8bdea312816e6d7d631b0ddb1cbe151971b98e21f701a44a7e3247fc
+    digest: sha256:ec3a81938e06785b151f8c8004a5e2f7aa5b320ab9d409d93147cc5bed7f88b2
 
   pdig:
     repository: pdig
@@ -799,7 +799,7 @@ images:
 
   k8sMetaCollector:
     repository: k8s-metacollector
-    digest: sha256:722f7d7e4b2cede3ab228635de2a7ced24aa959327603383df1e5305126d6821
+    digest: sha256:ed59906f58ddb744468f7199d484db5614146d1df87fb2a043b10bcbcec34c3d
 
 ##
 ## Determine whether to use existing secrets in the target namespace rather than
