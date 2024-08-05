@@ -3,9 +3,28 @@
 # a helper script to fetch Kubernetes settings and Trend Micro Cloud One container security logs.
 #
 
-RELEASE=${RELEASE:-trendmicro}
+RELEASE="trendmicro"
 KUBECTL=kubectl
 HELM=helm
+CONTEXT=""
+
+help()
+{
+cat << EOF
+Helper script to fetch Kubernetes settings and Trend Micro Cloud One container security logs.
+Options:
+-release          [Optional] Specifies the Trend Micro Cloud One container security release name. The default is trendmicro
+-namespace        [Optional] Specifies the the namespace of Trend Micro Cloud One container security deployment.
+                             The default is the current namespace or default.
+Usage examples:
+# Display this help
+./collect-logs.sh -h | H
+# Collect logs for the default release, namespace and context
+./collect-logs.sh
+# Collect logs for the named release, namespace and context
+./collect-logs.sh -release deepsecurity-smartcheck -namespace trendmicro -context kubernetes-cluster
+EOF
+}
 
 #####
 # check prerequisites
@@ -24,10 +43,47 @@ if ! command_exists $HELM; then
   exit 1
 fi
 
+while [[ $# -gt 0 ]]
+do
+  key="$1"
+  case $key in
+    -h|-H)
+      help
+      exit 0
+      ;;
+    -release)
+     RELEASE=$2
+     shift
+     shift
+     ;;
+    -namespace)
+     NAMESPACE=$2
+     shift
+     shift
+     ;;
+    -context)
+     CONTEXT=$2
+     shift
+     shift
+     ;;
+    *)
+     echo "Unrecognized options are specified: $1"
+     echo "Use option -h for help."
+     exit 1
+    ;;
+  esac
+done
+
 CURRENT_NS=$(kubectl config view --minify --output 'jsonpath={..namespace}')
 CURRENT_NS=${CURRENT_NS:-trendmicro-system}
 NAMESPACE=${NAMESPACE:-$CURRENT_NS}
 NAMESPACE_PARAM="--namespace=$NAMESPACE"
+
+CURRENT_CONTEXT=$(kubectl config view --minify --output 'jsonpath={.current-context}')
+CONTEXT=${CONTEXT:-$CURRENT_CONTEXT}
+CONTEXT_PARAM="--context=$CONTEXT"
+
+KUBECTL="$KUBECTL $CONTEXT_PARAM"
 
 PODS=$($KUBECTL get pods "$NAMESPACE_PARAM" -o=jsonpath='{range .items[*]}{.metadata.name}{";"}{end}' -l app.kubernetes.io/instance=$RELEASE)
 if [ -z "${PODS}" ]; then

@@ -245,9 +245,10 @@ Gather logs using the following command:
 ./collect-logs.sh
 ```
 
-The following environment variables are supported for log collection:
+The following environment parameters are supported for log collection:
 
-| Environment variable      | Description                             | Default                                                                                        |
-| ------------------------- |:----------------------------------------|:-----------------------------------------------------------------------------------------------|
-| RELEASE                   | Helm release name                       | `trendmicro`                                                                         |
-| NAMESPACE                 | The namespace that the helm chart is deployed in | Current namespace declared in `kubeconfig`. If no namespace setting exists in `kubeconfig`, then `trendmicro-system` will be used. |
+| Parameters | Description                                            | Default                                                                                                                           |
+|------------|:-------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------|
+| -release  | Helm release name                                      | `trendmicro`                                                                                                                      |
+| -namespace | The namespace that the helm chart is deployed in       | Current namespace declared in `kubeconfig`. If no namespace setting exists in `kubeconfig`, then `trendmicro-system` will be used. |
+| -context   | The Kluster context that the helm chart is deployed in | Current cluster declared in `kubeconfig`. |
