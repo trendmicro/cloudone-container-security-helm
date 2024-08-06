@@ -751,15 +751,15 @@ images:
     # imagePullSecret:
   admissionController:
     repository: admission-controller
-    digest: sha256:7337390b94aac7b3899c2532acc95e161758927adc5be6cf9d87f1c6a579824e
+    digest: sha256:8fe57301af457e723c4a473cd6ef4aad84e5b471a3726199abf1103e4cda2b26
 
   oversight:
     repository: oversight-controller
-    digest: sha256:c8d7aa154aa4c4c1abcad758e7ac193d8e7136e3abefe8e23f99c42f692fadad
+    digest: sha256:5f0124a347a72ae5f5d31badb656c626f0df81cf19f890c4a3d984f2a56386e6
 
   usage:
     repository: usage-controller
-    digest: sha256:54a84f8691bcf0e680885e297cdda89d812a4bc1b51b379c90c160d7757424a1
+    digest: sha256:6f38decf3adaa76394ef07b4b52c0e6e3566807c3f43428bb7938202d660fbdb
 
   rbacProxy:
     repository: rbac-proxy
@@ -771,35 +771,35 @@ images:
 
   scout:
     repository: scout
-    digest: sha256:05ded8e64880a517f730c0f51085dee79f5b64ec653fa7f4dad8a09ff494fd9a
+    digest: sha256:48a5bb9462cf058f04ef441fcd65b96d35aac11cb02b09dadccd0b769d797cde
 
   scanManager:
     repository: scan-manager
-    digest: sha256:915baaa07bf229f2351a474e4a320d3ca762d4d7f0b4ac1729a7ae0f785263bb
+    digest: sha256:48b18747cd6157dabaeeac6fe932a0c3d8367e15cd8c9ecd9f66780d4b4bb34e
 
   scanJob:
     repository: scan-job
-    digest: sha256:e53c4961794a649bfba4153c7934336156922d5044e36a1434ab22a659bdf8db
+    digest: sha256:871759e3c5bac8a5d6091ca4eb2498aef7b2fd65ebcec1322effc45ecaf0e716
 
   complianceScanJob:
     repository: compliance-scan-job
-    digest: sha256:d7f75f22c65fa62afe1f7f9f9ab95c3d534b2e9240604ff2695ae6e5022f0e29
+    digest: sha256:a575caf66eb8c27086208e246c4b2ef5ddf9fb3a2dfb1132633614d96bbc109b
 
   workloadOperator:
     repository: workload-operator
-    digest: sha256:a4da77f5edbc73c51701152346fee035579519af172904d61a60099c72b98067
+    digest: sha256:5ca5721459616034b4a62e3ebf5cf2b0ecf98231e0805a5337778b6630f5cc63
 
   fargateInjector:
     repository: fargate-tool
-    digest: sha256:ec3a81938e06785b151f8c8004a5e2f7aa5b320ab9d409d93147cc5bed7f88b2
+    digest: sha256:a3cd65de92df5c551bdb32e5b37cbe80cd7d11197bf2e25e886acc0325a5f3f4
 
   pdig:
     repository: pdig
-    digest: sha256:5a7d322787c68ff3fe85cd8bdb0367070ce65533a0292fe8f0e4297927cc6f7b
+    digest: sha256:1aa586f804a87e3a32dca9e2d3ae8a732e0b2238dd31c4bbeb434744f9472b6c
 
   k8sMetaCollector:
     repository: k8s-metacollector
-    digest: sha256:ed59906f58ddb744468f7199d484db5614146d1df87fb2a043b10bcbcec34c3d
+    digest: sha256:00c497c1b3d1483da53c32b58bae548af183a1c9f37c20298df1a79c10757e70
 
 ##
 ## Determine whether to use existing secrets in the target namespace rather than
