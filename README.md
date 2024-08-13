@@ -212,6 +212,27 @@ securityContext:
       privileged: true
 ```
 
+### Configure Runtime Container Interface
+
+You can configure Container Security to customize container runtime interface.
+For example, you can specify a custom path:
+
+```
+scout:
+  falco:
+    cri:
+      socket: "/run/cri/containerd.sock"
+```
+
+You can also configure a custom path for k0s or k3s. For example:
+
+```
+scout:
+  falco:
+    k0s:
+      socket: "/run/k0s/containerd.sock"
+```
+
 ## Troubleshooting
 
 ### Access logs

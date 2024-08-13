@@ -678,6 +678,16 @@ scout:
       ## socket, determines which socket to mount for enabling dockershim based runtimes.
       ## Default value: (determined by platform)
       socket:
+    k0s:
+      ## Determines if the k0s socket is mounted in the falco container.
+      enabled: true
+      ## socket, determines which socket to mount for enabling k0s based runtimes.
+      socket:
+    k3s:
+      ## Determines if the k3s socket is mounted in the falco container.
+      enabled: true
+      ## socket, determines which socket to mount for enabling k3s based runtimes.
+      socket:
     ## modernBpf, determine if falco uses ebpf CO-RE if kernel supports.
     ## If it is false or kernel doesn't support ebpf CO-RE, the ebpf driver will be downloaded from Trend Micro Cloud One Container Security service.
     ## Default value: true
