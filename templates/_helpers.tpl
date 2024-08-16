@@ -130,6 +130,8 @@ app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 Scanner Common labels
 */}}
 {{- define "scanner.labels" -}}
+helm.sh/chart: {{ include "container.security.chart" . }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
 app.kubernetes.io/part-of: {{ include "container.security.name" . }}
 {{ include "scanner.selectorLabels" . }}
 {{- range $k, $v := (default (dict) .Values.extraLabels) }}
@@ -144,6 +146,8 @@ app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 Compliance Scan Job Common labels
 */}}
 {{- define "complianceScanJob.labels" -}}
+helm.sh/chart: {{ include "container.security.chart" . }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
 app.kubernetes.io/part-of: {{ include "container.security.name" . }}
 {{ include "complianceScanJob.selectorLabels" . }}
 {{- range $k, $v := (default (dict) .Values.extraLabels) }}
@@ -152,15 +156,6 @@ app.kubernetes.io/part-of: {{ include "container.security.name" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
-{{- end }}
-
-{{/*
-Compliance Scan Job Selector labels
-*/}}
-{{- define "complianceScanJob.selectorLabels" -}}
-app.kubernetes.io/name: compliance-scan-job
-app.kubernetes.io/instance: {{ .Release.Name }}
-app.kubernetes.io/component: trendmicro-compliance-scan-job
 {{- end }}
 
 {{/*
@@ -275,6 +270,15 @@ k8s-metacollector Selector labels
 app.kubernetes.io/name: {{ include "k8sMetaCollector.fullname" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/component: trendmicro-k8s-metacollector
+{{- end }}
+
+{{/*
+Compliance Scan Job Selector labels
+*/}}
+{{- define "complianceScanJob.selectorLabels" -}}
+app.kubernetes.io/name: compliance-scan-job
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: trendmicro-compliance-scan-job
 {{- end }}
 
 {{/*
