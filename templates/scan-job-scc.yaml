@@ -16,7 +16,8 @@ allowHostPID: false
 allowHostPorts: false
 allowPrivilegeEscalation: false
 allowPrivilegedContainer: false
-allowedCapabilities: []
+allowedCapabilities:
+- DAC_READ_SEARCH
 allowedUnsafeSysctls: []
 defaultAddCapabilities: []
 fsGroup:

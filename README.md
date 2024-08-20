@@ -201,6 +201,16 @@ proxy:
   password: password  
 ```
 
+### Configure runtime vulnerability scanning for OpenShift
+
+On OpenShift, new namespaces created after installing container security need to be configured by upgrading container security to create RBAC resources and provide scanners in the new namespaces the required privileges.
+
+ServiceAccounts and cluster role bindings used to assign security context constraints to scanner pods will not be deleted on helm uninstall as some namespaces maybe privileged and require an admin role to delete. To delete all remaining rbac resources, you can run the following script with admin role:
+
+```sh
+./scripts/openshift-cleanup.sh
+```
+
 ### Enable runtime security on AWS bottlerocket
 
 You can run runtime security on AWS bottlerocket nodes by adding these configurations in your `overrides.yaml` file:
@@ -263,7 +273,7 @@ To help debug issues reported in support cases, a log collection script is provi
 Gather logs using the following command:
 
 ```sh
-./collect-logs.sh
+./scripts/collect-logs.sh
 ```
 
 The following environment variables are supported for log collection:
