@@ -248,9 +248,6 @@ data:
         spec:
           hostPID: true
           serviceAccountName: {{ include "complianceScanJob.serviceAccountName" . }}
-          securityContext:
-            runAsNonRoot: true
-            runAsUser: 65532
           restartPolicy: Never
           {{- $imageDefaults := .Values.images.defaults }}
           {{- with .Values.images.complianceScanJob }}
@@ -284,14 +281,138 @@ data:
               - name: etc-kubernetes
                 mountPath: /etc/kubernetes
                 readOnly: true
+              - name: etc-default
+                mountPath: /etc/default
+                readOnly: true
+              - name: home-kubernetes
+                mountPath: /home/kubernetes
+                readOnly: true
+              - name: var-lib-cni
+                mountPath: /var/lib/cni
+                readOnly: true
+              - name: var-lib-etcd
+                mountPath: /var/lib/etcd
+                readOnly: true
+              - name: var-lib-kube-scheduler
+                mountPath: /var/lib/kube-scheduler
+                readOnly: true
+              - name: var-lib-kube-controller-manager
+                mountPath: /var/lib/kube-controller-manager
+                readOnly: true
+              - name: lib-systemd
+                mountPath: /lib/systemd/
+                readOnly: true
+              - name: srv-kubernetes
+                mountPath: /srv/kubernetes/
+                readOnly: true
+                # /usr/local/mount-from-host/bin is mounted to access kubectl / kubelet, for auto-detecting the Kubernetes version.
+                # You can omit this mount if you specify --version as part of the command.
+              - name: usr-bin
+                mountPath: /usr/local/mount-from-host/bin
+                readOnly: true
+              - name: etc-cni-netd
+                mountPath: /etc/cni/net.d/
+                readOnly: true
+              - name: opt-cni-bin
+                mountPath: /opt/cni/bin/
+                readOnly: true
+              - name: etc-passwd
+                mountPath: /etc/passwd
+                readOnly: true
+              - name: etc-group
+                mountPath: /etc/group
+                readOnly: true
+              - name: var-vcap-jobs
+                mountPath: /var/vcap/jobs
+                readOnly: true
+              - name: var-vcap-packages
+                mountPath: /var/vcap/packages
+                readOnly: true
+              - name: var-vcap-store-etcd
+                mountPath: /var/vcap/store/etcd
+                readOnly: true
+              - name: var-vcap-sys
+                mountPath: /var/vcap/sys
+                readOnly: true
           volumes:
             - name: var-lib-kubelet
               hostPath:
                 path: "/var/lib/kubelet"
+                type: DirectoryOrCreate
             - name: etc-systemd
               hostPath:
                 path: "/etc/systemd"
+                type: DirectoryOrCreate
             - name: etc-kubernetes
               hostPath:
                 path: "/etc/kubernetes"
+                type: DirectoryOrCreate
+            - name: etc-default
+              hostPath:
+                path: "/etc/default"
+                type: DirectoryOrCreate
+            - name: home-kubernetes
+              hostPath:
+                path: "/home/kubernetes"
+                type: DirectoryOrCreate
+            - name: var-lib-cni
+              hostPath:
+                path: "/var/lib/cni"
+                type: DirectoryOrCreate
+            - name: var-lib-etcd
+              hostPath:
+                path: "/var/lib/etcd"
+                type: DirectoryOrCreate
+            - name: var-lib-kube-scheduler
+              hostPath:
+                path: "/var/lib/kube-scheduler"
+                type: DirectoryOrCreate
+            - name: var-lib-kube-controller-manager
+              hostPath:
+                path: "/var/lib/kube-controller-manager"
+                type: DirectoryOrCreate
+            - name: lib-systemd
+              hostPath:
+                path: "/lib/systemd"
+                type: DirectoryOrCreate
+            - name: srv-kubernetes
+              hostPath:
+                path: "/srv/kubernetes"
+                type: DirectoryOrCreate
+            - name: usr-bin
+              hostPath:
+                path: "/usr/bin"
+                type: DirectoryOrCreate
+            - name: etc-cni-netd
+              hostPath:
+                path: "/etc/cni/net.d/"
+                type: DirectoryOrCreate
+            - name: opt-cni-bin
+              hostPath:
+                path: "/opt/cni/bin/"
+                type: DirectoryOrCreate
+            - name: etc-passwd
+              hostPath:
+                path: "/etc/passwd"
+                type: FileOrCreate
+            - name: etc-group
+              hostPath:
+                path: "/etc/group"
+                type: FileOrCreate
+            - name: var-vcap-jobs
+              hostPath:
+                path: "/var/vcap/jobs"
+                type: DirectoryOrCreate
+            - name: var-vcap-packages
+              hostPath:
+                path: "/var/vcap/packages"
+                type: DirectoryOrCreate
+            - name: var-vcap-store-etcd
+              hostPath:
+                path: "/var/vcap/store/etcd"
+                type: DirectoryOrCreate
+            - name: var-vcap-sys
+              hostPath:
+                path: "/var/vcap/sys"
+                type: DirectoryOrCreate
 {{- end }}

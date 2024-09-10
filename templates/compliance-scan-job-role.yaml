@@ -20,7 +20,17 @@ rules:
   - rbac.authorization.k8s.io
   resources:
   - clusterroles
+  - clusterrolebindings
   - roles
+  - rolebindings
+  verbs:
+  - list
+  - get
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - serviceaccounts
   verbs:
   - list
   - get
