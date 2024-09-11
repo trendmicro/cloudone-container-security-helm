@@ -20,6 +20,8 @@ data:
       ttlSecondsAfterFinished: 60
       template:
         metadata:
+          annotations:
+            linkerd.io/inject: disabled
           labels:
             {{- include "scanner.labels" . | nindent 12 }}
             ignoreRuntimeScan: true
@@ -58,6 +60,8 @@ data:
 {{- end }}
             resources:
 {{ toYaml (default .Values.resources.defaults .Values.resources.scanner) | indent 14 }}
+          tolerations:          
+{{ toYaml (default .Values.tolerations.defaults .Values.tolerations.scanner) | indent 12 }}
           containers:
           - name: target
             image: IMAGE
