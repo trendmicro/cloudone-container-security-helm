@@ -14,9 +14,14 @@ command_exists () {
   command -v "$1" >/dev/null 2>&1
 }
 
+# Check if kubectl exists, if not, switch to oc
 if ! command_exists $KUBECTL; then
-  echo "No kubectl command found, exiting..."
-  exit 1
+  echo "No kubectl command found, switching to oc..."
+  KUBECTL=oc #For Openshift environments
+  if ! command_exists $KUBECTL; then
+    echo "Neither kubectl nor oc command found, exiting..."
+    exit 1
+  fi
 fi
 
 if ! command_exists $HELM; then
