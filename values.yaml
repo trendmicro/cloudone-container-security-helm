@@ -41,6 +41,19 @@ cloudOne:
     ## Default value: Ignore
     failurePolicy: Ignore
 
+    ## When scannerValidation is enabled, admission-controller validates the user who handle scan jobs for runtime vulnerability scanning feature.
+    ## After enabling this, only default scan-manager service account, kube-system components and usernames in the below trustedScanOperators list can handle scan jobs.
+    ##
+    ## Default value: false
+    scannerValidation: false
+
+    ## List of K8s usernames that admission-controller will let handle scan jobs pods
+    ##
+    ## Default value:
+    ##  - aksService
+    trustedScanOperators:
+    - aksService
+
     certificate:
       ## commonName is the common name to use in the default signed certificate.
       ##
@@ -64,16 +77,28 @@ cloudOne:
       ## Default value: 3650
       lifetime: 3650
 
+    ## webhookTimeoutSeconds defines the timeout used in validating admission webhook.
+    ##
+    ## Default value: 30
+    webhookTimeoutSeconds: 30
+
   oversight:
     enabled: true
 
-    ## syncPeriod is the time interval that how often Trend Micro Cloud One Container Security will evaluate 
-    ## the running pods. 
+    ## syncPeriod is the time interval that how often Trend Micro Cloud One Container Security will evaluate
+    ## the running pods.
     ##
     ## Default value: 3600s
     ## Minimum value: 600s
     ##
     syncPeriod: 3600s
+
+    ## pageSize is the maximum page size when fetching list of pods.
+    ##
+    ## Default value: 100
+    ## Minimum value: 1
+    ##
+    pageSize: 100
 
     ## enableNetworkPolicyCreation will tell the Oversight controller to create the Kubernetes network policy if it doesn't exist.
     ## The created network policy is used to perform `isolate` mitigation. The created network policy will not get cleaned up automatically.
@@ -82,8 +107,119 @@ cloudOne:
     ##
     enableNetworkPolicyCreation: true
 
+  scanManager:
+    ## Maximum number of scan jobs running at once.
+    ##
+    ## Default value: 5
+    ## Maximum value: 100
+    ## Minimum value: 3
+    ##
+    maxJobCount: 5
+    ## activeDeadlineSeconds is the maximum duration a scan job can run before timing out.
+    ##
+    ## Default value: 300
+    ##
+    activeDeadlineSeconds: 300
+
   runtimeSecurity:
     enabled: false
+    customRules:
+      enabled: false
+      output:
+        json: true
+        splunk:
+          url: https://splunkserver/services/collector/raw
+          headers:
+          - ''
+
+  complianceScan:
+    enabled: true
+    ## activeDeadlineSeconds is the maximum duration a compliance scan job can run before timing out.
+    ##
+    ## Default value: 600
+    ##
+    activeDeadlineSeconds: 600
+
+  vulnerabilityScanning:
+    enabled: false
+
+  fargateInjector:
+    enabled: false
+    logLevel: error
+    certificate:
+      ## commonName is the common name to use in the default signed certificate.
+      ##
+      ## Default value:
+      commonName:
+
+      ## ipAlternativeNames is a list of IP addresses to include as alternate names.
+      ## in the default signed certificate.
+      ##
+      ## Default value: []
+      ipAlternativeNames: []
+
+      ## dnsAlternativeNames is a list of DNS names to include as alternate names
+      ## in the default signed certificate.
+      ##
+      ## Default value: []
+      dnsAlternativeNames: []
+
+      ## lifetime is the lifetime in days of the default signed certificate.
+      ##
+      ## Default value: 3650
+      lifetime: 3650
+
+    ## failurePolicy defines the bahaviour if an unreconized error or timeout occurs. Enabling
+    ## this while not tagging kube-system to be ignored can easily cause the cluster to be
+    ## unresponsive.
+    ##
+    ## Default value: Ignore
+    failurePolicy: Ignore
+
+  inventoryCollection:
+    ## enable the inventory collection feature
+    enabled: false
+    ## Minimum value: 5m
+    ## Maximum value: 1d
+    period: 5m
+
+  k8sMetaCollector:
+    ## grpc authentication settings
+    grpcAuth:
+      ## authentication mode, insecure or tls
+      type: tls
+      ## certificate settings
+      certificate:
+        ## lifetime is the lifetime in days of the default signed certificate.
+        ##
+        ## Default value: 3650
+        lifetime: 3650
+    ## log verbosity level
+    vLevel: 5
+
+  kubeRbacProxy:
+    certificate:
+      ## commonName is the common name to use in the default signed certificate.
+      ##
+      ## Default value:
+      commonName:
+
+      ## ipAlternativeNames is a list of IP addresses to include as alternate names.
+      ## in the default signed certificate.
+      ##
+      ## Default value: []
+      ipAlternativeNames: []
+
+      ## dnsAlternativeNames is a list of DNS names to include as alternate names
+      ## in the default signed certificate.
+      ##
+      ## Default value: []
+      dnsAlternativeNames: []
+
+      ## lifetime is the lifetime in days of the default signed certificate.
+      ##
+      ## Default value: 3650
+      lifetime: 3650
 
 securityContextConstraints:
   # enable the Security Context Constraints creation in Openshift
@@ -93,8 +229,16 @@ serviceAccount:
   ## enable the service account creation. Each component with specific permission will use individual service account.
   ## If set to false, the default service account will be used, which might not have sufficient permission and introduce the failure.
   ##
-  ## Default value: true  
+  ## Default value: true
   create: true
+
+  admissionController:
+    ## The name of the service account to use.
+    ## If not set and create is true, a name is generated using the fullname of admissionController template
+    name: ''
+
+    ## Annotations to add to the service account
+    annotations: {}
 
   oversight:
     ## The name of the service account to use.
@@ -130,10 +274,12 @@ serviceAccount:
         type: MustRunAs
       supplementalGroups:
         type: RunAsAny
+      seccompProfiles:
+      - '*'
 
   usage:
     ## The name of the service account to use.
-    ## If not set and create is true, a name is generated using the fullname of oversight template
+    ## If not set and create is true, a name is generated using the fullname of usage template
     name: ''
 
     ## Annotations to add to the service account
@@ -147,6 +293,54 @@ serviceAccount:
     ## Annotations to add to the service account
     annotations: {}
 
+  scanManager:
+    ## The name of the service account to use.
+    ## If not set and create is true, a name is generated using the fullname of scanManager template
+    name: ''
+
+    ## Annotations to add to the service account
+    annotations: {}
+
+  scanJob:
+    ## The name of the service account to use.
+    ## If not set and create is true, a name is generated using the fullname of scanJob template
+    name: ''
+
+    ## Annotations to add to the service account
+    annotations: {}
+
+  complianceScanJob:
+    ## The name of the service account to use.
+    ## If not set and create is true, a name is generated using the fullname of complianceScanJob template
+    name: ''
+
+    ## Annotations to add to the service account
+    annotations: {}
+
+  workloadOperator:
+    ## The name of the service account to use.
+    ## If not set and create is true, a name is generated using the fullname of jobManager template
+    name: ''
+
+    ## Annotations to add to the service account
+    annotations: {}
+
+  fargateInjector:
+    ## The name of the service account to use.
+    ## If not set and create is true, a name is generated using the fullname of scout template
+    name: ''
+
+    ## Annotations to add to the service account
+    annotations: {}
+
+  k8sMetaCollector:
+    ## The name of the service account to use.
+    ## If not set and create is true, a name is generated using the fullname of k8sMetaCollector template
+    name: ''
+
+    ## Annotations to add to the service account
+    annotations: {}
+
 rbac:
   # Create and use rbac resources
   create: true
@@ -154,8 +348,11 @@ rbac:
 networkPolicy:
   ## enabled the network policy.
   ##
-  ## Default value: true 
+  ## Default value: true
   enabled: true
+  ## k8s-metacollector network policy, default false
+  k8sMetaCollector:
+    enabled: false
 
 telemetry:
   ## enabled controls whether telemetry events will be sent.
@@ -185,7 +382,9 @@ telemetry:
 
 ## securityContext specifies the security contexts that we'll apply to the pods.
 ##
-## NOTE: securityContext does not apply to scout, since it requires special privileges
+## To use on bottlerocket, set
+## securityContext.scout.scout.allowPrivilegeEscalation=true
+## securityContext.scout.scout.privileged=true
 securityContext:
   ## enabled is a global flag controlling whether security contexts are included at all in the manifest
   ## Default value: true
@@ -206,7 +405,30 @@ securityContext:
       readOnlyRootFilesystem: true
       runAsNonRoot: true
       # seLinuxOptions: "If unspecified, the container runtime will allocate a random SELinux context for each container": this seems appropriate.
-      runAsUser: 65532  # nonroot user
+      runAsUser: 65532 # nonroot user
+  scanner:
+    pod:
+      runAsNonRoot: true
+    target:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+        add:
+        - DAC_READ_SEARCH
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: false
+      runAsUser: 0 #root user
+    init:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 65532 # nonroot user
   scout:
     pod:
       runAsNonRoot: true
@@ -239,27 +461,19 @@ securityContext:
 proxy:
   ## httpProxy, if set, will be used as the proxy for outbound HTTP traffic.
   ##
-  ## The value may be either a complete URL, a `host[:port]`, or `socks5://host[:port]` when using a socks proxy
+  ## The value may be either a complete URL, a `http://host[:port]` when using a http proxy, or `socks5://host[:port]` when using a socks proxy
   ##
   ## Default value: (none)
   httpProxy:
 
-  ## httpsProxy, if set, will be used as the proxy for outbound HTTPS traffic. 
+  ## httpsProxy, if set, will be used as the proxy for outbound HTTPS traffic.
   ## If `httpsProxy` is not set, `httpProxy`
   ## is also checked and will be used if set.
   ##
-  ## The value may be either a complete URL, a `host[:port]`, or `socks5://host[:port]` when using a socks proxy
+  ## The value may be either a complete URL, a `http://host[:port]` when using a http proxy, or `socks5://host[:port]` when using a socks proxy
   ##
   ## Default value: (none)
   httpsProxy:
-
-  ## noProxy, if set, is a list of hosts or `host:port` combinations which
-  ## should not be accessed through the proxy.
-  ##
-  ## Default value:
-  ## .cluster.local
-  noProxy:
-  - .cluster.local
 
   ## username, if set, is the user name to provide to the outbound proxy when making requests.
   ##
@@ -275,6 +489,32 @@ proxy:
   ##
   ## Default value: true
   excludeKubernetesServiceHost: true
+
+tlsConfig:
+  ## minTLSVersion is the minimum TLS version that the server will accept.
+  ## Value must match version names from https://golang.org/pkg/crypto/tls/#pkg-constants.
+  ##
+  ## Default value: VersionTLS12
+  minTLSVersion: VersionTLS12
+
+  ## cipherSuites is a list of supported secure go cipher suites for TLS 1.2 and 1.3.
+  ## The list of supported cipher suites can be found at https://golang.org/pkg/crypto/tls/#pkg-constants
+  ##
+  ## Default value: List of secure cipher suites
+  cipherSuites:
+  - TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA
+  - TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA
+  - TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA
+  - TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA
+  - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+  - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+  - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+  - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+  - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
+  - TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256
+  - TLS_AES_128_GCM_SHA256
+  - TLS_AES_256_GCM_SHA384
+  - TLS_CHACHA20_POLY1305_SHA256
 
 resources:
   defaults: {}
@@ -306,7 +546,48 @@ resources:
     limits:
       cpu: 1000m
       memory: 1024Mi
-
+  scanManager:
+    requests:
+      cpu: 100m
+      memory: 20Mi
+    limits:
+      cpu: 800m
+      memory: 1Gi
+  workloadOperator:
+    requests:
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1024Mi
+  scanner:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      ## no cpu limits specified because it can cause cpu throttle
+      memory: 512Mi
+  fargateInjector:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 512Mi
+  complianceScanner:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      ## no cpu limits specified because it can cause cpu throttle
+      memory: 512Mi
+  k8sMetaCollector:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 1000m
+      memory: 1024Mi
 
 nodeSelector:
   ## nodeSelector if set, ensures pods are only assigned to a particular set of nodes.
@@ -359,6 +640,11 @@ scout:
   excludeSameNamespace: true
 
   falco:
+    ## apiUrl, provide the URL Falco should use to connect to the Kubernetes API.
+    ##
+    ## Default Value: https://$(KUBERNETES_SERVICE_HOST)
+    apiUrl: https://$(KUBERNETES_SERVICE_HOST)
+
     ## extraArgs, if set will apply additional arguments to falco container
     ##
     ## Default Value: []
@@ -369,10 +655,7 @@ scout:
     env: {}
 
     ## extra configs applied to falco container
-    config:
-      evt_queue:
-        enabled: true
-        timeout_sec: 2
+    config: {}
 
     docker:
       ## Determines if the docker socket is mounted in the falco container.
@@ -388,7 +671,34 @@ scout:
       ## socket, determines which socket to mount for enabling cri based runtimes.
       ## Default value: (determined by platform)
       socket:
+    dockershim:
+      ## Determines if the dockershim socket is mounted in the falco container.
+      ## Required for bottlerocket
+      enabled: true
+      ## socket, determines which socket to mount for enabling dockershim based runtimes.
+      ## Default value: (determined by platform)
+      socket:
+    k0s:
+      ## Determines if the k0s socket is mounted in the falco container.
+      enabled: true
+      ## socket, determines which socket to mount for enabling k0s based runtimes.
+      socket:
+    k3s:
+      ## Determines if the k3s socket is mounted in the falco container.
+      enabled: true
+      ## socket, determines which socket to mount for enabling k3s based runtimes.
+      socket:
+    ## modernBpf, determine if falco uses ebpf CO-RE if kernel supports.
+    ## If it is false or kernel doesn't support ebpf CO-RE, the ebpf driver will be downloaded from Trend Micro Cloud One Container Security service.
+    ## Default value: true
+    modernBpf: true
+
   scout:
+    ## falcoInternalEvent, determines how to deal with falco internal event
+    ## sysevent: send the internal events as system events to container security backend
+    ## log: log the internal events into scout's log
+    falcoInternalEvent: [log, sysevent]
+
     ## extraArgs, if set will apply additional arguments to scout container
     ##
     ## Default Value: []
@@ -416,21 +726,27 @@ images:
     ## Default registry to pull images from. This can be overridden for
     ## each image by specifying the registry attribute at the image level.
     ## If no registry is provided, images will be pulled from your default
-    ## registry (which may be Docker Hub).
+    ## registry (which may be Amazon ECR Public Gallery).
     ##
-    ## Default value: blank
+    ## The images can also be accessed in Docker Hub by leaving the registry field blank.
     # registry:
+    ##
+    ## Default value: public.ecr.aws
+    registry: public.ecr.aws
 
     ## Default project / organization to pull images from. This can be
     ## overridden for each image by specifying the project attribute at the
     ## image level.
     ##
-    ## Default value: trendmicrocloudone
+    ## The images can also be accessed in Docker Hub under trendmicrocloudone project
     # project: trendmicrocloudone
+    ##
+    ## Default value: trendmicro/container-security
+    project: trendmicro/container-security
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.2.7
+    tag: 2.3.47
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -445,24 +761,83 @@ images:
     # imagePullSecret:
   admissionController:
     repository: admission-controller
-    digest: sha256:0fc729045b3c958c04525e763ed39dffa754f178e19e7d740ef2428180e6d731
+    digest: sha256:8fe57301af457e723c4a473cd6ef4aad84e5b471a3726199abf1103e4cda2b26
 
   oversight:
     repository: oversight-controller
-    digest: sha256:684acabd117c6c692f4033c795078c2ca687c94d4c411fc00a9baca576002e72
+    digest: sha256:5f0124a347a72ae5f5d31badb656c626f0df81cf19f890c4a3d984f2a56386e6
 
   usage:
     repository: usage-controller
-    digest: sha256:25f09c178b96894bee13f3a554ca2fd933838d6e570063e16da1345fdd8de37b
+    digest: sha256:6f38decf3adaa76394ef07b4b52c0e6e3566807c3f43428bb7938202d660fbdb
 
   rbacProxy:
     repository: rbac-proxy
-    digest: sha256:c43be26f3ce3e934e9c1d12bb00b79201940cee1c22b0f445538fbf82645166a
+    digest: sha256:a5f4b8a0fba4cdbc3ede1ebc16b71bf4a1d78bcfb0831afd3526c7fb0b7f1013
 
   falco:
     repository: falco
-    digest: sha256:7a25881b727787396e49f5085debbbff4f1d2dafb2353133b34ab99b2bcc4e70
+    digest: sha256:7dd9913263de23484df1fce91a1cedf8d59a9ea49704714fb408664f8ebed2c0
 
   scout:
     repository: scout
-    digest: sha256:1abecbed05d2ea5706e6345cd8db406cb4d825b98bfbe3b51d6fc5d15f3e4111
+    digest: sha256:837942d2043da1fb667994d9900376be99d9fe0acbee43f007a1974e13781e3f
+
+  scanManager:
+    repository: scan-manager
+    digest: sha256:48b18747cd6157dabaeeac6fe932a0c3d8367e15cd8c9ecd9f66780d4b4bb34e
+
+  scanJob:
+    repository: scan-job
+    digest: sha256:b0623b73fa6c4cc74e4f69fd0da2ae09a879b72f8cb734b2bda7afaba2ee0845
+
+  complianceScanJob:
+    repository: compliance-scan-job
+    digest: sha256:f8895bd72786f59c7f8a9d181a20b3f21b5b1f7e94986ead9c733e59e277f109
+
+  workloadOperator:
+    repository: workload-operator
+    digest: sha256:7caa15319cef085787a7b9a4a4ab37d2bac034f7b8807970561a8c380d51e8cb
+
+  fargateInjector:
+    repository: fargate-tool
+    digest: sha256:a3cd65de92df5c551bdb32e5b37cbe80cd7d11197bf2e25e886acc0325a5f3f4
+
+  pdig:
+    repository: pdig
+    digest: sha256:1aa586f804a87e3a32dca9e2d3ae8a732e0b2238dd31c4bbeb434744f9472b6c
+
+  k8sMetaCollector:
+    repository: k8s-metacollector
+    digest: sha256:00c497c1b3d1483da53c32b58bae548af183a1c9f37c20298df1a79c10757e70
+
+##
+## Determine whether to use existing secrets in the target namespace rather than
+## specifying in overrides.yaml. Useful if you want to manage secrets on your own, e.g., in argocd.
+##
+## When this is enabled, typically you will need these secrets created in your target namespace.
+## (names may vary depending on your settings):
+##
+## - trendmicro-container-security-auth
+## - trendmicro-container-security-outbound-proxy-credentials
+##
+## You can fill overrides.yaml and use helm install --dry-run to generate these secret's
+## template.
+##
+## After deployment, if you update the secret after deployment, you will need to restart pods of
+## container security to make changes take effect.
+##
+useExistingSecrets:
+  ## containerSecurityAuth, if set to true, will use the existing secret for container security authentication.
+  ## The secret should be named trendmicro-container-security-auth in the target namespace if this is enabled.
+  ## The secret should contain base64 encoded cloud one api key in the api.key field.
+  ##
+  ## Default value: false
+  containerSecurityAuth: false
+
+  ## outboundProxy, if set to true, will use the existing secret for outbound proxy.
+  ## The secret should be named trendmicro-container-security-outbound-proxy-credentials in the target namespace if this is enabled.
+  ## For secret format, see templates/outbound-proxy.yaml
+  ##
+  ## Default value: false
+  outboundProxy: false

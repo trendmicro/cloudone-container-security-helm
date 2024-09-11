@@ -107,6 +107,8 @@ For more information about `helm install`, see the [Helm installation documentat
 
 **Note**: If you are running Container Security in a **Red Hat OpenShift** environment, the Helm Chart creates a [Security Context Constraint](https://docs.openshift.com/container-platform/4.7/authentication/managing-security-context-constraints.html) to allow Container Security components to have the minimum security context requirements to run.
 
+**Note**: If you are running Container Security in a cluster where Pod Security Admission is available and you have runtime security enabled, ensure the namespace where Container Security is installed is using the [privileged Pod Security Standards policy](https://kubernetes.io/docs/concepts/security/pod-security-standards/#privileged).
+
 ### Upgrade a Trend Micro Cloud One Container Security deployment
 
 To upgrade an existing installation in the default Kubernetes namespace to the latest version:
@@ -159,7 +161,7 @@ By default, Container Security Continuous Compliance will create a Kubernetes ne
 
 ### Install a specific version of the Container Security helm chart
 
-If you want to install a specific version you can use the archive link for the tagged release. For example, to install Trend Micro Cloud One Container Security helm chart version 2.2.7, run the following command:
+If you want to install a specific version you can use the archive link for the tagged release. For example, to install Trend Micro Cloud One Container Security helm chart version 2.3.47, run the following command:
 
 ```sh
   helm install \
@@ -167,7 +169,7 @@ If you want to install a specific version you can use the archive link for the t
     --namespace ${namespace} \
     --create-namespace \
     trendmicro \
-    https://github.com/trendmicro/cloudone-container-security-helm/archive/2.2.7.tar.gz
+    https://github.com/trendmicro/cloudone-container-security-helm/archive/2.3.47.tar.gz
 ```
 
 ### Enabling or disabling a specific component
@@ -182,13 +184,63 @@ For example, you can choose to enable the runtime security component by includin
 
 ### Configure Container Security to use a proxy
 
-You can configure Container Security to use a socks5 proxy by setting the `httpsProxy` value. It is possible to use an http proxy, **but the runtime feature will only work with socks5 proxies**.
+You can configure Container Security to use either a socks5 proxy or http proxy by setting the `httpsProxy` value.
 For example, you can configure a socks5 proxy with authentication in your `overrides.yaml` file this way:
 ```
 proxy:
   httpsProxy: socks5://10.10.10.10:1080
   username: user
   password: password  
+```
+
+For http proxy, you can configure it this way:
+```
+proxy:
+  httpsProxy: http://10.10.10.10:3128
+  username: user
+  password: password  
+```
+
+### Configure runtime vulnerability scanning for OpenShift
+
+On OpenShift, new namespaces created after installing container security need to be configured by upgrading container security to create RBAC resources and provide scanners in the new namespaces the required privileges.
+
+ServiceAccounts and cluster role bindings used to assign security context constraints to scanner pods will not be deleted on helm uninstall as some namespaces maybe privileged and require an admin role to delete. To delete all remaining rbac resources, you can run the following script with admin role:
+
+```sh
+./scripts/openshift-cleanup.sh
+```
+
+### Enable runtime security on AWS bottlerocket
+
+You can run runtime security on AWS bottlerocket nodes by adding these configurations in your `overrides.yaml` file:
+```yaml
+securityContext:
+  scout:
+    scout:
+      allowPrivilegeEscalation: true
+      privileged: true
+```
+
+### Configure Runtime Container Interface
+
+You can configure Container Security to customize container runtime interface.
+For example, you can specify a custom path:
+
+```
+scout:
+  falco:
+    cri:
+      socket: "/run/cri/containerd.sock"
+```
+
+You can also configure a custom path for k0s or k3s. For example:
+
+```
+scout:
+  falco:
+    k0s:
+      socket: "/run/k0s/containerd.sock"
 ```
 
 ## Troubleshooting
@@ -221,7 +273,7 @@ To help debug issues reported in support cases, a log collection script is provi
 Gather logs using the following command:
 
 ```sh
-./collect-logs.sh
+./scripts/collect-logs.sh
 ```
 
 The following environment variables are supported for log collection:

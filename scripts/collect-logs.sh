@@ -70,7 +70,8 @@ COMMANDS=( "version:$KUBECTL version"
            "container-security-secrets:$KUBECTL get secrets --all-namespaces -l app.kubernetes.io/instance=$RELEASE"
            "container-security-config:$KUBECTL describe configmap --all-namespaces -l app.kubernetes.io/instance=$RELEASE"
            "container-security-getvalidatewebhooks:$KUBECTL get ValidatingWebhookConfiguration --all-namespaces -l app.kubernetes.io/instance=$RELEASE"
-           "container-security-descvalidatewebhooks:$KUBECTL describe ValidatingWebhookConfiguration --all-namespaces -l app.kubernetes.io/instance=$RELEASE")
+           "container-security-descvalidatewebhooks:$KUBECTL describe ValidatingWebhookConfiguration --all-namespaces -l app.kubernetes.io/instance=$RELEASE"
+           "workloadmages: $KUBECTL get workloadimages --all-namespaces -o yaml")
 
 echo "Fetching setting logs..."
 for command in "${COMMANDS[@]}"; do
@@ -80,6 +81,12 @@ for command in "${COMMANDS[@]}"; do
     echo "====================================" >> "$MASTER_DIR/$KEY.log"
     $VALUE >> "$MASTER_DIR/$KEY.log" 2>&1
 done
+
+# get values file for current RELEASE and NAMESPACE
+VALUES=$($HELM get values $RELEASE -n $NAMESPACE -o yaml)
+VALUES=$(echo "$VALUES" | sed 's/apikey: .*/apiKey: xxxxxx/I') # redacting any exposed API keys
+VALUES=$(echo "$VALUES" | sed 's/password: .*/password: xxxxxx/I') # redacting any plain-text proxy password
+echo "$VALUES" > $MASTER_DIR/$RELEASE-$NAMESPACE-values.yaml
 
 #####
 # application logs

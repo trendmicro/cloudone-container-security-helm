@@ -1,0 +1,117 @@
+{{- if or (eq true .Values.cloudOne.vulnerabilityScanning.enabled) (eq true .Values.cloudOne.inventoryCollection.enabled) }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: workload-operator-role
+  labels:
+    {{- include "workloadOperator.labels" . | nindent 4 }}
+rules:
+- apiGroups:
+  - batch
+  - ""
+  - apps
+  - networking.k8s.io
+  resources:
+  - cronjobs
+  - jobs
+  - pods
+  - replicationcontrollers
+  - replicasets
+  - daemonsets
+  - statefulsets
+  - deployments
+  - nodes
+  - services
+  - ingresses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - cloudone.trendmicro.com
+  resources:
+  - workloadimages
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: workload-operator-rolebinding
+  labels:
+    {{- include "workloadOperator.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: workload-operator-role
+subjects:
+- kind: ServiceAccount
+  name: {{ include "workloadOperator.serviceAccountName" . }}
+  namespace: {{ .Release.Namespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: workload-images-remover-role
+  labels:
+    {{- include "workloadOperator.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: post-delete
+    helm.sh/hook-delete-policy: hook-succeeded,hook-failed,before-hook-creation
+    helm.sh/hook-weight: "-9"
+rules:
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  resourceNames:
+  - workloadimages.cloudone.trendmicro.com
+  verbs:
+  - delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: workload-images-remover-rolebinding
+  labels:
+    {{- include "workloadOperator.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: post-delete
+    helm.sh/hook-delete-policy: hook-succeeded,hook-failed,before-hook-creation
+    helm.sh/hook-weight: "-8"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: workload-images-remover-role
+subjects:
+- kind: ServiceAccount
+  name: workload-images-remover-service-account
+  namespace: {{ .Release.Namespace }}
+{{- end }}

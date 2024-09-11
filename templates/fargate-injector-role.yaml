@@ -1,0 +1,78 @@
+{{- if and (eq true .Values.cloudOne.runtimeSecurity.enabled) (eq true .Values.cloudOne.fargateInjector.enabled) }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: fargate-injector-role
+  labels:
+    {{- include "fargateInjector.labels" . | nindent 4 }}
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  - configmaps
+  verbs:
+  - list
+  - create
+  - get
+  - update
+- apiGroups:
+  - extensions
+  - ""
+  resources:
+  - nodes
+  - namespaces
+  - pods
+  - replicationcontrollers
+  - replicasets
+  - services
+  - daemonsets
+  - deployments
+  - events
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - daemonsets
+  - deployments
+  - replicasets
+  - statefulsets
+  verbs:
+  - get
+  - list
+  - watch
+- nonResourceURLs:
+  - /healthz
+  - /healthz/*
+  verbs:
+  - get
+- apiGroups:
+  - "rbac.authorization.k8s.io"
+  resources:
+  - clusterrolebindings
+  verbs:
+  - list
+  - get
+  - create
+  - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: fargate-injector-rolebinding
+  labels:
+    {{- include "fargateInjector.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: fargate-injector-role
+subjects:
+- kind: ServiceAccount
+  name: {{ include "fargateInjector.serviceAccountName" . }}
+  namespace: {{ .Release.Namespace }}
+{{- end }}

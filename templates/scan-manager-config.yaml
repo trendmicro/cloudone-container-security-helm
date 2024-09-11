@@ -1,0 +1,77 @@
+{{- if eq true .Values.cloudOne.vulnerabilityScanning.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "container.security.name" . }}-scan-manager-config
+  labels:
+    {{- include "scanManager.labels" . | nindent 4 }}
+data:
+  scan-job-template.yaml: |
+    apiVersion: batch/v1
+    kind: Job
+    metadata:
+      labels:
+        {{- include "scanner.labels" . | nindent 8 }}
+        sidecar.istio.io/inject: "false"
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: {{ .Values.cloudOne.scanManager.activeDeadlineSeconds }}
+      ttlSecondsAfterFinished: 60
+      template:
+        metadata:
+          labels:
+            {{- include "scanner.labels" . | nindent 12 }}
+            ignoreRuntimeScan: true
+            sidecar.istio.io/inject: "false"
+        spec:
+{{- $securityContextEnabled := .Values.securityContext.enabled }}
+{{- $securityContext := default .Values.securityContext.default .Values.securityContext.scanner }}
+{{- $podSecurityContext := default .Values.securityContext.default.pod $securityContext.pod }}
+{{- $initSecurityContext := default .Values.securityContext.default.container $securityContext.init }}
+{{- $targetSecurityContext := default .Values.securityContext.default.container $securityContext.target }}
+{{- if $securityContextEnabled }}
+          securityContext:
+{{ toYaml $podSecurityContext | indent 12 }}
+{{- end }}
+{{- if and .Values.securityContextConstraints.create (.Capabilities.APIVersions.Has "security.openshift.io/v1") }}
+          serviceAccountName: {{ include "scanJob.serviceAccountName" . }}
+{{- end}}
+          restartPolicy: Never
+          volumes:
+          - name: utility-volume
+            emptyDir: {}
+          - name: tmp-volume
+            emptyDir: {}
+          initContainers:
+          - name: vulnerability-scanner-init
+            image: IMAGE
+            imagePullPolicy: Always
+            volumeMounts:
+              - mountPath: /utility
+                name: utility-volume
+            args:
+            - init
+{{- if $securityContextEnabled }}
+            securityContext:
+{{ toYaml $initSecurityContext | indent 14 }}
+{{- end }}
+            resources:
+{{ toYaml (default .Values.resources.defaults .Values.resources.scanner) | indent 14 }}
+          containers:
+          - name: target
+            image: IMAGE
+            imagePullPolicy: Always
+            volumeMounts:
+              - mountPath: /utility
+                name: utility-volume
+                readOnly: true
+              - mountPath: /tmp
+                name: tmp-volume
+{{- if $securityContextEnabled }}
+            securityContext:
+{{ toYaml $targetSecurityContext | indent 14 }}
+{{- end }}
+            resources:
+{{ toYaml (default .Values.resources.defaults .Values.resources.scanner) | indent 14 }}
+{{- end }}

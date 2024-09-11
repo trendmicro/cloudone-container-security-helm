@@ -15,11 +15,12 @@ spec:
     metadata:
       annotations:
         checksum/auth: {{ include "container.security.auth.secret" . | sha256sum }}
+        checksum/cert: {{ include (print $.Template.BasePath "/kube-rbac-proxy-cert.yaml") . | sha256sum }}
 {{- with (default .Values.podAnnotations.defaults .Values.podAnnotations.oversight) }}
 {{- toYaml . | nindent 8 }}
 {{- end }}
       labels:
-        {{- include "oversight.selectorLabels" . | nindent 8 }}
+        {{- include "oversight.labels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "oversight.serviceAccountName" . }}
 {{- $securityContextEnabled := .Values.securityContext.enabled }}
@@ -49,6 +50,8 @@ spec:
         image: {{ include "image.source" (dict "repository" $repository "registry" .registry "tag" $tag "imageDefaults" $imageDefaults "digest" .digest) }}
         imagePullPolicy: {{ default (default "Always" $imageDefaults.pullPolicy) .pullPolicy }}
         {{- end }}
+        ports:
+          - containerPort: 8070
         volumeMounts:
           - name: workdir
             mountPath: /var/oversight
@@ -58,13 +61,21 @@ spec:
           - name: telemetry-secret
             mountPath: /telemetry
           {{- end }}{{/* .Values.telemetry.publicKey */}}
+          - name: compliance-scan-job-template
+            mountPath: /etc/config
         args:
+        - --tls-min-version={{ include "tlsConfig.minTLSVersion" .Values.tlsConfig }}
+        - --tls-cipher-suites={{ include "tlsConfig.cipherSuites" .Values.tlsConfig }}
         - --health-probe-bind-address=:8081
         - --metrics-bind-address=127.0.0.1:8080
+        - --compliance-scan-bind-address=:8070
         - --leader-elect
         - --mitigation-handler-buffer-size={{ default 50 .Values.cloudOne.oversight.mitigationHandlerBufferSize }}
+        - --page-size={{ default 100 .Values.cloudOne.oversight.pageSize }}
         - --sync-period={{ default "3600s" .Values.cloudOne.oversight.syncPeriod }}
         - --enable-runtime-mitigation={{ default false .Values.cloudOne.runtimeSecurity.enabled }}
+        - --enable-compliance-scan={{ default true .Values.cloudOne.complianceScan.enabled }}
+        - --job-template-path=/etc/config/compliance-scan-job-template.yaml
         - --exclude-kubernetes-service-host-from-proxy={{ default true .Values.proxy.excludeKubernetesServiceHost }}
         - --excluded-namespaces
         {{- $excludeNS := (default (list) .Values.cloudOne.exclusion.namespaces) }}
@@ -88,7 +99,7 @@ spec:
         env:
         {{- include "container.security.proxy.env" . | nindent 8 }}
         - name: APPLICATION_VERSION
-          value: {{ .Chart.Version | quote }}
+          value: {{ .Chart.AppVersion | quote }}
         - name: POD_NAME
           valueFrom:
             fieldRef:
@@ -111,7 +122,7 @@ spec:
           periodSeconds: 10
         resources:
 {{ toYaml (default .Values.resources.defaults .Values.resources.oversight) | indent 12 }}
-      - {{ include "rbacProxy" (dict "securityContext" .Values.securityContext "images" .Values.images "resources" .Values.resources "customSecurityContext" .Values.securityContext.oversight ) | nindent 8 | trim }}
+      - {{ include "rbacProxy" (dict "securityContext" .Values.securityContext "images" .Values.images "resources" .Values.resources "customSecurityContext" .Values.securityContext.oversight "tlsConfig" .Values.tlsConfig ) | nindent 8 | trim }}
       terminationGracePeriodSeconds: 10
       nodeSelector:
 {{ toYaml (default .Values.nodeSelector.defaults .Values.nodeSelector.oversight) | indent 8 }}
@@ -127,10 +138,13 @@ spec:
       volumes:
         - name: workdir
           emptyDir:
-            sizeLimit: 50Mi      
+            sizeLimit: 50Mi
         - name: api-key
           secret:
             secretName: {{ template "container.security.fullname" . }}-auth
+        - name: rbac-proxy-certs
+          secret:
+            secretName: {{ template "kubeRbacProxy.fullname" . }}-tls-certificate
         {{- if .Values.telemetry.publicKey }}
         - name: telemetry-secret
           secret:
@@ -139,6 +153,12 @@ spec:
             - key: publicKey
               path: key.pem
         {{- end }}{{/* .Values.telemetry.publicKey */}}
+        - name: compliance-scan-job-template
+          configMap:
+            name: {{ template "container.security.name" . }}-oversight-controller-config
+            items:
+              - key: compliance-scan-job-template.yaml
+                path: compliance-scan-job-template.yaml
 ---
 apiVersion: v1
 kind: Service
@@ -179,6 +199,13 @@ spec:
       ports:
         - protocol: TCP
           port: 8081
+    - from: # allows traffic from compliance scan jobs
+      - podSelector:
+          matchLabels:
+            {{- include "complianceScanJob.selectorLabels" . | nindent 12 }}
+      ports:
+        - protocol: TCP
+          port: 8070
 {{- end }}
 
 {{ if .Values.serviceAccount.create }}
@@ -194,4 +221,198 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 {{- end }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "container.security.name" . }}-oversight-controller-config
+  labels:
+    {{- include "oversight.labels" . | nindent 4 }}
+data:
+  compliance-scan-job-template.yaml: |
+    apiVersion: batch/v1
+    kind: Job
+    metadata:
+      labels:
+        {{- include "complianceScanJob.labels" . | nindent 8 }}
+      namespace: {{ .Release.Namespace }}
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: {{ .Values.cloudOne.complianceScan.activeDeadlineSeconds }}
+      ttlSecondsAfterFinished: 60
+      template:
+        metadata:
+          labels:
+            {{- include "complianceScanJob.labels" . | nindent 12 }}
+        spec:
+          hostPID: true
+          serviceAccountName: {{ include "complianceScanJob.serviceAccountName" . }}
+          restartPolicy: Never
+          {{- $imageDefaults := .Values.images.defaults }}
+          {{- with .Values.images.complianceScanJob }}
+          {{- $secret := (default (default "" $imageDefaults.imagePullSecret) .imagePullSecret) }}
+          {{- if not (eq "" $secret) }}
+          imagePullSecrets:
+            - name: {{ $secret | quote }}
+          {{- end }}
+          containers:
+          - name: compliance-scan-job
+            {{- $project := (default (default "trendmicrocloudone" $imageDefaults.project) .project) }}
+            {{- $repository := printf "%s/%s" $project (required ".repository is required!" .repository) }}
+            {{- $tag := (default $imageDefaults.tag .tag) }}
+            image: {{ include "image.source" (dict "repository" $repository "registry" .registry "tag" $tag "imageDefaults" $imageDefaults "digest" .digest) }}
+            imagePullPolicy: {{ default (default "Always" $imageDefaults.pullPolicy) .pullPolicy }}
+            {{- end }}
+            args:
+            - scan
+            env:
+            - name: LOG_LEVEL
+              value: info
+            resources:
+{{ toYaml (default .Values.resources.defaults .Values.resources.complianceScanner) | indent 14 }}
+            volumeMounts:
+              - name: var-lib-kubelet
+                mountPath: /var/lib/kubelet
+                readOnly: true
+              - name: etc-systemd
+                mountPath: /etc/systemd
+                readOnly: true
+              - name: etc-kubernetes
+                mountPath: /etc/kubernetes
+                readOnly: true
+              - name: etc-default
+                mountPath: /etc/default
+                readOnly: true
+              - name: home-kubernetes
+                mountPath: /home/kubernetes
+                readOnly: true
+              - name: var-lib-cni
+                mountPath: /var/lib/cni
+                readOnly: true
+              - name: var-lib-etcd
+                mountPath: /var/lib/etcd
+                readOnly: true
+              - name: var-lib-kube-scheduler
+                mountPath: /var/lib/kube-scheduler
+                readOnly: true
+              - name: var-lib-kube-controller-manager
+                mountPath: /var/lib/kube-controller-manager
+                readOnly: true
+              - name: lib-systemd
+                mountPath: /lib/systemd/
+                readOnly: true
+              - name: srv-kubernetes
+                mountPath: /srv/kubernetes/
+                readOnly: true
+                # /usr/local/mount-from-host/bin is mounted to access kubectl / kubelet, for auto-detecting the Kubernetes version.
+                # You can omit this mount if you specify --version as part of the command.
+              - name: usr-bin
+                mountPath: /usr/local/mount-from-host/bin
+                readOnly: true
+              - name: etc-cni-netd
+                mountPath: /etc/cni/net.d/
+                readOnly: true
+              - name: opt-cni-bin
+                mountPath: /opt/cni/bin/
+                readOnly: true
+              - name: etc-passwd
+                mountPath: /etc/passwd
+                readOnly: true
+              - name: etc-group
+                mountPath: /etc/group
+                readOnly: true
+              - name: var-vcap-jobs
+                mountPath: /var/vcap/jobs
+                readOnly: true
+              - name: var-vcap-packages
+                mountPath: /var/vcap/packages
+                readOnly: true
+              - name: var-vcap-store-etcd
+                mountPath: /var/vcap/store/etcd
+                readOnly: true
+              - name: var-vcap-sys
+                mountPath: /var/vcap/sys
+                readOnly: true
+          volumes:
+            - name: var-lib-kubelet
+              hostPath:
+                path: "/var/lib/kubelet"
+                type: DirectoryOrCreate
+            - name: etc-systemd
+              hostPath:
+                path: "/etc/systemd"
+                type: DirectoryOrCreate
+            - name: etc-kubernetes
+              hostPath:
+                path: "/etc/kubernetes"
+                type: DirectoryOrCreate
+            - name: etc-default
+              hostPath:
+                path: "/etc/default"
+                type: DirectoryOrCreate
+            - name: home-kubernetes
+              hostPath:
+                path: "/home/kubernetes"
+                type: DirectoryOrCreate
+            - name: var-lib-cni
+              hostPath:
+                path: "/var/lib/cni"
+                type: DirectoryOrCreate
+            - name: var-lib-etcd
+              hostPath:
+                path: "/var/lib/etcd"
+                type: DirectoryOrCreate
+            - name: var-lib-kube-scheduler
+              hostPath:
+                path: "/var/lib/kube-scheduler"
+                type: DirectoryOrCreate
+            - name: var-lib-kube-controller-manager
+              hostPath:
+                path: "/var/lib/kube-controller-manager"
+                type: DirectoryOrCreate
+            - name: lib-systemd
+              hostPath:
+                path: "/lib/systemd"
+                type: DirectoryOrCreate
+            - name: srv-kubernetes
+              hostPath:
+                path: "/srv/kubernetes"
+                type: DirectoryOrCreate
+            - name: usr-bin
+              hostPath:
+                path: "/usr/bin"
+                type: DirectoryOrCreate
+            - name: etc-cni-netd
+              hostPath:
+                path: "/etc/cni/net.d/"
+                type: DirectoryOrCreate
+            - name: opt-cni-bin
+              hostPath:
+                path: "/opt/cni/bin/"
+                type: DirectoryOrCreate
+            - name: etc-passwd
+              hostPath:
+                path: "/etc/passwd"
+                type: FileOrCreate
+            - name: etc-group
+              hostPath:
+                path: "/etc/group"
+                type: FileOrCreate
+            - name: var-vcap-jobs
+              hostPath:
+                path: "/var/vcap/jobs"
+                type: DirectoryOrCreate
+            - name: var-vcap-packages
+              hostPath:
+                path: "/var/vcap/packages"
+                type: DirectoryOrCreate
+            - name: var-vcap-store-etcd
+              hostPath:
+                path: "/var/vcap/store/etcd"
+                type: DirectoryOrCreate
+            - name: var-vcap-sys
+              hostPath:
+                path: "/var/vcap/sys"
+                type: DirectoryOrCreate
 {{- end }}

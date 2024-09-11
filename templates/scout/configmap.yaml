@@ -1,4 +1,5 @@
 {{- if eq true .Values.cloudOne.runtimeSecurity.enabled }}
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -12,6 +13,32 @@ data:
       condition: evt.type = setuid and (evt.num=0)
       output: none
       priority: NOTICE
-{{ (.Files.Glob "config/*").AsConfig | indent 2 }}
+{{ (.Files.Glob "config/falco.yaml").AsConfig | indent 2 }}
+{{- if .Values.scout.falco.config }}
 {{ toYaml .Values.scout.falco.config | indent 4 }}
+{{- end }}
+{{- if .Values.cloudOne.runtimeSecurity.customRules.enabled }}
+{{ (.Files.Glob "config/falco-customrules.yaml").AsConfig | indent 2 }}
+    json_output: {{.Values.cloudOne.runtimeSecurity.customRules.output.json}}
+    http_output:
+      enabled: {{ default false .Values.cloudOne.runtimeSecurity.customRules.enabled }}
+      url: {{ default "http://some.url" .Values.cloudOne.runtimeSecurity.customRules.output.splunk.url }}
+      custom_headers:
+        {{- range .Values.cloudOne.runtimeSecurity.customRules.output.splunk.headers}}
+        - "{{ . }}"
+        {{- end }}
+      ca_path: "/etc/ssl/certs"
+      ca_cert: "/etc/ssl/certs/ca-certificates.crt"
+{{- end }}
+---
+{{- if .Values.cloudOne.runtimeSecurity.customRules.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "container.security.name" . }}-customrules
+  labels:
+    {{- include "scout.labels" . | nindent 4 }}
+data:
+{{ (tpl (.Files.Glob "config/customrules/*.{yaml,yml}").AsConfig .) | indent 2 }}
+{{- end }}
 {{- end }}

@@ -1,0 +1,185 @@
+{{- if eq true .Values.cloudOne.vulnerabilityScanning.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    {{- include "scanManager.labels" . | nindent 4 }}
+  name: trendmicro-scan-manager
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "scanManager.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/auth: {{ include "container.security.auth.secret" . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/scan-manager-config.yaml") . | sha256sum }}
+{{- with (default .Values.podAnnotations.defaults .Values.podAnnotations.scanManager) }}
+{{- toYaml . | nindent 8 }}
+{{- end }}
+      labels:
+        {{- include "scanManager.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "scanManager.serviceAccountName" . }}
+{{- $securityContextEnabled := .Values.securityContext.enabled }}
+{{- $securityContext := default .Values.securityContext.default .Values.securityContext.scanManager }}
+{{- $podSecurityContext := default .Values.securityContext.default.pod $securityContext.pod }}
+{{- $containerSecurityContext := default .Values.securityContext.default.container $securityContext.container.scanManager }}
+{{- if $securityContextEnabled }}
+      securityContext:
+{{ toYaml $podSecurityContext | indent 8 }}
+{{- end }}
+      {{- $imageDefaults := .Values.images.defaults }}
+      {{- with .Values.images.scanManager }}
+      {{- $secret := (default (default "" $imageDefaults.imagePullSecret) .imagePullSecret) }}
+      {{- if not (eq "" $secret) }}
+      imagePullSecrets:
+        - name: {{ $secret | quote }}
+      {{- end }}
+      containers:
+      - name: scan-manager
+{{- if $securityContextEnabled }}
+        securityContext:
+{{ toYaml $containerSecurityContext | indent 12 }}
+{{- end }}
+        {{- $project := (default (default "trendmicrocloudone" $imageDefaults.project) .project) }}
+        {{- $repository := printf "%s/%s" $project (required ".repository is required!" .repository) }}
+        {{- $tag := (default $imageDefaults.tag .tag) }}
+        image: {{ include "image.source" (dict "repository" $repository "registry" .registry "tag" $tag "imageDefaults" $imageDefaults "digest" .digest) }}
+        imagePullPolicy: {{ default (default "Always" $imageDefaults.pullPolicy) .pullPolicy }}
+        {{- end }}
+        ports:
+          - containerPort: 8080
+          - containerPort: 8070
+        args:
+        - --cloud-one-scan-job-image=$(SCAN_JOB_IMAGE)
+        - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
+        - --max-job-count={{ default 5 .Values.cloudOne.scanManager.maxJobCount }}
+        {{- with .Values.images.scanManager }}
+        {{- $secret := (default (default "" $imageDefaults.imagePullSecret) .imagePullSecret) }}
+        {{- if not (eq "" $secret) }}
+        - --image-pull-secret-name={{ $secret }}
+        {{- end }}
+        {{- end }}
+        - --log-level
+        - debug
+        - --job-template-path
+        - /etc/config/scan-job-template.yaml
+        - --job-active-deadline={{ printf "%ds" (int .Values.cloudOne.scanManager.activeDeadlineSeconds) }}
+        env:
+        {{- include "container.security.proxy.env" . | nindent 8 }}
+        {{- $scanJobImageDefaults := .Values.images.defaults }}
+        {{- with .Values.images.scanJob }}
+        {{- $scanJobProject := (default (default "trendmicrocloudone" $scanJobImageDefaults.project) .project) }}
+        {{- $scanJobRepository := printf "%s/%s" $scanJobProject (required ".repository is required!" .repository) }}
+        {{- $scanJobTag := (default $scanJobImageDefaults.tag .tag) }}
+        {{- $scanJobImage := include "image.source" (dict "repository" $scanJobRepository "registry" .registry "tag" $scanJobTag "imageDefaults" $scanJobImageDefaults "digest" .digest)}}
+        - name: SCAN_JOB_IMAGE
+          value: {{ $scanJobImage }}
+        {{- end}} {{/* - with .Values.images.scanJob */}}
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        volumeMounts:
+          - mountPath: /secrets
+            name: api-key
+          - name: job-template
+            mountPath: /etc/config/
+        resources:
+{{ toYaml (default .Values.resources.defaults .Values.resources.scanManager) | indent 12 }}
+      volumes:
+        - name: api-key
+          secret:
+            secretName: {{ template "container.security.fullname" . }}-auth
+        - name: job-template
+          configMap:
+            name: {{ template "container.security.name" . }}-scan-manager-config
+            items:
+              - key: scan-job-template.yaml
+                path: scan-job-template.yaml
+      terminationGracePeriodSeconds: 10
+      nodeSelector:
+{{ toYaml (default .Values.nodeSelector.defaults .Values.nodeSelector.scanManager) | indent 8 }}
+      tolerations:
+{{ toYaml (default .Values.tolerations.defaults .Values.tolerations.scanManager) | indent 8 }}
+      affinity:
+{{ toYaml (default .Values.affinity.defaults .Values.affinity.scanManager) | indent 8 }}
+{{- $classname := (default (default "" .Values.priorityClassName.default ) .Values.priorityClassName.scanManager) }}
+{{- if not (eq "" $classname) }}
+      priorityClassName: "{{ $classname }}"
+{{- end }}
+      restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    {{- include "scanManager.labels" . | nindent 4 }}
+  name: trendmicro-scan-manager-service
+  namespace: {{ .Release.Namespace }}
+spec:
+  ports:
+  - name: https
+    port: 8443
+    targetPort: https
+  - name: scan-request-server
+    port: 8080
+    targetPort: 8080
+  - name: sbom-server
+    port: 8070
+    targetPort: 8070
+  selector:
+    {{- include "scanManager.selectorLabels" . | nindent 4 }}
+
+{{ if .Values.networkPolicy.enabled }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: scan-manager-networkpolicy
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "scanManager.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "scanManager.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from: # sbom-server
+      - namespaceSelector: {}
+        podSelector:
+          matchLabels:
+            {{- include "scanner.selectorLabels" . | nindent 12 }}
+      ports:
+        - protocol: TCP
+          port: 8070
+    - from: # any -- this is for metrics
+      ports:
+        - protocol: TCP
+          port: 8443
+    - from: # any -- this should just be kubelet for health probes
+      ports:
+        - protocol: TCP
+          port: 8081
+{{- end }}
+
+{{ if .Values.serviceAccount.create }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "scanManager.serviceAccountName" . }}
+  labels:
+    {{- include "scanManager.labels" . | nindent 4 }}
+  {{- with .Values.serviceAccount.scanManager.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}
+{{- end }}

@@ -49,9 +49,11 @@ metadata:
     {{- include "oversight.labels" . | nindent 4 }}
 rules:
 - apiGroups:
+  - coordination.k8s.io
   - ""
   resources:
-  - configmaps
+  - leases
+  - nodes
   verbs:
   - get
   - list
@@ -115,6 +117,15 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+  - batch
+  resources:
+  - jobs
+  verbs:
+  - get
+  - list
+  - watch
+  - create
 {{- end }}
 
 ---

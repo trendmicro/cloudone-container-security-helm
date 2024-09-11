@@ -14,11 +14,12 @@ spec:
     metadata:
       annotations:
         checksum/auth: {{ include "container.security.auth.secret" . | sha256sum }}
+        checksum/cert: {{ include (print $.Template.BasePath "/kube-rbac-proxy-cert.yaml") . | sha256sum }}
 {{- with (default .Values.podAnnotations.defaults .Values.podAnnotations.usage) }}
 {{- toYaml . | nindent 8 }}
 {{- end }}
       labels:
-        {{- include "usage.selectorLabels" . | nindent 8 }}
+        {{- include "usage.labels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "usage.serviceAccountName" . }}
 {{- $securityContextEnabled := .Values.securityContext.enabled }}
@@ -54,6 +55,7 @@ spec:
         - --exclude-kubernetes-service-host-from-proxy={{ default true .Values.proxy.excludeKubernetesServiceHost }}
         - --leader-elect
         - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
+        - --application-version={{ .Chart.AppVersion }}
         command:
         - /manager
         env:
@@ -79,11 +81,14 @@ spec:
             name: api-key
         resources:
 {{ toYaml (default .Values.resources.defaults .Values.resources.usage) | indent 12 }}
-      - {{ include "rbacProxy" (dict "securityContext" .Values.securityContext "images" .Values.images "resources" .Values.resources "customSecurityContext" .Values.securityContext.usage) | nindent 8 | trim }}
+      - {{ include "rbacProxy" (dict "securityContext" .Values.securityContext "images" .Values.images "resources" .Values.resources "customSecurityContext" .Values.securityContext.usage "tlsConfig" .Values.tlsConfig ) | nindent 8 | trim }}
       volumes:
         - name: api-key
           secret:
             secretName: {{ template "container.security.fullname" . }}-auth
+        - name: rbac-proxy-certs
+          secret:
+            secretName: {{ template "kubeRbacProxy.fullname" . }}-tls-certificate
       terminationGracePeriodSeconds: 10
       nodeSelector:
 {{ toYaml (default .Values.nodeSelector.defaults .Values.nodeSelector.usage) | indent 8 }}

@@ -42,9 +42,10 @@ spec:
 {{- toYaml . | nindent 8 }}
 {{- end }}
       labels:
-        {{- include "admissionController.selectorLabels" . | nindent 8 }}
+        {{- include "admissionController.labels" . | nindent 8 }}
     spec:
-      automountServiceAccountToken: false
+      serviceAccountName: {{ include "admissionController.serviceAccountName" . }}
+      automountServiceAccountToken: true
 {{- $securityContextEnabled := .Values.securityContext.enabled }}
 {{- $securityContext := default .Values.securityContext.default .Values.securityContext.admissionController }}
 {{- $podSecurityContext := default .Values.securityContext.default.pod $securityContext.pod }}
@@ -91,7 +92,7 @@ spec:
             initialDelaySeconds: 20
             timeoutSeconds: 5
             periodSeconds: 20
-            failureThreshold: 6            
+            failureThreshold: 6
           volumeMounts:
             - name: webhook-certs
               mountPath: /etc/webhook/certs
@@ -106,10 +107,15 @@ spec:
           args:
             - --tlsCertFile=/etc/webhook/certs/cert.pem
             - --tlsKeyFile=/etc/webhook/certs/key.pem
+            - --tls-min-version={{ include "tlsConfig.minTLSVersion" .Values.tlsConfig }}
+            - --tls-cipher-suites={{ include "tlsConfig.cipherSuites" .Values.tlsConfig }}
             - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
             - --excluded-namespaces
             {{- $excludeNS := (default (list) .Values.cloudOne.exclusion.namespaces) }}
             - {{ $excludeNS | join "," | quote }}
+            - --trusted-scan-operators
+            {{- $trustedOperators := (default (list) .Values.cloudOne.admissionController.trustedScanOperators) }}
+            - {{ $trustedOperators | join "," | quote }}
             - --application-version=$(APPLICATION_VERSION)
             {{- if .Values.telemetry.enabled }}
             - --telemetry-endpoint={{ .Values.telemetry.endpoint }}
@@ -122,8 +128,14 @@ spec:
             - 2>&1
           env:
             {{- include "container.security.proxy.env" . | nindent 12 }}
+            - name: SCAN_MANAGER_SERVICE_ACCOUNT
+              value: {{ include "scanManager.serviceAccountName" . }}
             - name: APPLICATION_VERSION
-              value: {{ .Chart.Version | quote }}
+              value: {{ .Chart.AppVersion | quote }}
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
           resources:
 {{ toYaml (default .Values.resources.defaults .Values.resources.admissionController) | indent 12 }}
       volumes:
@@ -155,4 +167,17 @@ spec:
       priorityClassName: "{{ $classname }}"
 {{- end }}
       restartPolicy: Always
+---
+{{ if .Values.serviceAccount.create }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "admissionController.serviceAccountName" . }}
+  labels:
+    {{- include "admissionController.labels" . | nindent 4 }}
+  {{- with .Values.serviceAccount.admissionController.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}
 {{- end }}

@@ -1,0 +1,56 @@
+{{- if and (eq true .Values.cloudOne.runtimeSecurity.enabled) (eq true .Values.cloudOne.fargateInjector.enabled) }}
+{{- $cn := printf "%s.%s.svc" "trendmicro-fargate-injector" .Release.Namespace }}
+{{- $ca := genCA (printf "%s-ca" "trendmicro-fargate-injector") (default 3650 (int .Values.cloudOne.fargateInjector.certificate.lifetime)) -}}
+{{- $cert := genSignedCert (default $cn .Values.cloudOne.fargateInjector.certificate.commonName) (default nil .Values.cloudOne.fargateInjector.certificate.ipAlternativeNames) (default (list $cn) .Values.cloudOne.fargateInjector.certificate.dnsAlternativeNames) (default 3650 (int .Values.cloudOne.fargateInjector.certificate.lifetime)) $ca -}}
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name:  {{ template "fargateInjector.fullname" . }}-tls-certificate
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "fargateInjector.labels" . | nindent 4 }}
+type: Opaque
+data:
+  key.pem: {{ $cert.Key | b64enc | quote }}
+  cert.pem: {{ $cert.Cert | b64enc | quote }}
+
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: {{ include "fargateInjector.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "fargateInjector.labels" . | nindent 4 }}
+webhooks:
+  - name: {{ default $cn .Values.cloudOne.fargateInjector.certificate.commonName }}
+    rules:
+      - apiGroups:
+          - '*'
+        apiVersions:
+          - '*'
+        operations: ["CREATE", "CONNECT"]
+        resources:
+          - "pods"
+          - "pods/exec"
+          - "pods/attach"
+          - "replicasets"
+          - "replicationcontrollers"
+          - "deployments"
+          - "statefulsets"
+          - "daemonsets"
+          - "jobs"
+          - "cronjobs"
+        scope: "*"
+    failurePolicy: {{ required "A valid failure policy is required!" .Values.cloudOne.fargateInjector.failurePolicy }}
+    clientConfig:
+      service:
+        name: trendmicro-fargate-injector
+        namespace: {{ .Release.Namespace }}
+        path: "/"
+      caBundle: {{ $ca.Cert | b64enc | quote }}
+    admissionReviewVersions: ["v1", "v1beta1"]
+    sideEffects: None
+    timeoutSeconds: {{ default 30 .Values.cloudOne.fargateInjector.webhookTimeoutSeconds }}
+{{- end }}
