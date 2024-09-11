@@ -24,7 +24,7 @@ if ! command_exists $HELM; then
   exit 1
 fi
 
-CURRENT_NS=$(kubectl config view --minify --output 'jsonpath={..namespace}')
+CURRENT_NS=$($KUBECTL config view --minify --output 'jsonpath={..namespace}')
 CURRENT_NS=${CURRENT_NS:-trendmicro-system}
 NAMESPACE=${NAMESPACE:-$CURRENT_NS}
 NAMESPACE_PARAM="--namespace=$NAMESPACE"
