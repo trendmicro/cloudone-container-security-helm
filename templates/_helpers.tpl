@@ -803,3 +803,11 @@ volumeMounts:
   readOnly: true
 resources: {{ toYaml (default .resources.defaults .resources.rbacProxy) | nindent 2 }}
 {{- end -}}{{/* define */}}
+
+{{/*
+Return the target Kubernetes version
+*/}}
+{{- define "kubeVersion" -}}
+{{- $version := semver .Capabilities.KubeVersion.Version }}
+{{- printf "%v.%v.%v" $version.Major $version.Minor $version.Patch -}}
+{{- end -}}

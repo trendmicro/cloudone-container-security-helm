@@ -16,8 +16,11 @@ spec:
       labels:
       {{- include "scout.labels" .| nindent 8 }}
       annotations:
+{{- $hasApparmorProfile := semverCompare ">=1.30" (include "kubeVersion" .) -}}
+{{- if not $hasApparmorProfile }}
         container.apparmor.security.beta.kubernetes.io/falco: unconfined
         container.apparmor.security.beta.kubernetes.io/scout: unconfined
+{{- end }}{{/* if */}}
         checksum/config: {{ include (print $.Template.BasePath "/scout/configmap.yaml") . | sha256sum }}
 {{- if eq "tls" .Values.cloudOne.k8sMetaCollector.grpcAuth.type }}
         checksum/metacollector: {{ include (print $.Template.BasePath "/k8s-metacollector-secret.yaml") . | sha256sum }}
@@ -75,6 +78,10 @@ spec:
 {{- if $securityContextEnabled }}
           securityContext:
 {{ toYaml $falcoSecurityContext | indent 12 }}
+{{- if $hasApparmorProfile }}
+            appArmorProfile:
+              type: Unconfined
+{{- end }}{{/* if */}}
 {{- end }}{{/* if $securityContextEnabled */}}
           args:
             - /usr/bin/falco
@@ -202,6 +209,10 @@ spec:
 {{- if $securityContextEnabled }}
           securityContext:
 {{ toYaml $falcoSecurityContext | indent 12 }}
+{{- if $hasApparmorProfile }}
+            appArmorProfile:
+              type: Unconfined
+{{- end }}{{/* if */}}
 {{- end }}{{/* if $securityContextEnabled */}}
           args:
             - /usr/bin/falco
@@ -367,6 +378,10 @@ spec:
 {{- if $securityContextEnabled }}
           securityContext:
 {{ toYaml $scoutSecurityContext | indent 12 }}
+{{- if $hasApparmorProfile }}
+            appArmorProfile:
+              type: Unconfined
+{{- end }}{{/* if */}}
 {{- end }}{{/* if */}}
           volumeMounts:
             - mountPath: /var/run/scout/
