@@ -471,3 +471,19 @@ grpc:
   # When the `threadiness` value is set to 0, Falco will automatically determine
   # the appropriate number of threads based on the number of online cores in the system.
   bind_address: "unix:///var/run/scout/scout.sock"
+
+
+################
+# Falco engine #
+################
+engine:
+  kind: modern_ebpf
+  ebpf:
+    # path to the elf file to load.
+    probe: ${HOME}/.falco/falco-bpf.o
+    buf_size_preset: 4
+    drop_failed_exit: false
+  modern_ebpf:
+    cpus_for_each_buffer: 2
+    buf_size_preset: 4
+    drop_failed_exit: false

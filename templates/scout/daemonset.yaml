@@ -94,10 +94,6 @@ spec:
             - --cri
             - /run/k3s/containerd/containerd.sock
             {{- end }}{{/* if */}}
-            - -K
-            - /var/run/secrets/kubernetes.io/serviceaccount/token
-            - --k8s-node
-            - $(NODE_NAME)
             - -p
             - >
               container.id=%container.id
