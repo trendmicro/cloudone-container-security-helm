@@ -79,8 +79,8 @@ spec:
         {{- $excludeNS := (default (list) .Values.cloudOne.exclusion.namespaces) }}
         - {{ $excludeNS | join "," | quote }}
         - --workload-controller-instance-name={{ .Release.Name }}
-        - --log-level
-        - debug
+        - --zap-devel=false
+        - --zap-log-level={{ default "info" .Values.cloudOne.workloadOperator.logLevel }}
         - --rescan-interval
         - 30m
         - --vulnerability-scanning={{ default "false" .Values.cloudOne.vulnerabilityScanning.enabled }}

@@ -107,6 +107,12 @@ cloudOne:
     ##
     enableNetworkPolicyCreation: true
 
+  workloadOperator:
+    ## logLevel sets the zap log verbosity level
+    ##
+    ## Default value: info
+    logLevel: info
+
   scanManager:
     ## Maximum number of scan jobs running at once.
     ##
