@@ -480,6 +480,13 @@ proxy:
   ## Default value: (none)
   httpsProxy:
 
+  ## noProxy is a comma-separated list of hosts or CIDR blocks that should not be proxied.
+  ##
+  ## The value may be a comma-separated list of hosts or CIDR blocks. Ex: "localhost,127.0.0.0/8"
+  ##
+  ## Default value: (none)
+  noProxy: 
+
   ## username, if set, is the user name to provide to the outbound proxy when making requests.
   ##
   ## Default value: (none)

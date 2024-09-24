@@ -110,6 +110,7 @@ spec:
             - --tls-min-version={{ include "tlsConfig.minTLSVersion" .Values.tlsConfig }}
             - --tls-cipher-suites={{ include "tlsConfig.cipherSuites" .Values.tlsConfig }}
             - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
+            - --exclude-kubernetes-service-host-from-proxy={{ default "true" .Values.proxy.excludeKubernetesServiceHost }}
             - --excluded-namespaces
             {{- $excludeNS := (default (list) .Values.cloudOne.exclusion.namespaces) }}
             - {{ $excludeNS | join "," | quote }}

@@ -56,6 +56,7 @@ spec:
         args:
         - --cloud-one-scan-job-image=$(SCAN_JOB_IMAGE)
         - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
+        - --exclude-kubernetes-service-host-from-proxy={{ default "true" .Values.proxy.excludeKubernetesServiceHost }}
         - --max-job-count={{ default 5 .Values.cloudOne.scanManager.maxJobCount }}
         {{- with .Values.images.scanManager }}
         {{- $secret := (default (default "" $imageDefaults.imagePullSecret) .imagePullSecret) }}

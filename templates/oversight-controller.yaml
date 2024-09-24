@@ -73,10 +73,10 @@ spec:
         - --mitigation-handler-buffer-size={{ default 50 .Values.cloudOne.oversight.mitigationHandlerBufferSize }}
         - --page-size={{ default 100 .Values.cloudOne.oversight.pageSize }}
         - --sync-period={{ default "3600s" .Values.cloudOne.oversight.syncPeriod }}
-        - --enable-runtime-mitigation={{ default false .Values.cloudOne.runtimeSecurity.enabled }}
-        - --enable-compliance-scan={{ default true .Values.cloudOne.complianceScan.enabled }}
+        - --enable-runtime-mitigation={{ default "false" .Values.cloudOne.runtimeSecurity.enabled }}
+        - --enable-compliance-scan={{ default "true" .Values.cloudOne.complianceScan.enabled }}
         - --job-template-path=/etc/config/compliance-scan-job-template.yaml
-        - --exclude-kubernetes-service-host-from-proxy={{ default true .Values.proxy.excludeKubernetesServiceHost }}
+        - --exclude-kubernetes-service-host-from-proxy={{ default "true" .Values.proxy.excludeKubernetesServiceHost }}
         - --excluded-namespaces
         {{- $excludeNS := (default (list) .Values.cloudOne.exclusion.namespaces) }}
         - {{ $excludeNS | join "," | quote }}

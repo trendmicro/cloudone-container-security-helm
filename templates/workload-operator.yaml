@@ -83,6 +83,7 @@ spec:
         - --zap-log-level={{ default "info" .Values.cloudOne.workloadOperator.logLevel }}
         - --rescan-interval
         - 30m
+        - --exclude-kubernetes-service-host-from-proxy={{ default "true" .Values.proxy.excludeKubernetesServiceHost }}
         - --vulnerability-scanning={{ default "false" .Values.cloudOne.vulnerabilityScanning.enabled }}
         - --inventory-collection={{ default "false" .Values.cloudOne.inventoryCollection.enabled }}
         - --inventory-collection-period={{ default "5m" .Values.cloudOne.inventoryCollection.period }}
