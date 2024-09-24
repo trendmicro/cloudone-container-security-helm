@@ -124,6 +124,7 @@ spec:
                   "Parsed" to indicate if the policy is able to be parsed successfully
                   "Applied" to indicate if the policy is applied in VisionOne backend
                   "InUse" to indicate if the policy is assigned to the cluster
+                  "Drifted" to indicate if the ruleset is drifted from the VisionOne backend
                 items:
                   description: Condition contains details for one aspect of the current
                     state of this API Resource.
@@ -195,9 +196,6 @@ spec:
                 type: string
             type: object
         type: object
-        x-kubernetes-validations:
-        - message: The cluster policy name must be trendmicro-cluster-policy
-          rule: self.metadata.name == 'trendmicro-cluster-policy'
     served: true
     storage: true
     subresources:

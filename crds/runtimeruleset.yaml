@@ -50,6 +50,7 @@ spec:
                   "Parsed" to indicate if the ruleset is able to be parsed successfully
                   "Applied" to indicate if the ruleset is applied in VisionOne backend
                   "InUse" to indicate if the ruleset is assigned to a policy
+                  "Drifted" to indicate if the ruleset is drifted from the VisionOne backend
                 items:
                   description: Condition contains details for one aspect of the current
                     state of this API Resource.

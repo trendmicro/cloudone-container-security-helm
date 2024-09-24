@@ -229,10 +229,24 @@ cloudOne:
 
   policyOperator:
     ## enable the cluster-managed policy feature
-    enabled: true
+    enabled: false
+
     ## Minimum value: 5m
     ## Maximum value: 1h
     reconciliationPeriod: 5m
+
+    ## clusterPolicyName is the name of the policy that will be reconciled by the policy operator
+    ## Only one policy can be reconciled by the policy operator and applied to the cluster
+    ## Use the name defined here as the name of the cluster policy custom resource
+    ## The policy name will also be used as vision one policy name
+    ##
+    ## Default value: trendmicro_cluster_policy
+    clusterPolicyName: trendmicro_cluster_policy
+
+    ## logLevel sets the zap log verbosity level
+    ##
+    ## Default value: info
+    logLevel: info
 
 securityContextConstraints:
   # enable the Security Context Constraints creation in Openshift

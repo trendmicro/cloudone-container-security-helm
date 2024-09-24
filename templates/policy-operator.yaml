@@ -51,9 +51,11 @@ spec:
         {{- end }}
         args:
         - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
+        - --exclude-kubernetes-service-host-from-proxy={{ default true .Values.proxy.excludeKubernetesServiceHost }}
         - --zap-devel=false
-        - --zap-log-level=debug
+        - --zap-log-level={{ default "info" .Values.cloudOne.policyOperator.logLevel }}
         - --reconciliation-period={{ .Values.cloudOne.policyOperator.reconciliationPeriod }}
+        - --cluster-policy-name={{ .Values.cloudOne.policyOperator.clusterPolicyName }}
         command:
         - /app/policy-operator
         env:
