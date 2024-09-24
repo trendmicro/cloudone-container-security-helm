@@ -243,6 +243,18 @@ scout:
       socket: "/run/k0s/containerd.sock"
 ```
 
+### Add capabilities to runtime vulnerability scanner
+
+Runtime vulnerability scanner needs the priviledge to access all directories and files in an image. `DAC_READ_SEARCH` is needed when the file permissions do not allow scanner to access the files or directories in an image. In this case, you can add `DAC_READ_SEARCH` to the `scanner`'s capabilities
+
+```
+securityContext:
+  scanner:
+    target:
+      capabilities:
+        add: ["DAC_READ_SEARCH"]
+```
+
 ## Troubleshooting
 
 ### Access logs

@@ -420,8 +420,7 @@ securityContext:
       capabilities:
         drop:
         - ALL
-        add:
-        - DAC_READ_SEARCH
+        add: []
       privileged: false
       readOnlyRootFilesystem: true
       runAsNonRoot: false
