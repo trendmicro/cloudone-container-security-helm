@@ -1,7 +1,7 @@
 name: trendmicro-container-security
 description: Trend Micro Cloud One Container Security
-appVersion: "2.3.47"
-version: "2.3.47"
+appVersion: "2.4.0"
+version: "2.4.0"
 kubeVersion: ">=1.16.0-0"
 apiVersion: v1
 deprecated: false

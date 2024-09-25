@@ -485,7 +485,7 @@ proxy:
   ## The value may be a comma-separated list of hosts or CIDR blocks. Ex: "localhost,127.0.0.0/8"
   ##
   ## Default value: (none)
-  noProxy: 
+  noProxy:
 
   ## username, if set, is the user name to provide to the outbound proxy when making requests.
   ##
@@ -758,7 +758,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.3.47
+    tag: 2.4.0
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -773,55 +773,55 @@ images:
     # imagePullSecret:
   admissionController:
     repository: admission-controller
-    digest: sha256:8fe57301af457e723c4a473cd6ef4aad84e5b471a3726199abf1103e4cda2b26
+    digest: sha256:8a7b732df6581445ce6793a963b9b65f934f567483dc4fea104b52ac82ba5b72
 
   oversight:
     repository: oversight-controller
-    digest: sha256:5f0124a347a72ae5f5d31badb656c626f0df81cf19f890c4a3d984f2a56386e6
+    digest: sha256:0d0f030a2d14705edbfba423968ed32aca4ef7d0a4dc814119d0c44b99c1e025
 
   usage:
     repository: usage-controller
-    digest: sha256:6f38decf3adaa76394ef07b4b52c0e6e3566807c3f43428bb7938202d660fbdb
+    digest: sha256:7506eb95d7a4d08827250c4e44aa807f007aca3742b01e855a13f2efa9293448
 
   rbacProxy:
     repository: rbac-proxy
-    digest: sha256:a5f4b8a0fba4cdbc3ede1ebc16b71bf4a1d78bcfb0831afd3526c7fb0b7f1013
+    digest: sha256:cf702fe130af0be68b29e5abc269e0556493d0eaadd2b59d3ef0266b56d2429d
 
   falco:
     repository: falco
-    digest: sha256:7dd9913263de23484df1fce91a1cedf8d59a9ea49704714fb408664f8ebed2c0
+    digest: sha256:6b5c4e79e6792511d87d6519838a7ad24121ef458292eea6acba014e11df5461
 
   scout:
     repository: scout
-    digest: sha256:837942d2043da1fb667994d9900376be99d9fe0acbee43f007a1974e13781e3f
+    digest: sha256:68b580765bfad31329073ba2bf24196917a951f124296824e642c736dc03ef67
 
   scanManager:
     repository: scan-manager
-    digest: sha256:48b18747cd6157dabaeeac6fe932a0c3d8367e15cd8c9ecd9f66780d4b4bb34e
+    digest: sha256:33e7b9b013a5ae123c28ae81b55dd0f6fe8563a46ad7c7f1224a7bca7488aa8a
 
   scanJob:
     repository: scan-job
-    digest: sha256:b0623b73fa6c4cc74e4f69fd0da2ae09a879b72f8cb734b2bda7afaba2ee0845
+    digest: sha256:8fe2f8e1d130d6ebe436b37c5fbcd150edf8f6b1e40e880547fb22db42878f2c
 
   complianceScanJob:
     repository: compliance-scan-job
-    digest: sha256:f8895bd72786f59c7f8a9d181a20b3f21b5b1f7e94986ead9c733e59e277f109
+    digest: sha256:205607772400ea03132589fa1e6c185b4d8848f21215d2db9b08cc35d362a67b
 
   workloadOperator:
     repository: workload-operator
-    digest: sha256:7caa15319cef085787a7b9a4a4ab37d2bac034f7b8807970561a8c380d51e8cb
+    digest: sha256:3e45e2af7ea5a82e0edba7c7c80e469caa7dd4a95cfa5665c09da27ab38aa05c
 
   fargateInjector:
     repository: fargate-tool
-    digest: sha256:a3cd65de92df5c551bdb32e5b37cbe80cd7d11197bf2e25e886acc0325a5f3f4
+    digest: sha256:2ca3c779fdc6412ad5575a2cc8febe15e96ec56711d89e3564f9c968fc03dbc5
 
   pdig:
     repository: pdig
-    digest: sha256:1aa586f804a87e3a32dca9e2d3ae8a732e0b2238dd31c4bbeb434744f9472b6c
+    digest: sha256:5aa508e6d73ef1211f75b97b7a39efc4266ab0a7c1b21a6cbd467511115e5f63
 
   k8sMetaCollector:
     repository: k8s-metacollector
-    digest: sha256:00c497c1b3d1483da53c32b58bae548af183a1c9f37c20298df1a79c10757e70
+    digest: sha256:c19b86eea4af2ae9878d84cb25a35b9b1d7f4013f1f732e0cfd3a3bba9fc5cf8
 
 ##
 ## Determine whether to use existing secrets in the target namespace rather than
