@@ -34,6 +34,14 @@ rules:
   verbs:
   - list
   - get
+- verbs:
+  - use
+  apiGroups:
+  - security.openshift.io
+  resources:
+  - securitycontextconstraints
+  resourceNames:
+  - {{ template "container.security.name" . }}-compliance-scanner
 
 ---
 
