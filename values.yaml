@@ -240,8 +240,8 @@ cloudOne:
     ## Use the name defined here as the name of the cluster policy custom resource
     ## The policy name will also be used as vision one policy name
     ##
-    ## Default value: trendmicro_cluster_policy
-    clusterPolicyName: trendmicro_cluster_policy
+    ## Default value: trendmicro-cluster-policy
+    clusterPolicyName: trendmicro-cluster-policy
 
     ## logLevel sets the zap log verbosity level
     ##

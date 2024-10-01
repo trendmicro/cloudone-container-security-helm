@@ -6,10 +6,8 @@
 
 Trend Micro Cloud One Container Security components use the `helm` package manager for Kubernetes.
 
-#### Helm 3
-
 Helm 3 or later is supported when installing Trend Micro Cloud One - Container Security components.
-To get started, see the [Helm installation guide](https://helm.sh/docs/intro/install/). Installing Helm 3 should only require you to run one command.
+To get started, see the [Helm installation guide](https://helm.sh/docs/intro/install/).
 
 ### Kubernetes Network Policies with Container Security Continuous Compliance
 
@@ -121,7 +119,7 @@ To upgrade an existing installation in the default Kubernetes namespace to the l
     https://github.com/trendmicro/cloudone-container-security-helm/archive/master.tar.gz
 ```
 
-**Note**: Helm will override or reset values in `overrides.yaml`. If you want to use the values you had previously, use the [--reuse-valeus](https://helm.sh/docs/helm/helm_upgrade/) option during a Helm upgrade:
+**Note**: Helm will override or reset values in `overrides.yaml`. If you want to use the values you had previously, use the [--reuse-values](https://helm.sh/docs/helm/helm_upgrade/) option during a Helm upgrade:
 
 ```sh
   helm upgrade \
@@ -156,6 +154,7 @@ By default, Container Security Continuous Compliance will create a Kubernetes ne
 ## Documentation
 
 - [Trend Micro Cloud One Container Security Documentation](https://cloudone.trendmicro.com/docs/container-security)
+- [Trend Micro Vision One Container Security Documentation](https://docs.trendmicro.com/en-us/documentation/article/trend-vision-one-container-security)
 
 ## Advanced topics
 
@@ -181,6 +180,10 @@ For example, you can choose to enable the runtime security component by includin
     runtimeSecurity:
       enabled: true
 ```
+
+### Managing Container Security policies with Policy as Code
+
+To learn more about managing Container Security policies with custom resources and policy operator, see the [Policy as Code documentation](./docs/policy-as-code.md).
 
 ### Configure Container Security to use a proxy
 
@@ -245,7 +248,7 @@ scout:
 
 ### Add capabilities to runtime vulnerability scanner
 
-Runtime vulnerability scanner needs the priviledge to access all directories and files in an image. `DAC_READ_SEARCH` is needed when the file permissions do not allow scanner to access the files or directories in an image. In this case, you can add `DAC_READ_SEARCH` to the `scanner`'s capabilities
+Runtime vulnerability scanner needs the privilege to access all directories and files in an image. `DAC_READ_SEARCH` is needed when the file permissions do not allow scanner to access the files or directories in an image. In this case, you can add `DAC_READ_SEARCH` to the `scanner`'s capabilities
 
 ```
 securityContext:
