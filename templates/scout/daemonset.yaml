@@ -336,7 +336,7 @@ spec:
             - --grpc-socket-path
             - unix:///var/run/scout/scout.sock
             - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
-            - --exclude-kubernetes-service-host-from-proxy={{ default "true" .Values.proxy.excludeKubernetesServiceHost }}
+            - --exclude-kubernetes-service-host-from-proxy={{ default "false" .Values.proxy.excludeKubernetesServiceHost }}
             - --excluded-namespaces
             {{- $excludeNS := (default (list) .Values.cloudOne.exclusion.namespaces) }}
             {{- if .Values.scout.excludeSameNamespace }}
@@ -448,7 +448,7 @@ spec:
             - /downloader
           args:
             - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
-            - --exclude-kubernetes-service-host-from-proxy={{ default "true" .Values.proxy.excludeKubernetesServiceHost }}
+            - --exclude-kubernetes-service-host-from-proxy={{ default "false" .Values.proxy.excludeKubernetesServiceHost }}
             - --log-level
             - debug
             - --componentdir
