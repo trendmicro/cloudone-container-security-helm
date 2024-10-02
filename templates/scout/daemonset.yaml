@@ -184,6 +184,9 @@ spec:
             - mountPath: /host/etc
               name: etc-fs
               readOnly: true
+            - mountPath: /sys/kernel/debug
+              name: debugfs
+              readOnly: true
             - mountPath: /etc/falco
               name: config-volume
               readOnly: true
@@ -306,6 +309,9 @@ spec:
               readOnly: true
             - mountPath: /host/etc
               name: etc-fs
+              readOnly: true
+            - mountPath: /sys/kernel/debug
+              name: debugfs
               readOnly: true
             - mountPath: /etc/falco
               name: config-volume
@@ -546,6 +552,9 @@ spec:
         - name: etc-fs
           hostPath:
             path: /etc
+        - name: debugfs
+          hostPath:
+            path: /sys/kernel/debug
         - name: config-volume
           configMap:
             name: {{ template "container.security.name" . }}-scout-config
