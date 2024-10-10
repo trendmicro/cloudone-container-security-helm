@@ -367,7 +367,6 @@ serviceAccount:
 
     ## Annotations to add to the service account
     annotations: {}
-    
   policyOperator:
     ## The name of the service account to use.
     ## If not set and create is true, a name is generated using the fullname of policyOperator template
@@ -833,7 +832,7 @@ images:
 
   scanManager:
     repository: scan-manager
-    digest: sha256:33e7b9b013a5ae123c28ae81b55dd0f6fe8563a46ad7c7f1224a7bca7488aa8a
+    digest: sha256:757c92f071e0a2aac5ae9d694106966bbe3dcea227975edefbb781904cec737f
 
   scanJob:
     repository: scan-job
@@ -861,7 +860,7 @@ images:
 
   policyOperator:
     repository: policy-operator
-    digest:
+    digest: sha256:9e26394cc159e67c199a90d6a8559d8ff0b9d582ff6c9ee44b365a6851b0af66
 
 ##
 ## Determine whether to use existing secrets in the target namespace rather than
