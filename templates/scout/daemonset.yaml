@@ -345,8 +345,6 @@ spec:
             - {{ $excludeNS | join "," | quote }}
             - --falco-event-max-diff
             - 90s
-            - --log-level
-            - debug
             {{- if ne (len .Values.scout.scout.falcoInternalEvent) 0 }}
             - --falco-internal-event
             - {{ join "," .Values.scout.scout.falcoInternalEvent }}

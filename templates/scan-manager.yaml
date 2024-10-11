@@ -64,8 +64,6 @@ spec:
         - --image-pull-secret-name={{ $secret }}
         {{- end }}
         {{- end }}
-        - --log-level
-        - debug
         - --job-template-path
         - /etc/config/scan-job-template.yaml
         - --job-active-deadline={{ printf "%ds" (int .Values.cloudOne.scanManager.activeDeadlineSeconds) }}
