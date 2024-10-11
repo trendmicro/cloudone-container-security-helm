@@ -15,7 +15,7 @@ allowHostNetwork: true
 allowHostPID: true
 allowHostPorts: true
 allowRunAsUser: true
-allowPrivilegeEscalation: false
+allowPrivilegeEscalation: true
 allowPrivilegedContainer: true
 allowedCapabilities:
 {{- toYaml .Values.securityContext.scanner.target.capabilities.add | nindent 2}}

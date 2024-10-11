@@ -29,11 +29,24 @@ rules:
 - apiGroups:
   - ""
   resources:
+  - nodes
+  - nodes/proxy
   - pods
+  - pods/log
+  - configmaps
   - serviceaccounts
   verbs:
   - list
   - get
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - pods/exec
+  - pods
+  verbs:
+  - create
+  - delete
 - verbs:
   - use
   apiGroups:
