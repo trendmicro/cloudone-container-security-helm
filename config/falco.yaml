@@ -438,13 +438,13 @@ metadata_download:
 #
 # Redirect logs to standard output.
 syslog_output:
-  enabled: true
+  enabled: false
 
 # [Stable] `stdout_output`
 #
 # Redirect logs to standard output.
 stdout_output:
-  enabled: true
+  enabled: false
 
 # [Stable] `grpc_output`
 #

@@ -740,6 +740,16 @@ scout:
     ## Default value: true
     modernBpf: true
 
+    ## stdout_enabled sets the status of stdout log output
+    ##
+    ## Default Value: false
+    stdout_enabled: false
+
+    ## syslog_enabled sets the status of syslog output
+    ##
+    ## Default Value: false
+    syslog_enabled: false
+
   scout:
     ## falcoInternalEvent, determines how to deal with falco internal event
     ## sysevent: send the internal events as system events to container security backend
