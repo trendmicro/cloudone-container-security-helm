@@ -82,6 +82,11 @@ cloudOne:
     ## Default value: 30
     webhookTimeoutSeconds: 30
 
+    ## logLevel sets the log verbosity level. Supported values are debug, info, and error
+    ##
+    ## Default value: info
+    logLevel: info
+
   oversight:
     enabled: true
 
@@ -107,8 +112,13 @@ cloudOne:
     ##
     enableNetworkPolicyCreation: true
 
+    ## logLevel sets the log verbosity level. Supported values are debug, info, and error
+    ##
+    ## Default value: info
+    logLevel: info
+
   workloadOperator:
-    ## logLevel sets the zap log verbosity level
+    ## logLevel sets the log verbosity level. Supported values are debug, info, and error
     ##
     ## Default value: info
     logLevel: info
@@ -120,12 +130,18 @@ cloudOne:
     ## Maximum value: 100
     ## Minimum value: 3
     ##
+    
     maxJobCount: 5
     ## activeDeadlineSeconds is the maximum duration a scan job can run before timing out.
     ##
     ## Default value: 300
     ##
     activeDeadlineSeconds: 300
+
+    ## logLevel sets the log verbosity level. Supported values are debug, info, and error
+    ##
+    ## Default value: info
+    logLevel: info
 
   runtimeSecurity:
     enabled: false
@@ -194,14 +210,18 @@ cloudOne:
     grpcAuth:
       ## authentication mode, insecure or tls
       type: tls
+      
       ## certificate settings
       certificate:
         ## lifetime is the lifetime in days of the default signed certificate.
         ##
         ## Default value: 3650
         lifetime: 3650
-    ## log verbosity level
-    vLevel: 5
+
+    ## logLevel sets the log verbosity level. Supported values are debug, info, and error
+    ##
+    ## Default value: info 
+    logLevel: info
 
   kubeRbacProxy:
     certificate:
@@ -243,7 +263,7 @@ cloudOne:
     ## Default value: trendmicro-cluster-policy
     clusterPolicyName: trendmicro-cluster-policy
 
-    ## logLevel sets the zap log verbosity level
+    ## logLevel sets the log verbosity level. Supported values are debug, info, and error
     ##
     ## Default value: info
     logLevel: info
@@ -530,6 +550,36 @@ proxy:
   ## Default value: true
   excludeKubernetesServiceHost: true
 
+
+logConfig:
+  ## devel sets the log mode defaults to development mode if set to true
+  ## Development mode defaults encoder=consoleEncoder,logLevel=Debug,stackTraceLevel=Warn) 
+  ## Production Mode defaults(encoder=jsonEncoder,logLevel=Info,stackTraceLevel=Error)
+  devel: false
+
+  ## logLevel sets the log verbosity level. Supported values are debug, info, and error
+  ## Overrides the logLevel set for each component
+  ##
+  ## Default value: 
+  logLevel:
+
+  ## encoder sets the log encoder. Supported values are json and console
+  ##
+  ## Default value: json
+  encoder: json
+
+  ## stackTraceLevel sets the level above which stacktraces are captured 
+  ## Supported values are info, error or panic
+  ##
+  ## Default value: error
+  stacktraceLevel: error
+
+  ## timeEncoding sets the time encoding format 
+  ## Supported values are epoch, millis, nano, iso8601, rfc3339 or rfc3339nano
+  ##
+  ## Default value: epoch
+  timeEncoding: epoch
+
 tlsConfig:
   ## minTLSVersion is the minimum TLS version that the server will accept.
   ## Value must match version names from https://golang.org/pkg/crypto/tls/#pkg-constants.
@@ -708,6 +758,7 @@ scout:
       ## Determines if the docker socket is mounted in the falco container.
       ## Required for docker based runtimes
       enabled: true
+
       ## socket, determines which socket to mount for enabling docker based runtimes.
       socket: /var/run/docker.sock
 
@@ -715,26 +766,34 @@ scout:
       ## Determines if the cri (containerd or crio) socket is mounted in the falco container.
       ## Required for cri based runtimes
       enabled: true
+
       ## socket, determines which socket to mount for enabling cri based runtimes.
       ## Default value: (determined by platform)
       socket:
+
     dockershim:
       ## Determines if the dockershim socket is mounted in the falco container.
       ## Required for bottlerocket
       enabled: true
+
       ## socket, determines which socket to mount for enabling dockershim based runtimes.
       ## Default value: (determined by platform)
       socket:
+
     k0s:
       ## Determines if the k0s socket is mounted in the falco container.
       enabled: true
+
       ## socket, determines which socket to mount for enabling k0s based runtimes.
       socket:
+
     k3s:
       ## Determines if the k3s socket is mounted in the falco container.
       enabled: true
+
       ## socket, determines which socket to mount for enabling k3s based runtimes.
       socket:
+
     ## modernBpf, determine if falco uses ebpf CO-RE if kernel supports.
     ## If it is false or kernel doesn't support ebpf CO-RE, the ebpf driver will be downloaded from Trend Micro Cloud One Container Security service.
     ## Default value: true
@@ -760,21 +819,31 @@ scout:
     ##
     ## Default Value: []
     extraArgs: []
+
     ## env, if set will apply additional environment variables to the scout container
     ##
     ## Default Value: []
     env: {}
+
+    ## logLevel sets the log verbosity level. Supported values are debug, info, and error
+    ##
+    ## Default value: info
+    logLevel: info
+    
   downloader:
     ## extraArgs, if set will apply additional arguments to scout container
     ##
     ## Default Value: []
     extraArgs: []
+
     ## env, if set will apply additional environment variables to the scout container
     ##
     ## Default Value: []
     env: {}
+
     ## componentType, the type of component to download
     componentType: falco-ebpf-program
+    
     ## componentDir, the directory where the component to be downloaded
     componentDir: /var/component
 

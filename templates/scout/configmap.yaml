@@ -21,7 +21,7 @@ data:
 {{ (.Files.Glob "config/falco-customrules.yaml").AsConfig | indent 2 }}
     json_output: {{.Values.cloudOne.runtimeSecurity.customRules.output.json}}
     http_output:
-      enabled: {{ default false .Values.cloudOne.runtimeSecurity.customRules.enabled }}
+      enabled: {{ default "false" .Values.cloudOne.runtimeSecurity.customRules.enabled }}
       url: {{ default "http://some.url" .Values.cloudOne.runtimeSecurity.customRules.output.splunk.url }}
       custom_headers:
         {{- range .Values.cloudOne.runtimeSecurity.customRules.output.splunk.headers}}

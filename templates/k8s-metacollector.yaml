@@ -87,8 +87,11 @@ spec:
             - --broker-server-key
             - /etc/metacollector/certs/key.pem
 {{- end }}
-            - --zap-log-level
-            - {{ quote .Values.cloudOne.k8sMetaCollector.vLevel }}
+            - --zap-devel={{ default "false" .Values.logConfig.devel }}
+            - --zap-log-level={{ include "logLevel" (list .Values.cloudOne.k8sMetaCollector.logLevel .) }}
+            - --zap-encoder={{ default "json" .Values.logConfig.encoder }}
+            - --zap-stacktrace-level={{ default "error" .Values.logConfig.stacktraceLevel }}
+            - --zap-time-encoding={{ default "epoch" .Values.logConfig.timeEncoding }}
           ports:
             - name: "broker-grpc"
               containerPort: 45000

@@ -74,13 +74,16 @@ spec:
         {{- end }}
         {{- end }}
         args:
+        - --zap-devel={{ default "false" .Values.logConfig.devel }}
+        - --zap-log-level={{ include "logLevel" (list .Values.cloudOne.workloadOperator.logLevel .) }}
+        - --zap-encoder={{ default "json" .Values.logConfig.encoder }}
+        - --zap-stacktrace-level={{ default "error" .Values.logConfig.stacktraceLevel }}
+        - --zap-time-encoding={{ default "epoch" .Values.logConfig.timeEncoding }}
         - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
         - --excluded-namespaces
         {{- $excludeNS := (default (list) .Values.cloudOne.exclusion.namespaces) }}
         - {{ $excludeNS | join "," | quote }}
         - --workload-controller-instance-name={{ .Release.Name }}
-        - --zap-devel=false
-        - --zap-log-level={{ default "info" .Values.cloudOne.workloadOperator.logLevel }}
         - --rescan-interval
         - 30m
         - --exclude-kubernetes-service-host-from-proxy={{ default "false" .Values.proxy.excludeKubernetesServiceHost }}

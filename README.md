@@ -258,6 +258,39 @@ securityContext:
         add: ["DAC_READ_SEARCH"]
 ```
 
+### Configuring logging for the Container Security components
+
+You can configure the logging for all components by setting the `logConfig` value in your `overrides.yaml` file:
+
+```yaml
+logConfig:
+  logLevel: info # Sets the log verbosity level. Supported values are debug, info, and error. Overrides the logLevel set for each component
+  logFormat: json # Sets the log encoder. Supported values are json and console
+  stackTraceLevel: error # Sets the level above which stacktraces are captured. Supported values are info, error or panic
+  timeEncoding: epoch # Sets the time encoding format. Supported values are epoch, millis, nano, iso8601, rfc3339 or rfc3339nano
+```
+
+You can also configure the log level for each component individually by setting the `logLevel` value for the component in your `overrides.yaml` file:
+
+```yaml
+cloudone:
+  admissionController:
+    logLevel: debug
+```
+
+### Configuring Falco event outputs
+
+You can enable Falco event outputs to stdout or syslog by setting values under `scout.falco` in your `overrides.yaml` file:
+
+```yaml
+scout:
+  falco:
+    stdout_enabled: true # Enable stdout output for Falco events. 
+    syslog_enabled: true # Enable syslog output for Falco events
+```
+
+Note: Enabling stdout output will cause large amounts of logs to be generated. Enable these if the events are being consumed from the respective channel. Container security will only consume the events from the grpc channel.
+
 ## Troubleshooting
 
 ### Access logs
@@ -285,6 +318,13 @@ Most issues can be investigated using the application logs. The logs can be acce
 
 ### Collect support logs
 To help debug issues reported in support cases, a log collection script is provided for customer use.
+
+To enable debug logging, set the `logConfig.logLevel` to `debug` in the `overrides.yaml` file and upgrade the helm chart.
+```yaml
+logConfig:
+  logLevel: debug
+```
+
 Gather logs using the following command:
 
 ```sh

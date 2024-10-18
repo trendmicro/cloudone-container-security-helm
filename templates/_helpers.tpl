@@ -867,3 +867,18 @@ Return the target Kubernetes version
 {{- $version := semver .Capabilities.KubeVersion.Version }}
 {{- printf "%v.%v.%v" $version.Major $version.Minor $version.Patch -}}
 {{- end -}}
+
+{{/*
+Return the logLevel for the component
+*/}}
+{{- define "logLevel" -}}
+{{- $componentLogLevel := index . 0 }}
+{{- $ctx := index . 1 }}
+{{- if $ctx.Values.logConfig.logLevel }}
+{{- $ctx.Values.logConfig.logLevel }}
+{{- else if $componentLogLevel }}
+{{- $componentLogLevel }}
+{{- else }}
+{{- "info" }}
+{{- end }}
+{{- end -}}

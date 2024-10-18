@@ -64,6 +64,11 @@ spec:
           - name: compliance-scan-job-template
             mountPath: /etc/config
         args:
+        - --zap-devel={{ default "false" .Values.logConfig.devel }}
+        - --zap-log-level={{ include "logLevel" (list .Values.cloudOne.oversight.logLevel .) }}
+        - --zap-encoder={{ default "json" .Values.logConfig.encoder }}
+        - --zap-stacktrace-level={{ default "error" .Values.logConfig.stacktraceLevel }}
+        - --zap-time-encoding={{ default "epoch" .Values.logConfig.timeEncoding }}
         - --tls-min-version={{ include "tlsConfig.minTLSVersion" .Values.tlsConfig }}
         - --tls-cipher-suites={{ include "tlsConfig.cipherSuites" .Values.tlsConfig }}
         - --health-probe-bind-address=:8081

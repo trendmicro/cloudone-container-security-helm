@@ -105,6 +105,11 @@ spec:
               mountPath: /telemetry
             {{- end }}{{/* .Values.telemetry.publicKey */}}
           args:
+            - --zap-devel={{ default "false" .Values.logConfig.devel }}
+            - --zap-log-level={{ include "logLevel" (list .Values.cloudOne.admissionController.logLevel .) }}
+            - --zap-encoder={{ default "json" .Values.logConfig.encoder }}
+            - --zap-stacktrace-level={{ default "error" .Values.logConfig.stacktraceLevel }}
+            - --zap-time-encoding={{ default "epoch" .Values.logConfig.timeEncoding }}
             - --tlsCertFile=/etc/webhook/certs/cert.pem
             - --tlsKeyFile=/etc/webhook/certs/key.pem
             - --tls-min-version={{ include "tlsConfig.minTLSVersion" .Values.tlsConfig }}

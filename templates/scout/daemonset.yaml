@@ -337,6 +337,11 @@ spec:
           imagePullPolicy: {{ default (default "Always" $imageDefaults.pullPolicy) .pullPolicy }}
           {{- end }}{{/* with */}}
           args:
+            - --zap-devel={{ default "false" .Values.logConfig.devel }}
+            - --zap-log-level={{ include "logLevel" (list .Values.scout.scout.logLevel .) }}
+            - --zap-encoder={{ default "json" .Values.logConfig.encoder }}
+            - --zap-stacktrace-level={{ default "error" .Values.logConfig.stacktraceLevel }}
+            - --zap-time-encoding={{ default "epoch" .Values.logConfig.timeEncoding }}
             - --grpc-socket-path
             - unix:///var/run/scout/scout.sock
             - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
