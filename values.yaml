@@ -130,7 +130,6 @@ cloudOne:
     ## Maximum value: 100
     ## Minimum value: 3
     ##
-    
     maxJobCount: 5
     ## activeDeadlineSeconds is the maximum duration a scan job can run before timing out.
     ##
@@ -210,7 +209,7 @@ cloudOne:
     grpcAuth:
       ## authentication mode, insecure or tls
       type: tls
-      
+
       ## certificate settings
       certificate:
         ## lifetime is the lifetime in days of the default signed certificate.
@@ -829,7 +828,7 @@ scout:
     ##
     ## Default value: info
     logLevel: info
-    
+
   downloader:
     ## extraArgs, if set will apply additional arguments to scout container
     ##
@@ -843,7 +842,7 @@ scout:
 
     ## componentType, the type of component to download
     componentType: falco-ebpf-program
-    
+
     ## componentDir, the directory where the component to be downloaded
     componentDir: /var/component
 
@@ -872,7 +871,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.4.1
+    tag: 2.4.2
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -887,11 +886,11 @@ images:
     # imagePullSecret:
   admissionController:
     repository: admission-controller
-    digest: sha256:8a7b732df6581445ce6793a963b9b65f934f567483dc4fea104b52ac82ba5b72
+    digest: sha256:c8365724375cdfb2065a74bb12799385e1c6b22f13c74ea1580c85f7acc15ff2
 
   oversight:
     repository: oversight-controller
-    digest: sha256:84a44263b838559650b819d8c21a40d5374fd4488f36b46e1f98963f0f088377
+    digest: sha256:474fc351f64c7f438225fb84c1dcd3d3319209a9bcaa16f9d6f27fefc59a9924
 
   usage:
     repository: usage-controller
@@ -903,15 +902,15 @@ images:
 
   falco:
     repository: falco
-    digest: sha256:6b5c4e79e6792511d87d6519838a7ad24121ef458292eea6acba014e11df5461
+    digest: sha256:66a35a3f1200fc37ec48a3bfd9ce2ea5261552d647e3039616e1c423c1b404ba
 
   scout:
     repository: scout
-    digest: sha256:68b580765bfad31329073ba2bf24196917a951f124296824e642c736dc03ef67
+    digest: sha256:4513f4e91e1f9ce9d1296d62202fac98a5ffd7d204bc97d44058cdda0426f0b4
 
   scanManager:
     repository: scan-manager
-    digest: sha256:757c92f071e0a2aac5ae9d694106966bbe3dcea227975edefbb781904cec737f
+    digest: sha256:a36da9847e7069f5dafe362d9e051b7b4684d3f7ea85d61d07b19ff078706bbd
 
   scanJob:
     repository: scan-job
@@ -919,7 +918,7 @@ images:
 
   complianceScanJob:
     repository: compliance-scan-job
-    digest: sha256:e9a54446c739ca6cb3c8dc2441ebd8d2d705487ef461025df8bf7691ee43212f
+    digest: sha256:3dfbf17bfac77a9bcab12339a5a488a17b56a229326cb09e2895ea45aca499bc
 
   workloadOperator:
     repository: workload-operator
@@ -939,7 +938,7 @@ images:
 
   policyOperator:
     repository: policy-operator
-    digest: sha256:9e26394cc159e67c199a90d6a8559d8ff0b9d582ff6c9ee44b365a6851b0af66
+    digest: sha256:ae98181466f801a623dacb711dff1ed6b1822f1867eb326e0b3610537cb7c40d
 
 ##
 ## Determine whether to use existing secrets in the target namespace rather than
