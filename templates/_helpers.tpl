@@ -882,3 +882,20 @@ Return the logLevel for the component
 {{- "info" }}
 {{- end }}
 {{- end -}}
+
+{{/*
+Return the trusted images digest
+*/}}
+{{- define "digest" -}}
+{{- $digest :=""}}
+{{- range $image := .Values.images }}
+{{- if $image.digest}}
+{{- if $digest}}
+{{- $digest = printf "%s,%s" $digest $image.digest}}
+{{- else}}
+{{- $digest = $image.digest}}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- $digest}}
+{{- end -}}

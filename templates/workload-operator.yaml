@@ -63,16 +63,6 @@ spec:
         image: {{ include "image.source" (dict "repository" $repository "registry" .registry "tag" $tag "imageDefaults" $imageDefaults "digest" .digest) }}
         imagePullPolicy: {{ default (default "Always" $imageDefaults.pullPolicy) .pullPolicy }}
         {{- end }}
-        {{- $digest :=""}}
-        {{- range $image := .Values.images }}
-        {{- if $image.digest}}
-        {{- if $digest}}
-        {{- $digest = printf "%s,%s" $digest $image.digest}}
-        {{- else}}
-        {{- $digest = $image.digest}}
-        {{- end }}
-        {{- end }}
-        {{- end }}
         args:
         - --zap-devel={{ default "false" .Values.logConfig.devel }}
         - --zap-log-level={{ include "logLevel" (list .Values.cloudOne.workloadOperator.logLevel .) }}
@@ -92,7 +82,7 @@ spec:
         - --inventory-collection-period={{ default "5m" .Values.cloudOne.inventoryCollection.period }}
         - --chart-version={{ default "unknown" .Chart.AppVersion }}
         - --runtime-security={{ default "false" .Values.cloudOne.runtimeSecurity.enabled }}
-        - --trusted-images={{ default "" $digest }}
+        - --trusted-images={{ include "digest" . }}
         command:
         - /app/workload-operator
         env:
