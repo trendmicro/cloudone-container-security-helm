@@ -266,7 +266,7 @@ cloudOne:
         targetCPUUtilization: 800
       readinessProbe:
         tcpSocket:
-          port: 50051 
+          port: 50051
         initialDelaySeconds: 300
 
   policyOperator:
@@ -896,9 +896,9 @@ scout:
     componentDir: /var/component
 
 malwareScanner:
-  defaultExcludedPaths: 
-  - /proc 
-  - /dev 
+  defaultExcludedPaths:
+  - /proc
+  - /dev
   - /sys
   scanWorkerCount: 5
 
@@ -927,7 +927,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.4.2
+    tag: 2.4.3
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -942,11 +942,11 @@ images:
     # imagePullSecret:
   admissionController:
     repository: admission-controller
-    digest: sha256:c8365724375cdfb2065a74bb12799385e1c6b22f13c74ea1580c85f7acc15ff2
+    digest: sha256:7eda014ed641b9d83d024ef328ae82f102402e2ce16494c7a118a75e8f3dc960
 
   oversight:
     repository: oversight-controller
-    digest: sha256:474fc351f64c7f438225fb84c1dcd3d3319209a9bcaa16f9d6f27fefc59a9924
+    digest: sha256:b277e0dbbdf376219d0143b8813844d3dd8c489153f0d65e0f3f5733ac511c47
 
   usage:
     repository: usage-controller
@@ -962,15 +962,15 @@ images:
 
   scout:
     repository: scout
-    digest: sha256:4513f4e91e1f9ce9d1296d62202fac98a5ffd7d204bc97d44058cdda0426f0b4
+    digest: sha256:51585703524b717a78317c42b92341a4f45f8c254617ed94f9d23f1bb6868623
 
   scanManager:
     repository: scan-manager
-    digest: sha256:a36da9847e7069f5dafe362d9e051b7b4684d3f7ea85d61d07b19ff078706bbd
+    digest: sha256:9e1bb550cf29666bb98d08f6d0ae1a11eedf0844ad0db06c56138777272c3eda
 
   scanJob:
     repository: scan-job
-    digest: sha256:8fe2f8e1d130d6ebe436b37c5fbcd150edf8f6b1e40e880547fb22db42878f2c
+    digest: sha256:c11973b07a7e53da9dec070a7844795f45066191b9734ce9271c0e9fbee0e6d5
 
   complianceScanJob:
     repository: compliance-scan-job
@@ -978,7 +978,7 @@ images:
 
   workloadOperator:
     repository: workload-operator
-    digest: sha256:3e45e2af7ea5a82e0edba7c7c80e469caa7dd4a95cfa5665c09da27ab38aa05c
+    digest: sha256:77cbddc919b440382a21102007e0b04cdebb23a586b0613b83a6019ecf962500
 
   fargateInjector:
     repository: fargate-tool
@@ -986,7 +986,7 @@ images:
 
   pdig:
     repository: pdig
-    digest: sha256:5aa508e6d73ef1211f75b97b7a39efc4266ab0a7c1b21a6cbd467511115e5f63
+    digest: sha256:cb38872e6013b7e6ea837612d6819dad066721dc9f60bbda1e453ac5338161fa
 
   k8sMetaCollector:
     repository: k8s-metacollector
@@ -994,7 +994,7 @@ images:
 
   policyOperator:
     repository: policy-operator
-    digest: sha256:ae98181466f801a623dacb711dff1ed6b1822f1867eb326e0b3610537cb7c40d
+    digest: sha256:9fa022bca41c1a4e60c4dff56a01b0bf2e9670c71d8f46945d7573b8b4e7a018
 
   malwareScanner:
     repository: malware-scanner
