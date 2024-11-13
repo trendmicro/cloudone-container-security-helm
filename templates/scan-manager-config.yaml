@@ -1,4 +1,4 @@
-{{- if eq true .Values.cloudOne.vulnerabilityScanning.enabled }}
+{{- if or (eq true .Values.cloudOne.vulnerabilityScanning.enabled) (eq true .Values.cloudOne.malwareScanning.enabled) }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -62,6 +62,11 @@ data:
           - name: target
             image: IMAGE
             imagePullPolicy: Always
+            env:
+            {{- if .Values.cloudOne.malwareScanning.enabled }}
+            - name: TM_AM_SCAN_TIMEOUT_SECS
+              value: {{ .Values.cloudOne.malwareScanning.scanTimeoutSeconds }}
+            {{- end }}{{/* if */}}
             volumeMounts:
               - mountPath: /utility
                 name: utility-volume

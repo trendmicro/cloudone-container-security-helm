@@ -82,6 +82,7 @@ spec:
         - --inventory-collection-period={{ default "5m" .Values.cloudOne.inventoryCollection.period }}
         - --chart-version={{ default "unknown" .Chart.AppVersion }}
         - --runtime-security={{ default "false" .Values.cloudOne.runtimeSecurity.enabled }}
+        - --malware-scanning={{ default "false" .Values.cloudOne.malwareScanning.enabled }}
         - --trusted-images={{ include "digest" . }}
         command:
         - /app/workload-operator

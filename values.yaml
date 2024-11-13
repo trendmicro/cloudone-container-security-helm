@@ -133,9 +133,9 @@ cloudOne:
     maxJobCount: 5
     ## activeDeadlineSeconds is the maximum duration a scan job can run before timing out.
     ##
-    ## Default value: 300
+    ## Default value: 3600
     ##
-    activeDeadlineSeconds: 300
+    activeDeadlineSeconds: 3600
 
     ## logLevel sets the log verbosity level. Supported values are debug, info, and error
     ##
@@ -245,6 +245,29 @@ cloudOne:
       ##
       ## Default value: 3650
       lifetime: 3650
+
+  ## malwareScanning is a section that controls the malware scanning feature.
+  malwareScanning:
+    enabled: false
+    excludedPaths: []
+    scanTimeoutSeconds: 300
+
+    scanner:
+      ## scanner is a section that controls the malware scanner engine.
+      enableScanCache: false
+      scanLog: false
+      port: 50051
+      logLevel: info
+
+      autoscaling:
+        enabled: false
+        minReplicas: 1
+        maxReplicas: 2
+        targetCPUUtilization: 800
+      readinessProbe:
+        tcpSocket:
+          port: 50051 
+        initialDelaySeconds: 300
 
   policyOperator:
     ## enable the cluster-managed policy feature
@@ -394,6 +417,14 @@ serviceAccount:
     ## Annotations to add to the service account
     annotations: {}
 
+  malwareScanner:
+    ## The name of the service account to use.
+    ## If not set and create is true, a name is generated using the fullname of malwareScanner template
+    name: ''
+
+    ## Annotations to add to the service account
+    annotations: {}
+
 rbac:
   # Create and use rbac resources
   create: true
@@ -405,6 +436,9 @@ networkPolicy:
   enabled: true
   ## k8s-metacollector network policy, default false
   k8sMetaCollector:
+    enabled: false
+  ## malwareScanner network policy, default false
+  malwareScanner:
     enabled: false
 
 telemetry:
@@ -485,13 +519,13 @@ securityContext:
     pod:
       runAsNonRoot: true
     scout:
-      allowPrivilegeEscalation: false
+      allowPrivilegeEscalation: true
       capabilities:
         drop:
         - ALL
         add:
         - SYS_PTRACE
-      privileged: false
+      privileged: true
       readOnlyRootFilesystem: true
       runAsNonRoot: false
       runAsUser: 0
@@ -507,6 +541,14 @@ securityContext:
     falco:
       privileged: true
       readOnlyRootFilesystem: true
+      runAsNonRoot: false
+      runAsUser: 0
+
+  malwareScanner:
+    pod:
+      runAsNonRoot: false
+    scanner:
+      privileged: true
       runAsNonRoot: false
       runAsUser: 0
 
@@ -684,6 +726,13 @@ resources:
     limits:
       cpu: 1000m
       memory: 1024Mi
+  malwareScanner:
+    requests:
+      cpu: 100m
+      memory: 1Gi
+    limits:
+      cpu: 1000m
+      memory: 2Gi
 
 nodeSelector:
   ## nodeSelector if set, ensures pods are only assigned to a particular set of nodes.
@@ -846,6 +895,13 @@ scout:
     ## componentDir, the directory where the component to be downloaded
     componentDir: /var/component
 
+malwareScanner:
+  defaultExcludedPaths: 
+  - /proc 
+  - /dev 
+  - /sys
+  scanWorkerCount: 5
+
 images:
   defaults:
     ## Default registry to pull images from. This can be overridden for
@@ -939,6 +995,10 @@ images:
   policyOperator:
     repository: policy-operator
     digest: sha256:ae98181466f801a623dacb711dff1ed6b1822f1867eb326e0b3610537cb7c40d
+
+  malwareScanner:
+    repository: malware-scanner
+    digest: sha256:aee886896786c00ec05d59f6e0122f3b655e1d81b7e361e903cc28880d3d2c35
 
 ##
 ## Determine whether to use existing secrets in the target namespace rather than

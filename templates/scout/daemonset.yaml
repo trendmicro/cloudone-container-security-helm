@@ -1,4 +1,4 @@
-{{- if eq true .Values.cloudOne.runtimeSecurity.enabled }}
+{{- if or .Values.cloudOne.runtimeSecurity.enabled .Values.cloudOne.malwareScanning.enabled }}
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -60,6 +60,8 @@ spec:
 {{- $falcoSecurityContext := default .Values.securityContext.default.container $securityContext.falco }}
 {{- $downloaderSecurityContext := default .Values.securityContext.default.container $securityContext.downloader }}
 {{- $initSecurityContext := default .Values.securityContext.default.container $securityContext.init }}
+{{- $jobStatusMntPath := "/host-tmp" }}
+
 {{- if $securityContextEnabled }}
       securityContext:
 {{ toYaml $podSecurityContext | indent 8 }}
@@ -326,7 +328,7 @@ spec:
             - mountPath: /root/.falco
               name: components-dir
               readOnly: true
-{{- end }}{{/* if */}}
+{{- end }}{{/* if .Values.cloudOne.runtimeSecurity.customRules.enabled */}}
         - name: scout
           {{- $imageDefaults := .Values.images.defaults }}
           {{- with .Values.images.scout }}
@@ -364,6 +366,38 @@ spec:
             - --k8s-metacollector-cert
             - /etc/scout/metacollector-ca-cert.pem
             {{- end}}
+            {{- if .Values.scout.falco.cri.enabled }}
+            - --cri
+            - /run/cri/cri.sock
+            {{- end }}{{/* if */}}
+            {{- if .Values.scout.falco.dockershim.enabled }}
+            - --cri
+            - /run/dockershim.sock
+            {{- end }}{{/* if */}}
+            {{- if .Values.scout.falco.k0s.enabled }}
+            - --cri
+            - /run/k0s/containerd.sock
+            {{- end }}{{/* if */}}
+            {{- if .Values.scout.falco.k3s.enabled }}
+            - --cri
+            - /run/k3s/containerd/containerd.sock
+            {{- end }}{{/* if */}}
+            - --malware-scanning={{ default "false" .Values.cloudOne.malwareScanning.enabled }}
+            - --runtime-security={{ default "false" .Values.cloudOne.runtimeSecurity.enabled }}
+            {{- if .Values.cloudOne.malwareScanning.enabled }}
+            - --malware-scanner-url
+            - {{ include "malwareScanner.svc.url" . }}:{{ .Values.cloudOne.malwareScanning.scanner.port }}
+            - --excluded-scan-path
+            {{- $excludedPaths := (default (list) .Values.cloudOne.malwareScanning.excludedPaths) }}
+            {{- $combinedListPath := .Values.malwareScanner.defaultExcludedPaths }}
+            {{- range $excludedPaths }}
+            {{- $combinedListPath = append $combinedListPath . }}
+            {{- end }}{{/* range */}}
+            - {{ $combinedListPath | join "," | quote }}
+            - --job-status-file-path={{ printf "%s%s%s" "../.." $jobStatusMntPath "/malware_scan_job_status.json" }}
+            - --scan-worker-count
+            - "{{ .Values.malwareScanner.scanWorkerCount }}"
+            {{- end }}{{/* if .Values.cloudOne.malwareScanning.enabled */}}
         {{- if .Values.scout.scout.extraArgs }}
 {{ toYaml .Values.scout.scout.extraArgs | indent 12 }}
         {{- end }}{{/* if */}}
@@ -373,6 +407,10 @@ spec:
             - name: "{{ $key }}"
               value: "{{ $value }}"
           {{- end }}{{/* range */}}
+          {{- if .Values.cloudOne.malwareScanning.enabled }}
+            - name: TM_AM_SCAN_TIMEOUT_SECS
+              value: "{{ .Values.cloudOne.malwareScanning.scanTimeoutSeconds }}"
+          {{- end }}{{/* if */}}
             - name: POD_NAME
               valueFrom:
                 fieldRef:
@@ -389,6 +427,7 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.nodeName
+
 {{- if $securityContextEnabled }}
           securityContext:
 {{ toYaml $scoutSecurityContext | indent 12 }}
@@ -398,6 +437,26 @@ spec:
 {{- end }}{{/* if */}}
 {{- end }}{{/* if */}}
           volumeMounts:
+            {{- if .Values.scout.falco.docker.enabled }}
+            - mountPath: /host/var/run/docker.sock
+              name: docker-socket
+            {{- end}}{{/* if */}}
+            {{- if .Values.scout.falco.cri.enabled }}
+            - mountPath: /host/run/cri/cri.sock
+              name: cri-socket
+            {{- end}}{{/* if */}}
+            {{- if .Values.scout.falco.dockershim.enabled }}
+            - mountPath: /host/run/dockershim.sock
+              name: dockershim-socket
+            {{- end}}{{/* if */}}
+            {{- if .Values.scout.falco.k0s.enabled }}
+            - mountPath: /host/run/k0s/containerd.sock
+              name: k0s-socket
+            {{- end}}{{/* if */}}
+            {{- if .Values.scout.falco.k3s.enabled }}
+            - mountPath: /host/run/k3s/containerd/containerd.sock
+              name: k3s-socket
+            {{- end}}{{/* if */}}
             - mountPath: /var/run/scout/
               name: grpc-socket-dir
               readOnly: true
@@ -408,6 +467,11 @@ spec:
             - mountPath: /secrets
               name: api-key
               readOnly: true
+            - mountPath: /host
+              name: host-root
+              readOnly: true
+            - mountPath: {{ $jobStatusMntPath }}
+              name: host-tmp
 {{- if eq "tls" .Values.cloudOne.k8sMetaCollector.grpcAuth.type }}
             - mountPath: /etc/scout/metacollector-ca-cert.pem
               name: metacollector-grpc-certs
@@ -441,7 +505,7 @@ spec:
           args:
             - /component.version
             - {{ .Values.scout.downloader.componentDir }}
-        {{- end }}{{/* if eq */}}
+        {{- end }}{{/* if eq .Values.scout.downloader.componentType "falco-ebpf-program" */}}
         - name: downloader
           {{- $imageDefaults := .Values.images.defaults }}
           {{- with .Values.images.scout }}
@@ -559,6 +623,14 @@ spec:
         - name: etc-fs
           hostPath:
             path: /etc
+        - name: host-root
+          hostPath:
+            path: /
+            type: Directory
+        - name: host-tmp
+          hostPath:
+            path: /tmp
+            type: Directory
         - name: debugfs
           hostPath:
             path: /sys/kernel/debug
@@ -598,4 +670,4 @@ spec:
 {{- end }}
   updateStrategy:
     type: RollingUpdate
-{{- end }}{{/* if eq true .Values.cloudOne.runtimeSecurity.enabled */}}
+{{- end }}{{/* if or (eq true .Values.cloudOne.runtimeSecurity.enabled) (eq true .Values.cloudOne.malwareScanning.enabled) */}}

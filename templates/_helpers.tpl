@@ -191,6 +191,16 @@ app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 
 {{/*
+malwareScanner Common labels
+*/}}
+{{- define "malwareScanner.labels" -}}
+helm.sh/chart: {{ include "container.security.chart" . }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/part-of: {{ include "container.security.name" . }}
+{{ include "malwareScanner.selectorLabels" . }}
+{{- end }}
+
+{{/*
 Policy Operator Common Labels
 */}}
 {{- define "policyOperator.labels" -}}
@@ -304,6 +314,15 @@ Compliance Scan Job Selector labels
 app.kubernetes.io/name: compliance-scan-job
 app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/component: trendmicro-compliance-scan-job
+{{- end }}
+
+{{/*
+Malware Scanner Selector labels
+*/}}
+{{- define "malwareScanner.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "malwareScanner.fullname" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: trendmicro-malware-scanner
 {{- end }}
 
 {{/*
@@ -580,10 +599,44 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{/*
+Create a default fully qualified app name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+If release name contains chart name it will be used as a full name.
+*/}}
+{{- define "malwareScanner.fullname" -}}
+{{- if .Values.malwareScannerFullnameOverride -}}
+{{- .Values.malwareScannerFullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default .Chart.Name .Values.malwareScannerFullnameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- printf "%s-%s" "malware-scanner" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else if contains .Release.Name $name -}}
+{{- printf "%s-%s" "malware-scanner" $name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s-%s" "malware-scanner" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Service name of k8s-metacollector
 */}}
 {{- define "k8sMetaCollector.svc.url" -}}
 {{- printf "%s.%s.svc.cluster.local:45000" (include "k8sMetaCollector.fullname" .) .Release.Namespace -}}
+{{- end -}}
+
+{{/*
+Service name of malware scanner
+*/}}
+{{- define "malwareScanner.svc" -}}
+{{- printf "trendmicro-malware-scanner" -}}
+{{- end -}}
+
+{{/*
+Service url of malware scanner
+*/}}
+{{- define "malwareScanner.svc.url" -}}
+{{- printf "%s.%s.svc.cluster.local" (include "malwareScanner.svc" .) .Release.Namespace -}}
 {{- end -}}
 
 {{/*
@@ -810,6 +863,17 @@ k8s-collector service account
 {{- default (include "k8sMetaCollector.fullname" .) .Values.serviceAccount.k8sMetaCollector.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.k8sMetaCollector.name }}
+{{- end }}
+{{- end }}
+
+{{/*
+Malware Scanner service account
+*/}}
+{{- define "malwareScanner.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "malwareScanner.fullname" .) .Values.serviceAccount.malwareScanner.name }}
+{{- else }}
+{{- default "default" .Values.serviceAccount.malwareScanner.name }}
 {{- end }}
 {{- end }}
 

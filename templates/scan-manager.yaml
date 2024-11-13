@@ -1,4 +1,4 @@
-{{- if eq true .Values.cloudOne.vulnerabilityScanning.enabled }}
+{{- if or (eq true .Values.cloudOne.vulnerabilityScanning.enabled) (eq true .Values.cloudOne.malwareScanning.enabled) }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -53,6 +53,8 @@ spec:
         ports:
           - containerPort: 8080
           - containerPort: 8070
+          - containerPort: 8071
+        workingDir: /var/scanmanager
         args:
         - --zap-devel={{ default "false" .Values.logConfig.devel }}
         - --zap-log-level={{ include "logLevel" (list .Values.cloudOne.scanManager.logLevel .) }}
@@ -72,6 +74,21 @@ spec:
         - --job-template-path
         - /etc/config/scan-job-template.yaml
         - --job-active-deadline={{ printf "%ds" (int .Values.cloudOne.scanManager.activeDeadlineSeconds) }}
+        {{- if .Values.cloudOne.vulnerabilityScanning.enabled }}
+        - --enable-vulnerability-scanning
+        {{- end }}
+        {{- if .Values.cloudOne.malwareScanning.enabled }}
+        - --enable-malware-scanning
+        - --scanner-endpoint={{ printf "%s:%d" (include "malwareScanner.svc.url" .) 50051 }}
+        - --malware-exclude-namespaces={{ .Values.cloudOne.exclusion.namespaces | join "," }}
+          {{- $excludedPaths := (default (list) .Values.cloudOne.malwareScanning.excludedPaths) }}
+          {{- $combinedListPath := .Values.malwareScanner.defaultExcludedPaths }}
+          {{- range $excludedPaths }}
+          {{- $combinedListPath = append $combinedListPath . }}
+          {{- end }}{{/* range */}}
+        - --malware-exclude-paths={{ $combinedListPath | join "," }}
+        - --mqtt-config-file-path=/app/scanmanager.yaml
+        {{- end }}
         env:
         {{- include "container.security.proxy.env" . | nindent 8 }}
         {{- $scanJobImageDefaults := .Values.images.defaults }}
@@ -92,6 +109,11 @@ spec:
             name: api-key
           - name: job-template
             mountPath: /etc/config/
+          - name: grpc-certs
+            mountPath: /etc/malwarescan/certs
+            readOnly: true
+          - mountPath: /var/scanmanager
+            name: scanmanager-workdir
         resources:
 {{ toYaml (default .Values.resources.defaults .Values.resources.scanManager) | indent 12 }}
       volumes:
@@ -104,6 +126,12 @@ spec:
             items:
               - key: scan-job-template.yaml
                 path: scan-job-template.yaml
+        - name: scanmanager-workdir
+          emptyDir:
+            sizeLimit: 50Mi
+        - name: grpc-certs
+          secret:
+            secretName: trendmicro-scan-manager-tls-certificate
       terminationGracePeriodSeconds: 10
       nodeSelector:
 {{ toYaml (default .Values.nodeSelector.defaults .Values.nodeSelector.scanManager) | indent 8 }}
@@ -136,6 +164,9 @@ spec:
   - name: sbom-server
     port: 8070
     targetPort: 8070
+  - name: malware-event-server
+    port: 8071
+    targetPort: 8071
   selector:
     {{- include "scanManager.selectorLabels" . | nindent 4 }}
 
@@ -163,6 +194,14 @@ spec:
       ports:
         - protocol: TCP
           port: 8070
+    - from: # malware-event-server
+      - namespaceSelector: {}
+        podSelector:
+          matchLabels:
+            {{- include "scanner.selectorLabels" . | nindent 12 }}
+      ports:
+        - protocol: TCP
+          port: 8071
     - from: # any -- this is for metrics
       ports:
         - protocol: TCP
@@ -186,4 +225,22 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 {{- end }}
+
+---
+{{- $cn := (printf "trendmicro-scan-manager-service.%s.svc.cluster.local:8071" .Release.Namespace) }}
+{{- $ca := genCA (printf "trendmicro-scan-manager-service-ca") 3650 -}}
+{{- $cert := genSignedCert $cn nil (list $cn) 3650 $ca -}}
+apiVersion: v1
+kind: Secret
+metadata:
+  name:  trendmicro-scan-manager-tls-certificate
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "scanManager.labels" . | nindent 4 }}
+type: Opaque
+data:
+  key.pem: {{ $cert.Key | b64enc | quote }}
+  cert.pem: {{ $cert.Cert | b64enc | quote }}
+  ca-cert.pem: {{ $ca.Cert | b64enc | quote }}
+
 {{- end }}
