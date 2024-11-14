@@ -235,12 +235,14 @@ spec:
             - --cri
             - /run/dockershim.sock
             {{- end }}{{/* if */}}
-            - -K
-            - /var/run/secrets/kubernetes.io/serviceaccount/token
-            - -k
-            - {{ default "https://$(KUBERNETES_SERVICE_HOST)" .Values.scout.falco.apiUrl }}
-            - --k8s-node
-            - $(NODE_NAME)
+            {{- if .Values.scout.falco.k0s.enabled }}
+            - --cri
+            - /run/k0s/containerd.sock
+            {{- end }}{{/* if */}}
+            {{- if .Values.scout.falco.k3s.enabled }}
+            - --cri
+            - /run/k3s/containerd/containerd.sock
+            {{- end }}{{/* if */}}
             - -p
             - >
               container.id=%container.id
@@ -270,10 +272,14 @@ spec:
               proc.ppid=%proc.ppid
               user.loginuid=%user.loginuid
               user.name=%user.name
+            - -o
+            - stdout_output.enabled={{ default "false" .Values.scout.falco.stdout_enabled }}
+            - -o
+            - syslog_output.enabled={{ default "false" .Values.scout.falco.syslog_enabled }}
         {{- if .Values.scout.falco.extraArgs }}
 {{ toYaml .Values.scout.falco.extraArgs | indent 12 }}
         {{- end }}{{/* if */}}
-          env:            
+          env:
             - name: SKIP_DRIVER_LOADER
               value: "true"
             - name: TZ
@@ -298,6 +304,14 @@ spec:
             {{- if .Values.scout.falco.dockershim.enabled }}
             - mountPath: /host/run/dockershim.sock
               name: dockershim-socket
+            {{- end}}{{/* if */}}
+            {{- if .Values.scout.falco.k0s.enabled }}
+            - mountPath: /host/run/k0s/containerd.sock
+              name: k0s-socket
+            {{- end}}{{/* if */}}
+            {{- if .Values.scout.falco.k3s.enabled }}
+            - mountPath: /host/run/k3s/containerd/containerd.sock
+              name: k3s-socket
             {{- end}}{{/* if */}}
             - mountPath: /host/dev
               name: dev-fs

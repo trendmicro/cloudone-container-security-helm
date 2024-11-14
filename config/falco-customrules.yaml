@@ -315,10 +315,25 @@ metadata_download:
 #
 # Redirect logs to standard output.
 syslog_output:
-  enabled: true
+  enabled: false
 
 # [Stable] `stdout_output`
 #
 # Redirect logs to standard output.
 stdout_output:
-  enabled: true
+  enabled: false
+
+################
+# Falco engine #
+################
+engine:
+  kind: modern_ebpf
+  ebpf:
+    # path to the elf file to load.
+    probe: ${HOME}/.falco/falco-bpf.o
+    buf_size_preset: 4
+    drop_failed_exit: false
+  modern_ebpf:
+    cpus_for_each_buffer: 2
+    buf_size_preset: 4
+    drop_failed_exit: false
