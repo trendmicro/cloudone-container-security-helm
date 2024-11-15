@@ -267,7 +267,7 @@ logConfig:
   logLevel: info # Sets the log verbosity level. Supported values are debug, info, and error. Overrides the logLevel set for each component
   logFormat: json # Sets the log encoder. Supported values are json and console
   stackTraceLevel: error # Sets the level above which stacktraces are captured. Supported values are info, error or panic
-  timeEncoding: epoch # Sets the time encoding format. Supported values are epoch, millis, nano, iso8601, rfc3339 or rfc3339nano
+  timeEncoding: rfc3339 # Sets the time encoding format. Supported values are epoch, millis, nano, iso8601, rfc3339 or rfc3339nano
 ```
 
 You can also configure the log level for each component individually by setting the `logLevel` value for the component in your `overrides.yaml` file:

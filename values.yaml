@@ -618,8 +618,8 @@ logConfig:
   ## timeEncoding sets the time encoding format 
   ## Supported values are epoch, millis, nano, iso8601, rfc3339 or rfc3339nano
   ##
-  ## Default value: epoch
-  timeEncoding: epoch
+  ## Default value: rfc3339
+  timeEncoding: rfc3339
 
 tlsConfig:
   ## minTLSVersion is the minimum TLS version that the server will accept.

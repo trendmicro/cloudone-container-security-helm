@@ -54,7 +54,7 @@ spec:
         - --zap-log-level={{ include "logLevel" (list .Values.cloudOne.policyOperator.logLevel .) }}
         - --zap-encoder={{ default "json" .Values.logConfig.encoder }}
         - --zap-stacktrace-level={{ default "error" .Values.logConfig.stacktraceLevel }}
-        - --zap-time-encoding={{ default "epoch" .Values.logConfig.timeEncoding }}
+        - --zap-time-encoding={{ default "rfc3339" .Values.logConfig.timeEncoding }}
         - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
         - --exclude-kubernetes-service-host-from-proxy={{ default "false" .Values.proxy.excludeKubernetesServiceHost }}
         - --reconciliation-period={{ .Values.cloudOne.policyOperator.reconciliationPeriod }}

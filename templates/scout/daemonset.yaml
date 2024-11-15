@@ -357,7 +357,7 @@ spec:
             - --zap-log-level={{ include "logLevel" (list .Values.scout.scout.logLevel .) }}
             - --zap-encoder={{ default "json" .Values.logConfig.encoder }}
             - --zap-stacktrace-level={{ default "error" .Values.logConfig.stacktraceLevel }}
-            - --zap-time-encoding={{ default "epoch" .Values.logConfig.timeEncoding }}
+            - --zap-time-encoding={{ default "rfc3339" .Values.logConfig.timeEncoding }}
             - --grpc-socket-path
             - unix:///var/run/scout/scout.sock
             - --cloud-one-endpoint={{ include "container.security.endpoint" . }}

@@ -91,7 +91,7 @@ spec:
             - --zap-log-level={{ include "logLevel" (list .Values.cloudOne.k8sMetaCollector.logLevel .) }}
             - --zap-encoder={{ default "json" .Values.logConfig.encoder }}
             - --zap-stacktrace-level={{ default "error" .Values.logConfig.stacktraceLevel }}
-            - --zap-time-encoding={{ default "epoch" .Values.logConfig.timeEncoding }}
+            - --zap-time-encoding={{ default "rfc3339" .Values.logConfig.timeEncoding }}
           ports:
             - name: "broker-grpc"
               containerPort: 45000
