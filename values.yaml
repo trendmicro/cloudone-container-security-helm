@@ -857,6 +857,11 @@ scout:
     ## Default Value: false
     syslog_enabled: false
 
+    ## least_privileged, determines if falco is running in least privileged mode
+    ##
+    ## Default Value: false
+    least_privileged: false
+
   scout:
     ## falcoInternalEvent, determines how to deal with falco internal event
     ## sysevent: send the internal events as system events to container security backend

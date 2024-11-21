@@ -57,7 +57,7 @@ spec:
 {{- $securityContext := default .Values.securityContext.default .Values.securityContext.scout }}
 {{- $podSecurityContext := default .Values.securityContext.default.pod $securityContext.pod }}
 {{- $scoutSecurityContext := default .Values.securityContext.default.container $securityContext.scout }}
-{{- $falcoSecurityContext := default .Values.securityContext.default.container $securityContext.falco }}
+{{- $falcoSecurityContext := include "falco.securityContext" . | fromYaml }}
 {{- $downloaderSecurityContext := default .Values.securityContext.default.container $securityContext.downloader }}
 {{- $initSecurityContext := default .Values.securityContext.default.container $securityContext.init }}
 {{- $jobStatusMntPath := "/host-tmp" }}
@@ -79,7 +79,7 @@ spec:
 {{ toYaml (default .Values.resources.defaults .Values.resources.falco) | indent 12 }}
 {{- if $securityContextEnabled }}
           securityContext:
-{{ toYaml $falcoSecurityContext | indent 12 }}
+{{ include "falco.securityContext" . | indent 12 }}
 {{- if $hasApparmorProfile }}
             appArmorProfile:
               type: Unconfined
@@ -217,7 +217,7 @@ spec:
 {{ toYaml (default .Values.resources.defaults .Values.resources.falco) | indent 12 }}
 {{- if $securityContextEnabled }}
           securityContext:
-{{ toYaml $falcoSecurityContext | indent 12 }}
+{{ include "falco.securityContext" . | indent 12 }}
 {{- if $hasApparmorProfile }}
             appArmorProfile:
               type: Unconfined

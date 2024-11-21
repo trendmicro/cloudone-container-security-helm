@@ -963,3 +963,14 @@ Return the trusted images digest
 {{- end }}
 {{- $digest}}
 {{- end -}}
+
+{{- define "falco.securityContext" -}}
+{{- $falcosecurityContext := default .Values.securityContext.default.container .Values.securityContext.scout.falco -}}
+{{- if .Values.scout.falco.least_privileged }}
+  {{- $patch := dict -}}
+  {{- $patch := set $patch "privileged" false -}}
+  {{- $patch := set $patch "capabilities" (dict "add" (list "SYS_ADMIN" "SYS_RESOURCE" "SYS_PTRACE")) -}}
+  {{- $falcosecurityContext := mergeOverwrite $falcosecurityContext $patch -}}
+{{- end -}}
+{{- toYaml $falcosecurityContext }}
+{{- end -}}

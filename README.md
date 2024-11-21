@@ -291,6 +291,16 @@ scout:
 
 Note: Enabling stdout output will cause large amounts of logs to be generated. Enable these if the events are being consumed from the respective channel. Container security will only consume the events from the grpc channel.
 
+### Least Privileged mode
+
+Falco runs in full privileged mode by default. For the sake of security, you can enable `least_privileged` to make Falco to run in the least privileged mode. In this case, Falco will be non-privileged container with minimum capabilities added. 
+
+```yaml
+scout:
+  falco:
+    least_privileged: true
+```
+
 ## Troubleshooting
 
 ### Access logs
