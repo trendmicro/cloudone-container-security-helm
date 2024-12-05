@@ -39,6 +39,7 @@ rules_file:
   - /etc/falco/default_rules.yaml
   - /etc/scout/rules.d/tm_falco_rules.yaml
   - /etc/scout/rules.d/tm_override_rules.yaml
+  - /etc/scout/rules.d/tm_malware_rules.yaml
 
 ######################
 # Falco config files #

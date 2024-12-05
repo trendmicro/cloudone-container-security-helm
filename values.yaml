@@ -525,7 +525,9 @@ securityContext:
         - ALL
         add:
         - SYS_PTRACE
-      privileged: true
+        - SYS_ADMIN
+        - DAC_READ_SEARCH
+      privileged: false
       readOnlyRootFilesystem: true
       runAsNonRoot: false
       runAsUser: 0
@@ -548,7 +550,7 @@ securityContext:
     pod:
       runAsNonRoot: false
     scanner:
-      privileged: true
+      privileged: false
       runAsNonRoot: false
       runAsUser: 0
 

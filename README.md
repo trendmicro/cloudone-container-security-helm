@@ -347,3 +347,8 @@ The following environment variables are supported for log collection:
 | ------------------------- |:----------------------------------------|:-----------------------------------------------------------------------------------------------|
 | RELEASE                   | Helm release name                       | `trendmicro`                                                                         |
 | NAMESPACE                 | The namespace that the helm chart is deployed in | Current namespace declared in `kubeconfig`. If no namespace setting exists in `kubeconfig`, then `trendmicro-system` will be used. |
+
+### Known Issue
+
+1. Malware scanning is not supported in the OpenShift environment.
+2. Malware scanning is not supported in ARM64 environments.

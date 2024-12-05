@@ -60,7 +60,7 @@ spec:
 {{- $falcoSecurityContext := include "falco.securityContext" . | fromYaml }}
 {{- $downloaderSecurityContext := default .Values.securityContext.default.container $securityContext.downloader }}
 {{- $initSecurityContext := default .Values.securityContext.default.container $securityContext.init }}
-{{- $jobStatusMntPath := "/host-tmp" }}
+{{- $jobStatusMntPath := "/status-dir" }}
 
 {{- if $securityContextEnabled }}
       securityContext:
@@ -485,7 +485,7 @@ spec:
               name: host-root
               readOnly: true
             - mountPath: {{ $jobStatusMntPath }}
-              name: host-tmp
+              name: status-dir
 {{- if eq "tls" .Values.cloudOne.k8sMetaCollector.grpcAuth.type }}
             - mountPath: /etc/scout/metacollector-ca-cert.pem
               name: metacollector-grpc-certs
@@ -641,10 +641,9 @@ spec:
           hostPath:
             path: /
             type: Directory
-        - name: host-tmp
-          hostPath:
-            path: /tmp
-            type: Directory
+        - name: status-dir
+          emptyDir:
+            sizeLimit: 1Mi
         - name: debugfs
           hostPath:
             path: /sys/kernel/debug
