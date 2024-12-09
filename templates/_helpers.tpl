@@ -663,6 +663,7 @@ Cloud One API Key auth
 .Values.cloudOne.admissionController.apiKey is for backwards compatibility with the version <= v.1.0.1
 */}}
 {{- define "container.security.auth.secret" -}}
+{{- if not .Values.cloudOne.clusterRegistrationKey }}
 {{- if not (and .Values.useExistingSecrets (eq true .Values.useExistingSecrets.containerSecurityAuth)) }}
 apiVersion: v1
 kind: Secret
@@ -678,6 +679,7 @@ data:
   api.key: {{ .Values.cloudOne.admissionController.apiKey | toString | b64enc | quote }}
 {{- else }}
   api.key: {{ required "A valid Cloud One apiKey is required" .Values.cloudOne.apiKey | toString | b64enc | quote }}
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end -}}{{/* define */}}
@@ -962,6 +964,24 @@ Return the trusted images digest
 {{- end }}
 {{- end }}
 {{- $digest}}
+{{- end -}}
+
+{{/*
+Validate input for cluster registration from override file
+*/}}
+{{- define "validateClusterInput" -}}
+{{- if and .Values.cloudOne.apiKey .Values.cloudOne.clusterRegistrationKey }}
+{{- fail "Please do not specify the apiKey in the override file when using automated cluster registration" }}
+{{- end }}
+{{- if and (not .Values.cloudOne.groupId ) (.Values.cloudOne.clusterRegistrationKey) }}
+{{- fail "Please specify the groupId in the override file when using automated cluster registration" }}
+{{- end }}
+{{- if and .Values.cloudOne.clusterName (gt (float64 (len .Values.cloudOne.clusterName)) 64.0) }}
+{{- fail "The cluster name must be less than 64 characters" }}
+{{- end }}
+{{- if and .Values.cloudOne.clusterNamePrefix (gt (float64 (len .Values.cloudOne.clusterNamePrefix)) 16.0) }}
+{{- fail "The cluster name prefix must be less than 16 characters" }}
+{{- end }}
 {{- end -}}
 
 {{- define "falco.securityContext" -}}

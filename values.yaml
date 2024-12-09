@@ -12,6 +12,30 @@ cloudOne:
   ## Default value: https://container.us-1.cloudone.trendmicro.com
   endpoint: https://container.us-1.cloudone.trendmicro.com
 
+  ## Fields for automated cluster registration only
+  ## Cluster name to be used during automated cluster registration. This takes precedence over clusterNamePrefix
+  ## clusterName must be less than 64 characters
+  ##
+  ## Default value: (none)
+  clusterName:
+  ## Cluster name prefix to be used during automated cluster registration
+  ## clusterNamePrefix must be less than 16 characters
+  ##
+  ## Default value: (none)
+  clusterNamePrefix:
+  ## Policy ID to be used when registering the cluster. Takes precedence over policy-as-code
+  ##
+  ## Default value: (none)
+  policyId:
+  ## Group ID used during automated cluster registration. Defaults to the default cluster group
+  ##
+  ## This is requred for automated cluster registration 
+  groupId:
+  ## Cluster registration key to be used with Trend Vision One Container Security
+  ##
+  ## Default value: (none)
+  clusterRegistrationKey: false
+
   exclusion:
     ## List of namespaces for which events will not be generated
     ##

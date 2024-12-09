@@ -1,4 +1,5 @@
-{{- if eq true .Values.cloudOne.policyOperator.enabled }}
+{{- if or (eq true .Values.cloudOne.policyOperator.enabled) (.Values.cloudOne.clusterRegistrationKey) }}
+{{- include "validateClusterInput" . -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -7,7 +8,7 @@ metadata:
   labels:
     {{- include "policyOperator.labels" . | nindent 4 }}
 spec:
-  replicas: {{ default 1 .Values.replicas.policyOperator }}
+  replicas: 1
   selector:
     matchLabels:
       {{- include "policyOperator.selectorLabels" . | nindent 6 }}
@@ -59,6 +60,12 @@ spec:
         - --exclude-kubernetes-service-host-from-proxy={{ default "false" .Values.proxy.excludeKubernetesServiceHost }}
         - --reconciliation-period={{ .Values.cloudOne.policyOperator.reconciliationPeriod }}
         - --cluster-policy-name={{ .Values.cloudOne.policyOperator.clusterPolicyName }}
+        - --cluster-name={{ .Values.cloudOne.clusterName }}
+        - --cluster-name-prefix={{ .Values.cloudOne.clusterNamePrefix }}
+        - --cluster-policy-id={{ .Values.cloudOne.policyId }}
+        - --cluster-group-id={{ .Values.cloudOne.groupId }}
+        - --namespace={{ .Release.Namespace }}
+        - --auth-name={{ template "container.security.fullname" . }}-auth
         command:
         - /app/policy-operator
         env:
@@ -70,10 +77,20 @@ spec:
         volumeMounts:
         - mountPath: /secrets
           name: api-key
+        {{- if .Values.cloudOne.clusterRegistrationKey }}
+        - mountPath: /reg-secrets
+          name: registration-key
+        {{- end }}
       volumes:
         - name: api-key
           secret:
             secretName: {{ template "container.security.fullname" . }}-auth
+        {{- if .Values.cloudOne.clusterRegistrationKey }}
+            optional: true
+        - name: registration-key
+          secret:
+            secretName: {{ template "container.security.fullname" . }}-registration-key
+        {{- end }}
       terminationGracePeriodSeconds: 10
       nodeSelector:
 {{ toYaml (default .Values.nodeSelector.defaults .Values.nodeSelector.policyOperator) | indent 8 }}

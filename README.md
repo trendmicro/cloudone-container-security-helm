@@ -64,6 +64,19 @@ To obtain an API key:
 
 4. Copy your API key, as it will be used during the installation process.
 
+### Using automated cluster registration
+
+Instead of individually registering each cluster, Trend Vision One Container Security users can configure automated cluster registration.
+
+To use automated cluster registration:
+1. Navigate to the _Trend Micro Vision One_ console using https://portal.xdr.trendmicro.com/
+
+2. Create a Vision One API Key with a role that contains only the "Automatically register cluster" permission
+
+3. Put the Vision One API Key into a secret called `trendmicro-container-security-registration-key`
+
+4. Install the Container Security Helm chart using the values `cloudOne.clusterRegistrationKey: true` and `cloudOne.groupId=<your cluster group ID>`.
+
 ### Override configuration defaults
 
 Helm uses a file called `values.yaml` to set configuration defaults. You can find detailed documentation for each of the configuration options in this file.
