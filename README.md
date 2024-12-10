@@ -363,5 +363,5 @@ The following environment variables are supported for log collection:
 
 ### Known Issue
 
-1. Malware scanning is not supported in the OpenShift environment.
+1. Malware scanning is not supported in air-gapped environments.
 2. Malware scanning is not supported in ARM64 environments.

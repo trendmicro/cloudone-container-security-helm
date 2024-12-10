@@ -40,10 +40,10 @@ users:
 - system:serviceaccount:{{ .Release.Namespace }}:{{ include "admissionController.serviceAccountName" . }}
 {{- end }}
 - system:serviceaccount:{{ .Release.Namespace }}:{{ include "usage.serviceAccountName" . }}
-{{- if or (eq true .Values.cloudOne.vulnerabilityScanning.enabled) (eq true .Values.cloudOne.inventoryCollection.enabled) }}
+{{- if or (or (eq true .Values.cloudOne.vulnerabilityScanning.enabled) (eq true .Values.cloudOne.malwareScanning.enabled)) (eq true .Values.cloudOne.inventoryCollection.enabled) }}
 - system:serviceaccount:{{ .Release.Namespace }}:{{ include "workloadOperator.serviceAccountName" . }}
 {{- end }}
-{{- if eq true .Values.cloudOne.vulnerabilityScanning.enabled }}
+{{- if (or (eq true .Values.cloudOne.vulnerabilityScanning.enabled) (eq true .Values.cloudOne.malwareScanning.enabled)) }}
 - system:serviceaccount:{{ .Release.Namespace }}:{{ include "scanManager.serviceAccountName" . }}
 {{- end }}
 {{- if or (eq true .Values.cloudOne.runtimeSecurity.enabled)  (eq true .Values.cloudOne.malwareScanning.enabled) }}
