@@ -958,7 +958,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.5.0
+    tag: 2.5.1
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -997,7 +997,7 @@ images:
 
   scanManager:
     repository: scan-manager
-    digest: sha256:d198e2f7392028a9030230b700aea46dab6e6d4acba17f329129f4717483deeb
+    digest: sha256:2d038e9dc2ab1265e4041eeb5c72cd868754468c9b289ef8dc249dfc3a0e5158
 
   scanJob:
     repository: scan-job
@@ -1025,7 +1025,7 @@ images:
 
   policyOperator:
     repository: policy-operator
-    digest: sha256:23c4c5668790425048929de0f8a513312f518f1aa0c51babf97641d068d962d8
+    digest: sha256:d19329b8e66432cd1315676e99b1bfb5bb1206633953925c27270a6ef3a695af
 
   malwareScanner:
     repository: malware-scanner
