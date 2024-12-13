@@ -1029,7 +1029,7 @@ images:
 
   malwareScanner:
     repository: malware-scanner
-    digest: sha256:aee886896786c00ec05d59f6e0122f3b655e1d81b7e361e903cc28880d3d2c35
+    digest: sha256:0f354c2c7fa25494f2e214a70e87d6304dae15e9986b724fce900ff509a58410
 
 ##
 ## Determine whether to use existing secrets in the target namespace rather than
