@@ -242,6 +242,10 @@ data:
     metadata:
       labels:
         {{- include "complianceScanJob.labels" . | nindent 8 }}
+      annotations:
+        {{- with (default .Values.podAnnotations.defaults .Values.podAnnotations.complianceScanJob) }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       namespace: {{ .Release.Namespace }}
     spec:
       backoffLimit: 2
@@ -251,6 +255,10 @@ data:
         metadata:
           labels:
             {{- include "complianceScanJob.labels" . | nindent 12 }}
+          annotations:
+            {{- with (default .Values.podAnnotations.defaults .Values.podAnnotations.complianceScanJob) }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
         spec:
           hostPID: true
           serviceAccountName: {{ include "complianceScanJob.serviceAccountName" . }}
