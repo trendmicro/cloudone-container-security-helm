@@ -71,8 +71,7 @@ spec:
         - --image-pull-secret-name={{ $secret }}
         {{- end }}
         {{- end }}
-        - --job-template-path
-        - /etc/config/scan-job-template.yaml
+        - --scan-config-path=/etc/config
         - --job-active-deadline={{ printf "%ds" (int .Values.cloudOne.scanManager.activeDeadlineSeconds) }}
         {{- if .Values.cloudOne.vulnerabilityScanning.enabled }}
         - --enable-vulnerability-scanning
@@ -107,7 +106,7 @@ spec:
         volumeMounts:
           - mountPath: /secrets
             name: api-key
-          - name: job-template
+          - name: scan-manager-config
             mountPath: /etc/config/
           - name: grpc-certs
             mountPath: /etc/malwarescan/certs
@@ -120,12 +119,9 @@ spec:
         - name: api-key
           secret:
             secretName: {{ template "container.security.fullname" . }}-auth
-        - name: job-template
+        - name: scan-manager-config
           configMap:
             name: {{ template "container.security.name" . }}-scan-manager-config
-            items:
-              - key: scan-job-template.yaml
-                path: scan-job-template.yaml
         - name: scanmanager-workdir
           emptyDir:
             sizeLimit: 50Mi

@@ -7,6 +7,16 @@ metadata:
   labels:
     {{- include "scanManager.labels" . | nindent 4 }}
 data:
+  inheritNodeSelector: {{ .Values.nodeSelector.inheritNodeSelectorScanner | quote }}
+  inheritTolerations: {{ .Values.tolerations.inheritTolerationsScanner | quote }}
+  filterInheritNodeSelector: |
+    {{- if .Values.nodeSelector.filterNodeSelectorScanner }}
+    {{- toYaml .Values.nodeSelector.filterNodeSelectorScanner | nindent 6 }}
+    {{- end }}
+  filterInheritTolerations: |
+    {{- if .Values.tolerations.filterTolerationsScanner }}
+    {{- toYaml .Values.tolerations.filterTolerationsScanner | nindent 6 }}
+    {{- end }}
   scan-job-template.yaml: |
     apiVersion: batch/v1
     kind: Job

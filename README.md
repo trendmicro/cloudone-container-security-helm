@@ -271,6 +271,49 @@ securityContext:
         add: ["DAC_READ_SEARCH"]
 ```
 
+### Configure node selectors and tolerations for the Container Security components
+
+To configure the scheduling of the Container Security components, you can set the `nodeSelector` and `tolerations` values in your `overrides.yaml` file:
+```yaml
+nodeSelector:
+  defaults: # Node selector applied to all components except scanner pods (see below)
+    kubernetes.io/arch: arm64
+
+  admissionController: # Node selector applied to specific component
+    kubernetes.io/arch: amd64
+
+tolerations:
+  defaults: # Tolerations applied to all components except scanner pods (see below)
+  - key: kubernetes.io/arch 
+    operator: Equal
+    value: amd64
+    effect: NoSchedule
+
+  admissionController: # Tolerations applied to specific component
+  - key: kubernetes.io/os
+    operator: Exists
+    effect: NoSchedule
+```
+
+For scanner pods, since they run images from the pods being scanned, you can configure the scanner to inherit the node selectors and tolerations from the owner resource (ie. deployment, daemonset, pod, etc.):
+```yaml
+nodeSelector:
+  inheritNodeSelectorScanner: true # Inherit node selector from the owner resource (default: false)
+
+  filterNodeSelectorScanner: # Only inherit node selector specified in the filter (default: all node selectors are inherited)
+    kubernetes.io/arch: amd64
+
+tolerations:
+  inheritTolerationsScanner: true # Inherit tolerations from the owner resource (default: false)
+
+  filterTolerationsScanner: # Only inherit tolerations specified in the filter (default: all tolerations are inherited)
+  - key: kubernetes.io/arch 
+    operator: Equal
+    value: amd64
+    effect: NoSchedule
+```
+
+
 ### Configuring logging for the Container Security components
 
 You can configure the logging for all components by setting the `logConfig` value in your `overrides.yaml` file:

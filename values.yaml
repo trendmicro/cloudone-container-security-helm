@@ -58,7 +58,7 @@ cloudOne:
       - key: ignoreAdmissionControl
         operator: DoesNotExist
 
-    ## failurePolicy defines the bahaviour if an unreconized error or timeout occurs. Enabling
+    ## failurePolicy defines the behavior if an unrecognized error or timeout occurs. Enabling
     ## this while not tagging kube-system to be ignored can easily cause the cluster to be
     ## unresponsive.
     ##
@@ -214,7 +214,7 @@ cloudOne:
       ## Default value: 3650
       lifetime: 3650
 
-    ## failurePolicy defines the bahaviour if an unreconized error or timeout occurs. Enabling
+    ## failurePolicy defines the behavior if an unrecognized error or timeout occurs. Enabling
     ## this while not tagging kube-system to be ignored can easily cause the cluster to be
     ## unresponsive.
     ##
@@ -763,16 +763,50 @@ resources:
 nodeSelector:
   ## nodeSelector if set, ensures pods are only assigned to a particular set of nodes.
   ## Defaults apply to all pods created by this chart unless overridden by a non default configuration.
+  ## Does not apply to scanner pods. Use inheritNodeSelectorScanner instead.
   ##
+  ## Type: map[string]string
   ## Default Value: {}
   defaults: {}
+
+  ## inheritNodeSelectorScanner if set, will inherit the nodeSelectors from the owner resource of the pod 
+  ##  whose images are being scanned to the respective scanner pods.
+  ## By default nodeSelectors are not inherited.
+  ##
+  ## Default Value: false
+  inheritNodeSelectorScanner: false
+
+  ## filterNodeSelectorScanner if set, will only inherit the specified nodeSelectors from the owner resource of the pod
+  ##  whose images are being scanned to the respective scanner pods.
+  ## By default all nodeSelectors are inherited if inheritNodeSelectorScanner is set to true and filterNodeSelectorScanner is not set.
+  ##
+  ## Type: map[string]string
+  ## Default Value: []
+  filterNodeSelectorScanner: {}
 
 tolerations:
   ## tolerations if set, allows (but does not require) the pods to schedule onto nodes with matching taints.
   ## Defaults apply to all pods created by this chart unless overridden by a non default configuration.
+  ## Does not apply to scanner pods. Use inheritTolerationsScanner instead.
   ##
+  ## Type: list of map[string]string
   ## Default Value: {}
   defaults: []
+
+  ## inheritTolerationsScanner if set, will inherit the tolerations from the owner resource of the pod
+  ##  whose images are being scanned to the respective scanner pods.
+  ## By default tolerations are not inherited.
+  ##
+  ## Default Value: false
+  inheritTolerationsScanner: false
+
+  ## filterTolerationsScanner if set, will only inherit the specified tolerations from the owner resource of the pod
+  ##  whose images are being scanned to the respective scanner pods.
+  ## By default all tolerations are inherited if inheritTolerationsScanner is set to true and filterTolerationsScanner is not set.
+  ##
+  ## Type: list of map[string]string
+  ## Default Value: []
+  filterTolerationsScanner: []
 
 affinity:
   ## affinity if set, provides the ability constrain which nodes your pod is eligible to be scheduled on, based on labels.

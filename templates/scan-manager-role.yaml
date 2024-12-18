@@ -18,8 +18,16 @@ rules:
   - update
 - apiGroups:
   - ""
+  - batch
+  - apps
   resources:
   - pods
+  - deployments
+  - replicasets
+  - daemonsets
+  - statefulsets
+  - jobs
+  - cronjobs
   verbs:
   - get
   - list
