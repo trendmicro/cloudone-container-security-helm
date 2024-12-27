@@ -47,8 +47,7 @@ cloudOne:
   admissionController:
     enabled: true
 
-    ## validationNamespaceSelector is a namespace selector defined so that matching namespaces will
-    ## be subject to validation.
+    ## validationNamespaceSelector is the namespace selector defined for the validating webhook configuration
     ##
     ## For more information about namespace selectors, please see
     ## https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
