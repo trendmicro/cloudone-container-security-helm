@@ -25,7 +25,14 @@ data:
       url: {{ default "http://some.url" .Values.cloudOne.runtimeSecurity.customRules.output.splunk.url }}
       custom_headers:
         {{- range .Values.cloudOne.runtimeSecurity.customRules.output.splunk.headers}}
+        {{- if contains "Authorization:" . }}
+        {{- if $.Values.cloudOne.runtimeSecurity.customRules.output.splunk.hecTokenSecretName -}}
+        {{- fail "customRules.output.splunk.hecTokenSecretName automatically adds Splunk HEC auth header, no other Authorization headers allowed" -}}
+        {{- end}}{{- end}}
         - "{{ . }}"
+        {{- end }}
+        {{- if $.Values.cloudOne.runtimeSecurity.customRules.output.splunk.hecTokenSecretName }}
+        - "Authorization: Splunk ${SPLUNK_HEC_TOKEN}"
         {{- end }}
       ca_path: "/etc/ssl/certs"
       ca_cert: "/etc/ssl/certs/ca-certificates.crt"

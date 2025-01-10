@@ -175,6 +175,7 @@ cloudOne:
           url: https://splunkserver/services/collector/raw
           headers:
           - ''
+          hecTokenSecretName: ''
 
   complianceScan:
     enabled: true

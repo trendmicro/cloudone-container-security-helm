@@ -292,6 +292,18 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.nodeName
+          {{- if .Values.cloudOne.runtimeSecurity.customRules.output.splunk.hecTokenSecretName }}
+          {{- if not ( lookup "v1" "Secret" .Release.Namespace .Values.cloudOne.runtimeSecurity.customRules.output.splunk.hecTokenSecretName ) -}}{{- fail (
+              printf "secret %s is expected in namespace %s, with key 'hec_secret' containing Splunk HEC token"
+                .Values.cloudOne.runtimeSecurity.customRules.output.splunk.hecTokenSecretName
+                .Release.Namespace
+              ) -}}{{- end}}
+            - name: SPLUNK_HEC_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.cloudOne.runtimeSecurity.customRules.output.splunk.hecTokenSecretName }}
+                  key: hec_secret
+          {{- end }}
           volumeMounts:
             {{- if .Values.scout.falco.docker.enabled }}
             - mountPath: /host/var/run/docker.sock
