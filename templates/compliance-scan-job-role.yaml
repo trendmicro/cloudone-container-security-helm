@@ -33,6 +33,8 @@ rules:
   - nodes/proxy
   - pods
   - pods/log
+  - services
+  - replicationcontrollers
   - configmaps
   - serviceaccounts
   - namespaces
@@ -48,6 +50,38 @@ rules:
   verbs:
   - create
   - delete
+- apiGroups:
+  - "apps"
+  resources:
+  - daemonsets
+  - deployments
+  - replicasets
+  - statefulsets
+  verbs:
+  - list
+  - get
+- apiGroups:
+  - "autoscaling"
+  resources:
+  - horizontalpodautoscalers
+  verbs:
+  - list
+  - get
+- apiGroups:
+  - "batch"
+  resources:
+  - cronjobs
+  - jobs
+  verbs:
+  - list
+  - get
+- apiGroups:
+  - "networking.k8s.io"
+  resources:
+  - networkpolicies
+  verbs:
+  - list
+  - get
 - verbs:
   - use
   apiGroups:
