@@ -157,7 +157,9 @@ spec:
 {{- $containerSecurityContext := default .Values.securityContext.default.container $securityContext.container.workloadOperator }}
 {{- if $securityContextEnabled }}
       securityContext:
-{{ toYaml $podSecurityContext | indent 8 }}
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
 {{- end }}
       {{- $imageDefaults := .Values.images.defaults }}
       {{- with .Values.images.workloadOperator }}
@@ -171,7 +173,13 @@ spec:
         - name: trendmicro-workload-images-remover
 {{- if $securityContextEnabled }}
           securityContext:
-{{ toYaml $containerSecurityContext | indent 12 }}
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
 {{- end }}
         {{- $project := (default (default "trendmicrocloudone" $imageDefaults.project) .project) }}
         {{- $repository := printf "%s/%s" $project (required ".repository is required!" .repository) }}
