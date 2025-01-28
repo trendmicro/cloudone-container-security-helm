@@ -66,6 +66,7 @@ spec:
         - --cluster-group-id={{ .Values.cloudOne.groupId }}
         - --namespace={{ .Release.Namespace }}
         - --auth-name={{ template "container.security.fullname" . }}-auth
+        - --auto-register={{ default "false" .Values.cloudOne.clusterRegistrationKey }}
         command:
         - /app/policy-operator
         env:

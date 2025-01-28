@@ -13,7 +13,7 @@ To get started, see the [Helm installation guide](https://helm.sh/docs/intro/ins
 
 Container Security Continuous Compliance enforces policies by leveraging [Kubernetes network policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/) to perform isolation mitigation. Network policies are implemented by the [network plugin](https://kubernetes.io/docs/concepts/extend-kubernetes/compute-storage-net/network-plugins/).
 
-To install Container Security, a network plugin with NetworkPolicy support is required to allow for network isolation mitigation. 
+To install Container Security, a network plugin with NetworkPolicy support is required to allow for network isolation mitigation.
 
 - In Amazon Elastic Kubernetes Service (Amazon EKS), the [Calico network plugin](https://docs.aws.amazon.com/eks/latest/userguide/calico.html) can be used as network policy engine.
 - In OpenShift 4.x, [OpenShift SDN](https://docs.openshift.com/container-platform/4.7/networking/network_policy/about-network-policy.html) supports using network policy in its default network isolation mode.
@@ -31,7 +31,7 @@ By default, Container Security Continuous Compliance will create a Kubernetes ne
       enableNetworkPolicyCreation: false
 ```
 
-2. Create a network policy with `matchLabels` set to `trendmicro-cloud-one: isolate` in your desired namespaces. 
+2. Create a network policy with `matchLabels` set to `trendmicro-cloud-one: isolate` in your desired namespaces.
 
 ```
   apiVersion: networking.k8s.io/v1
@@ -60,7 +60,7 @@ To obtain an API key:
 
 2. Go to [Add a cluster](https://cloudone.trendmicro.com/docs/container-security/cluster-add/).
 
-3. Give your Kubernetes cluster a unique name. 
+3. Give your Kubernetes cluster a unique name.
 
 4. Copy your API key, as it will be used during the installation process.
 
@@ -73,15 +73,15 @@ To use automated cluster registration:
 
 2. Create a Vision One API Key with a role that contains only the "Automatically register cluster" permission
 
-3. Put the Vision One API Key into a secret called `trendmicro-container-security-registration-key`
+3. Put the Vision One API Key into a secret called `trendmicro-container-security-registration-key` with the key `registration.key` in the same namespace where the Container Security components are installed.
 
-4. Install the Container Security Helm chart using the values `cloudOne.clusterRegistrationKey: true` and `cloudOne.groupId=<your cluster group ID>`.
+4. Install the Container Security Helm chart using the values `cloudOne.clusterRegistrationKey: true` and `cloudOne.groupId=<your cluster group ID>`. You can optionally define the cluster name by setting either `cloudOne.clusterName` or `cloudOne.clusterNamePrefix`, if these are not specified the name will be a random string. An existing policy can also be assigned to the cluster by setting `cloudOne.policyId=<your policy ID>`.
 
 ### Override configuration defaults
 
 Helm uses a file called `values.yaml` to set configuration defaults. You can find detailed documentation for each of the configuration options in this file.
 
-You can override the defaults in this file by creating an `overrides.yaml` file and providing the location of this file as input during installation. The `cloudOne.APIKey` should be overridden in the `overrides.yaml` file. 
+You can override the defaults in this file by creating an `overrides.yaml` file and providing the location of this file as input during installation. The `cloudOne.APIKey` should be overridden in the `overrides.yaml` file.
 
 **Note**: If you create a file to override the values, make sure to copy the structure from the chart's `values.yaml` file. You only need to provide the values that you are overriding.
 
@@ -89,7 +89,7 @@ You can override the defaults in this file by creating an `overrides.yaml` file 
 
 1. Create a file called overrides.yaml that will contain your cluster-specific settings. You can find these values in the Container Security console or Container Security API when creating a cluster. The [Values.yaml](values.yaml) file can be used as a reference when creating your overrides file.
 
-2. Use `helm` to install Container Security components with your cluster-specific settings. We recommend that you run Container Security in its own namespace. 
+2. Use `helm` to install Container Security components with your cluster-specific settings. We recommend that you run Container Security in its own namespace.
 
 To install Container Security chart into an existing Kubernetes namespace, use the `--namespace` flag with the `helm install` command:
 
@@ -101,7 +101,7 @@ To install Container Security chart into an existing Kubernetes namespace, use t
     https://github.com/trendmicro/cloudone-container-security-helm/archive/master.tar.gz
 ```
 
-In the example below, we create a new namespace by using `helm`'s `--create-namespace` option: 
+In the example below, we create a new namespace by using `helm`'s `--create-namespace` option:
 
 ```sh
   helm install \
@@ -139,7 +139,7 @@ To upgrade an existing installation in the default Kubernetes namespace to the l
     --namespace ${namespace} \
     --reuse-values \
     trendmicro \
-    https://github.com/trendmicro/cloudone-container-security-helm/archive/master.tar.gz 
+    https://github.com/trendmicro/cloudone-container-security-helm/archive/master.tar.gz
 ```
 
 ### Uninstall the Container Security Helm chart
@@ -154,7 +154,7 @@ You can delete all of the resources created by a helm chart using Helm's `uninst
 
 Use the `helm list --all-namespaces` command to list installed releases in all namespaces.
 
-If you created a `trendmicro-system` namespace during install, and don't have any other components in the `trendmicro-system` namespace, you can delete the namespace by running `kubectl delete namespace trendmicro-system`. 
+If you created a `trendmicro-system` namespace during install, and don't have any other components in the `trendmicro-system` namespace, you can delete the namespace by running `kubectl delete namespace trendmicro-system`.
 
 By default, Container Security Continuous Compliance will create a Kubernetes network policy for you. The created network policies will be cleaned up, even if the chart is uninstalled. To clean them up, run:
 
@@ -206,7 +206,7 @@ For example, you can configure a socks5 proxy with authentication in your `overr
 proxy:
   httpsProxy: socks5://10.10.10.10:1080
   username: user
-  password: password  
+  password: password
 ```
 
 For http proxy, you can configure it this way:
@@ -214,7 +214,7 @@ For http proxy, you can configure it this way:
 proxy:
   httpsProxy: http://10.10.10.10:3128
   username: user
-  password: password  
+  password: password
 ```
 
 ### Configure runtime vulnerability scanning for OpenShift
@@ -284,7 +284,7 @@ nodeSelector:
 
 tolerations:
   defaults: # Tolerations applied to all components except scanner pods (see below)
-  - key: kubernetes.io/arch 
+  - key: kubernetes.io/arch
     operator: Equal
     value: amd64
     effect: NoSchedule
@@ -307,7 +307,7 @@ tolerations:
   inheritTolerationsScanner: true # Inherit tolerations from the owner resource (default: false)
 
   filterTolerationsScanner: # Only inherit tolerations specified in the filter (default: all tolerations are inherited)
-  - key: kubernetes.io/arch 
+  - key: kubernetes.io/arch
     operator: Equal
     value: amd64
     effect: NoSchedule
@@ -341,7 +341,7 @@ You can enable Falco event outputs to stdout or syslog by setting values under `
 ```yaml
 scout:
   falco:
-    stdout_enabled: true # Enable stdout output for Falco events. 
+    stdout_enabled: true # Enable stdout output for Falco events.
     syslog_enabled: true # Enable syslog output for Falco events
 ```
 
@@ -354,7 +354,7 @@ To learn more about configuring the Splunk HEC token for falco custom rules, see
 
 ### Least Privileged mode
 
-Falco runs in full privileged mode by default. For the sake of security, you can enable `least_privileged` to make Falco to run in the least privileged mode. In this case, Falco will be non-privileged container with minimum capabilities added. 
+Falco runs in full privileged mode by default. For the sake of security, you can enable `least_privileged` to make Falco to run in the least privileged mode. In this case, Falco will be non-privileged container with minimum capabilities added.
 
 ```yaml
 scout:
@@ -367,7 +367,7 @@ scout:
 ### Access logs
 Most issues can be investigated using the application logs. The logs can be accessed using `kubectl`.
 
-* Access the logs for the admission controller using the following command: 
+* Access the logs for the admission controller using the following command:
 ```sh
   kubectl logs deployment/trendmicro-admission-controller --namespace ${namespace}
 ```
