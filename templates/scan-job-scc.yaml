@@ -9,13 +9,13 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "container.security.labels" . | nindent 4 }}
-allowHostDirVolumePlugin: false
+allowHostDirVolumePlugin: true
 allowHostIPC: false
 allowHostNetwork: false
 allowHostPID: false
 allowHostPorts: false
-allowPrivilegeEscalation: false
-allowPrivilegedContainer: false
+allowPrivilegeEscalation: {{ .Values.scanner.imageAnnotations.enabled }}
+allowPrivilegedContainer: {{ .Values.scanner.imageAnnotations.enabled }}
 allowedCapabilities:
 {{- toYaml .Values.securityContext.scanner.target.capabilities.add | nindent 2}}
 allowedUnsafeSysctls: []
@@ -34,6 +34,7 @@ supplementalGroups:
   type: RunAsAny
 users: []
 volumes:
+- hostPath
 - configMap
 - downwardAPI
 - emptyDir

@@ -994,3 +994,109 @@ Validate input for cluster registration from override file
 {{- end -}}
 {{- toYaml $falcosecurityContext }}
 {{- end -}}
+
+
+{{/*
+Return the arguments for container runtime's sockets
+Usage:
+{{ include "containerRuntime.sock.args" ( list "cri-arg-name" "path-prefix" .Values.scout.falco ) }}
+*/}}
+{{- define "containerRuntime.sock.args"  -}}
+{{- $arg := index . 0 -}}
+{{- $pathprefix := index . 1 -}}
+{{- $context := index . 2 -}}
+{{- if and $context.docker $context.docker.enabled }}
+- --{{$arg}}
+- {{$pathprefix}}/var/run/docker.sock
+{{- end }}{{/* if */}}
+{{- if and $context.cri $context.cri.enabled }}
+- --{{$arg}}
+- {{$pathprefix}}/run/cri/cri.sock
+{{- end }}{{/* if */}}
+{{- if and $context.dockershim $context.dockershim.enabled }}
+- --{{$arg}}
+- {{$pathprefix}}/run/dockershim.sock
+{{- end }}{{/* if */}}
+{{- if and $context.k0s $context.k0s.enabled }}
+- --{{$arg}}
+- {{$pathprefix}}/run/k0s/containerd.sock
+{{- end }}{{/* if */}}
+{{- if and $context.k3s $context.k3s.enabled }}
+- --{{$arg}}
+- {{$pathprefix}}/run/k3s/containerd/containerd.sock
+{{- end }}{{/* if */}}
+{{- end -}}
+
+{{/*
+Return the volume mounts for container runtime's sockets
+Usage:
+{{ include "containerRuntime.sock.volumeMounts" ( list "path-prefix" .Values.scout.falco ) }}
+*/}}
+{{- define "containerRuntime.sock.volumeMounts" -}}
+{{- $pathprefix := index . 0 -}}
+{{- $context := index . 1 -}}
+{{- if and $context.docker $context.docker.enabled }}
+- mountPath: {{$pathprefix}}/var/run/docker.sock
+  name: docker-socket
+{{- end}}{{/* if */}}
+{{- if and $context.cri $context.cri.enabled }}
+- mountPath: {{$pathprefix}}/run/cri/cri.sock
+  name: cri-socket
+{{- end}}{{/* if */}}
+{{- if and $context.dockershim $context.dockershim.enabled }}
+- mountPath: {{$pathprefix}}/run/dockershim.sock
+  name: dockershim-socket
+{{- end}}{{/* if */}}
+{{- if and $context.k0s $context.k0s.enabled }}
+- mountPath: {{$pathprefix}}/run/k0s/containerd.sock
+  name: k0s-socket
+{{- end}}{{/* if */}}
+{{- if and $context.k3s $context.k3s.enabled }}
+- mountPath: {{$pathprefix}}/run/k3s/containerd/containerd.sock
+  name: k3s-socket
+{{- end}}{{/* if */}}
+{{- end -}}
+
+{{/*
+Return the volume for container runtime's sockets
+Usage:
+{{ include "containerRuntime.sock.volumes" ( list $ .Values.scout.falco ) }}
+*/}}
+{{- define "containerRuntime.sock.volumes"  -}}
+{{- $ := index . 0 -}}
+{{- $context := index . 1 -}}
+{{- if $context.docker.enabled }}
+- name: docker-socket
+  hostPath:
+    path: {{ $context.docker.socket }}
+{{- end}}{{/* if */}}
+{{- if $context.cri.enabled }}
+- name: cri-socket
+  hostPath:
+    # default is /run/crio/crio.sock on OpenShift.
+    {{- $defaultcripath := "/run/containerd/containerd.sock" }}
+    {{- if $.Capabilities.APIVersions.Has "security.openshift.io/v1" }}
+    {{- $defaultcripath = "/run/crio/crio.sock" }}
+    {{- end }}{{/* if */}}
+    path: {{ $context.cri.socket | default $defaultcripath }}
+{{- end }}{{/* if */}}
+{{- if (and $context.dockershim $context.dockershim.enabled) }}
+- name: dockershim-socket
+  hostPath:
+    # default is /run/dockershim.sock on bottlerocket.
+    {{- $defaultdockershimpath := "/run/dockershim.sock" }}
+    path: {{ $context.dockershim.socket | default $defaultdockershimpath }}
+{{- end }}{{/* if */}}
+{{- if (and $context.k0s $context.k0s.enabled) }}
+- name: k0s-socket
+  hostPath:
+    {{- $defaultk0spath := "/run/k0s/containerd.sock" }}
+    path: {{ $context.k0s.socket | default $defaultk0spath }}
+{{- end }}{{/* if */}}
+{{- if (and $context.k3s $context.k3s.enabled) }}
+- name: k3s-socket
+  hostPath:
+    {{- $defaultk3spath := "/run/k3s/containerd/containerd.sock" }}
+    path: {{ $context.k3s.socket | default $defaultk3spath }}
+{{- end }}{{/* if */}}
+{{- end -}}

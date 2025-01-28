@@ -967,6 +967,25 @@ malwareScanner:
   - /sys
   scanWorkerCount: 5
 
+scanner:
+  imageAnnotations:
+    ## enabled is a global flag controlling whether image annotations are retrieved from the image manifest, the image annotation will be displayed in vulnerability events
+    ## Default value: false
+    enabled: false
+    docker:
+      ## Determines if the docker socket is mounted in the scan-job pod.
+      ## Required for docker based runtimes
+      enabled: true
+      ## socket, determines which socket to mount for enabling docker based runtimes.
+      socket: /var/run/docker.sock
+    cri:
+      ## Determines if the cri (containerd or crio) socket is mounted in the scan-job container.
+      ## Required for cri based runtimes
+      enabled: true
+      ## socket, determines which socket to mount for enabling cri based runtimes.
+      ## Default value: (determined by platform)
+      socket:
+
 images:
   defaults:
     ## Default registry to pull images from. This can be overridden for

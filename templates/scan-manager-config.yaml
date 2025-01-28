@@ -54,13 +54,16 @@ data:
 {{- end }}
 {{- if and .Values.securityContextConstraints.create (.Capabilities.APIVersions.Has "security.openshift.io/v1") }}
           serviceAccountName: {{ include "scanJob.serviceAccountName" . }}
-{{- end}}
+{{- end }}
           restartPolicy: Never
           volumes:
           - name: utility-volume
             emptyDir: {}
           - name: tmp-volume
             emptyDir: {}
+{{- if and .Values.cloudOne.vulnerabilityScanning.enabled .Values.scanner.imageAnnotations.enabled }}
+{{- include "containerRuntime.sock.volumes" ( list $ .Values.scanner.imageAnnotations ) | trim | nindent 10 }}
+{{- end }}
           initContainers:
           - name: vulnerability-scanner-init
             image: IMAGE
@@ -80,6 +83,10 @@ data:
           - name: target
             image: IMAGE
             imagePullPolicy: Always
+            args:
+{{- if and .Values.cloudOne.vulnerabilityScanning.enabled .Values.scanner.imageAnnotations.enabled }}
+{{- include "containerRuntime.sock.args" ( list "cri-path" "/host" .Values.scanner.imageAnnotations ) | trim | nindent 14 }}
+{{- end }}
             env:
             {{- if .Values.cloudOne.malwareScanning.enabled }}
             - name: TM_AM_SCAN_TIMEOUT_SECS
@@ -91,6 +98,9 @@ data:
                 readOnly: true
               - mountPath: /tmp
                 name: tmp-volume
+{{- if and .Values.cloudOne.vulnerabilityScanning.enabled .Values.scanner.imageAnnotations.enabled }}
+{{- include "containerRuntime.sock.volumeMounts" ( list "/host" .Values.scanner.imageAnnotations ) | trim | nindent 14 }}
+{{- end }}
 {{- if $securityContextEnabled }}
             securityContext:
 {{ toYaml $targetSecurityContext | indent 14 }}

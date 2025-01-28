@@ -87,22 +87,7 @@ spec:
 {{- end }}{{/* if $securityContextEnabled */}}
           args:
             - /usr/bin/falco
-            {{- if .Values.scout.falco.cri.enabled }}
-            - --cri
-            - /run/cri/cri.sock
-            {{- end }}{{/* if */}}
-            {{- if .Values.scout.falco.dockershim.enabled }}
-            - --cri
-            - /run/dockershim.sock
-            {{- end }}{{/* if */}}
-            {{- if .Values.scout.falco.k0s.enabled }}
-            - --cri
-            - /run/k0s/containerd.sock
-            {{- end }}{{/* if */}}
-            {{- if .Values.scout.falco.k3s.enabled }}
-            - --cri
-            - /run/k3s/containerd/containerd.sock
-            {{- end }}{{/* if */}}
+{{- include "containerRuntime.sock.args" ( list "cri" "" .Values.scout.falco ) | trim | nindent 12 }}
             - -p
             - >
               container.id=%container.id
@@ -153,26 +138,7 @@ spec:
                 fieldRef:
                   fieldPath: spec.nodeName
           volumeMounts:
-            {{- if .Values.scout.falco.docker.enabled }}
-            - mountPath: /host/var/run/docker.sock
-              name: docker-socket
-            {{- end}}{{/* if */}}
-            {{- if .Values.scout.falco.cri.enabled }}
-            - mountPath: /host/run/cri/cri.sock
-              name: cri-socket
-            {{- end}}{{/* if */}}
-            {{- if .Values.scout.falco.dockershim.enabled }}
-            - mountPath: /host/run/dockershim.sock
-              name: dockershim-socket
-            {{- end}}{{/* if */}}
-            {{- if .Values.scout.falco.k0s.enabled }}
-            - mountPath: /host/run/k0s/containerd.sock
-              name: k0s-socket
-            {{- end}}{{/* if */}}
-            {{- if .Values.scout.falco.k3s.enabled }}
-            - mountPath: /host/run/k3s/containerd/containerd.sock
-              name: k3s-socket
-            {{- end}}{{/* if */}}
+{{- include "containerRuntime.sock.volumeMounts" ( list "/host" .Values.scout.falco ) | trim | nindent 12 }}
             - mountPath: /host/dev
               name: dev-fs
               readOnly: true
@@ -227,22 +193,7 @@ spec:
             - /usr/bin/falco
             - -c
             - /etc/falco/falco-customrules.yaml
-            {{- if .Values.scout.falco.cri.enabled }}
-            - --cri
-            - /run/cri/cri.sock
-            {{- end }}{{/* if */}}
-            {{- if .Values.scout.falco.dockershim.enabled }}
-            - --cri
-            - /run/dockershim.sock
-            {{- end }}{{/* if */}}
-            {{- if .Values.scout.falco.k0s.enabled }}
-            - --cri
-            - /run/k0s/containerd.sock
-            {{- end }}{{/* if */}}
-            {{- if .Values.scout.falco.k3s.enabled }}
-            - --cri
-            - /run/k3s/containerd/containerd.sock
-            {{- end }}{{/* if */}}
+{{- include "containerRuntime.sock.args" ( list "cri" "" .Values.scout.falco ) | trim | nindent 12 }}
             - -p
             - >
               container.id=%container.id
@@ -305,26 +256,7 @@ spec:
                   key: hec_secret
           {{- end }}
           volumeMounts:
-            {{- if .Values.scout.falco.docker.enabled }}
-            - mountPath: /host/var/run/docker.sock
-              name: docker-socket
-            {{- end}}{{/* if */}}
-            {{- if .Values.scout.falco.cri.enabled }}
-            - mountPath: /host/run/cri/cri.sock
-              name: cri-socket
-            {{- end}}{{/* if */}}
-            {{- if .Values.scout.falco.dockershim.enabled }}
-            - mountPath: /host/run/dockershim.sock
-              name: dockershim-socket
-            {{- end}}{{/* if */}}
-            {{- if .Values.scout.falco.k0s.enabled }}
-            - mountPath: /host/run/k0s/containerd.sock
-              name: k0s-socket
-            {{- end}}{{/* if */}}
-            {{- if .Values.scout.falco.k3s.enabled }}
-            - mountPath: /host/run/k3s/containerd/containerd.sock
-              name: k3s-socket
-            {{- end}}{{/* if */}}
+{{- include "containerRuntime.sock.volumeMounts" ( list "/host" .Values.scout.falco ) | trim | nindent 12 }}
             - mountPath: /host/dev
               name: dev-fs
               readOnly: true
@@ -392,22 +324,7 @@ spec:
             - --k8s-metacollector-cert
             - /etc/scout/metacollector-ca-cert.pem
             {{- end}}
-            {{- if .Values.scout.falco.cri.enabled }}
-            - --cri
-            - /run/cri/cri.sock
-            {{- end }}{{/* if */}}
-            {{- if .Values.scout.falco.dockershim.enabled }}
-            - --cri
-            - /run/dockershim.sock
-            {{- end }}{{/* if */}}
-            {{- if .Values.scout.falco.k0s.enabled }}
-            - --cri
-            - /run/k0s/containerd.sock
-            {{- end }}{{/* if */}}
-            {{- if .Values.scout.falco.k3s.enabled }}
-            - --cri
-            - /run/k3s/containerd/containerd.sock
-            {{- end }}{{/* if */}}
+{{- include "containerRuntime.sock.args" ( list "cri" "" .Values.scout.falco ) | trim | nindent 12 }}
             - --malware-scanning={{ default "false" .Values.cloudOne.malwareScanning.enabled }}
             - --runtime-security={{ default "false" .Values.cloudOne.runtimeSecurity.enabled }}
             {{- if .Values.cloudOne.malwareScanning.enabled }}
@@ -463,26 +380,7 @@ spec:
 {{- end }}{{/* if */}}
 {{- end }}{{/* if */}}
           volumeMounts:
-            {{- if .Values.scout.falco.docker.enabled }}
-            - mountPath: /host/var/run/docker.sock
-              name: docker-socket
-            {{- end}}{{/* if */}}
-            {{- if .Values.scout.falco.cri.enabled }}
-            - mountPath: /host/run/cri/cri.sock
-              name: cri-socket
-            {{- end}}{{/* if */}}
-            {{- if .Values.scout.falco.dockershim.enabled }}
-            - mountPath: /host/run/dockershim.sock
-              name: dockershim-socket
-            {{- end}}{{/* if */}}
-            {{- if .Values.scout.falco.k0s.enabled }}
-            - mountPath: /host/run/k0s/containerd.sock
-              name: k0s-socket
-            {{- end}}{{/* if */}}
-            {{- if .Values.scout.falco.k3s.enabled }}
-            - mountPath: /host/run/k3s/containerd/containerd.sock
-              name: k3s-socket
-            {{- end}}{{/* if */}}
+{{- include "containerRuntime.sock.volumeMounts" ( list "/host" .Values.scout.falco ) | trim | nindent 12 }}
             - mountPath: /var/run/scout/
               name: grpc-socket-dir
               readOnly: true
@@ -597,40 +495,7 @@ spec:
         - name: api-key
           secret:
             secretName: {{ template "container.security.fullname" . }}-auth
-        {{- if .Values.scout.falco.docker.enabled }}
-        - name: docker-socket
-          hostPath:
-            path: {{ .Values.scout.falco.docker.socket }}
-        {{- end}}{{/* if */}}
-        {{- if .Values.scout.falco.cri.enabled }}
-        - name: cri-socket
-          hostPath:
-            # default is /run/crio/crio.sock on OpenShift.
-            {{- $defaultcripath := "/run/containerd/containerd.sock" }}
-            {{- if .Capabilities.APIVersions.Has "security.openshift.io/v1" }}
-            {{- $defaultcripath = "/run/crio/crio.sock" }}
-            {{- end }}{{/* if */}}
-            path: {{ .Values.scout.falco.cri.socket | default $defaultcripath }}
-        {{- end }}{{/* if */}}
-        {{- if .Values.scout.falco.dockershim.enabled }}
-        - name: dockershim-socket
-          hostPath:
-            # default is /run/dockershim.sock on bottlerocket.
-            {{- $defaultdockershimpath := "/run/dockershim.sock" }}
-            path: {{ .Values.scout.falco.dockershim.socket | default $defaultdockershimpath }}
-        {{- end }}{{/* if */}}
-        {{- if .Values.scout.falco.k0s.enabled }}
-        - name: k0s-socket
-          hostPath:
-            {{- $defaultk0spath := "/run/k0s/containerd.sock" }}
-            path: {{ .Values.scout.falco.k0s.socket | default $defaultk0spath }}
-        {{- end }}{{/* if */}}
-        {{- if .Values.scout.falco.k3s.enabled }}
-        - name: k3s-socket
-          hostPath:
-            {{- $defaultk3spath := "/run/k3s/containerd/containerd.sock" }}
-            path: {{ .Values.scout.falco.k3s.socket | default $defaultk3spath }}
-        {{- end }}{{/* if */}}
+{{- include "containerRuntime.sock.volumes" ( list $ .Values.scout.falco ) | trim | nindent 8 }}
         - name: dev-fs
           hostPath:
             path: /dev
