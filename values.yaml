@@ -1011,7 +1011,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.5.4
+    tag: 2.5.5
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -1050,11 +1050,11 @@ images:
 
   scanManager:
     repository: scan-manager
-    digest: sha256:d3dec85d7303df63c39d531cf2ef643e999f23e4bfaa7b59238763b240912d90
+    digest: sha256:7cd555455756b6e9229915681588e8cf55a8365ae6e5bd5275a26264563d13d6
 
   scanJob:
     repository: scan-job
-    digest: sha256:d6e129a7cf3bc314289db3bf30d3610a257da28a50168b14e1cdee6918a681a5
+    digest: sha256:6f0a7b20e1583de8855c88c9b414b1df0c873a14727c10ef1faa7f735396bda8
 
   complianceScanJob:
     repository: compliance-scan-job
@@ -1062,7 +1062,7 @@ images:
 
   workloadOperator:
     repository: workload-operator
-    digest: sha256:35d7613313b97c8ec20887a43fe829b1c2eaa28d3dcfb4372a1bda7c5255dbce
+    digest: sha256:72247060fcfc7ddb401ac882704f21546b8af31b0291e0143e648e4eb9019d99
 
   fargateInjector:
     repository: fargate-tool
@@ -1078,7 +1078,7 @@ images:
 
   policyOperator:
     repository: policy-operator
-    digest: sha256:41a95ec5c64fc65e20844de2d918f924a625d1ce652e9937fb7c17c1d02a132e
+    digest: sha256:a1de8cf9e9ee263f4ac116c77c713b42c4302f6370db8a44c52e2c6274c9994c
 
   malwareScanner:
     repository: malware-scanner
