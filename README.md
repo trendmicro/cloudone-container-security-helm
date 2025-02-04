@@ -362,6 +362,18 @@ scout:
     least_privileged: true
 ```
 
+## Falco Version Matrix 
+
+The following matrix shows the Falco version that is bundled with each Helm chart version:
+
+| **Helm Chart Version** | **Falco Version** |
+|------------------------|-------------------|
+| 2.6.x                  | 0.39.2            |
+| 2.5.x                  | 0.37.1            |
+| 2.4.x                  | 0.37.1            |
+| 2.3.24 - 2.3.47        | 0.36.1            |
+| 2.3.14 - 2.3.23        | 0.34.1            |
+
 ## Troubleshooting
 
 ### Access logs
@@ -409,7 +421,7 @@ The following environment variables are supported for log collection:
 | RELEASE                   | Helm release name                       | `trendmicro`                                                                         |
 | NAMESPACE                 | The namespace that the helm chart is deployed in | Current namespace declared in `kubeconfig`. If no namespace setting exists in `kubeconfig`, then `trendmicro-system` will be used. |
 
-### Known Issue
+### Known Limitations
 
 1. Malware scanning is not supported in air-gapped environments.
 2. Malware scanning is not supported in ARM64 environments.

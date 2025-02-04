@@ -556,11 +556,7 @@ securityContext:
       runAsNonRoot: false
       runAsUser: 0
     downloader:
-      allowPrivilegeEscalation: false
-      capabilities:
-        drop:
-        - ALL
-      privileged: false
+      privileged: true
       readOnlyRootFilesystem: true
       runAsNonRoot: false
       runAsUser: 0
@@ -921,6 +917,12 @@ scout:
     ##
     ## Default Value: false
     least_privileged: false
+
+    ## logLevel sets the log verbosity level for Falco's operational logs. Supported values are "emergency", "alert", "critical",
+    ## "error", "warning", "notice", "info", "debug".
+    ##
+    ## Default value: info
+    logLevel: info
 
   scout:
     ## falcoInternalEvent, determines how to deal with falco internal event

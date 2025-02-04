@@ -87,7 +87,7 @@ spec:
 {{- end }}{{/* if $securityContextEnabled */}}
           args:
             - /usr/bin/falco
-{{- include "containerRuntime.sock.args" ( list "cri" "" .Values.scout.falco ) | trim | nindent 12 }}
+{{- include "containerRuntime.sock.falco.args" .Values.scout.falco | trim | nindent 12 }}
             - -p
             - >
               container.id=%container.id
@@ -121,6 +121,8 @@ spec:
             - stdout_output.enabled={{ default "false" .Values.scout.falco.stdout_enabled }}
             - -o
             - syslog_output.enabled={{ default "false" .Values.scout.falco.syslog_enabled }}
+            - -o
+            - log_level={{ include "logLevel" (list .Values.scout.falco.logLevel .) }}
         {{- if .Values.scout.falco.extraArgs }}
 {{ toYaml .Values.scout.falco.extraArgs | indent 12 }}
         {{- end }}{{/* if */}}
@@ -193,7 +195,7 @@ spec:
             - /usr/bin/falco
             - -c
             - /etc/falco/falco-customrules.yaml
-{{- include "containerRuntime.sock.args" ( list "cri" "" .Values.scout.falco ) | trim | nindent 12 }}
+{{- include "containerRuntime.sock.falco.args" .Values.scout.falco | trim | nindent 12 }}
             - -p
             - >
               container.id=%container.id
@@ -227,6 +229,8 @@ spec:
             - stdout_output.enabled={{ default "false" .Values.scout.falco.stdout_enabled }}
             - -o
             - syslog_output.enabled={{ default "false" .Values.scout.falco.syslog_enabled }}
+            - -o
+            - log_level={{ include "logLevel" (list .Values.scout.falco.logLevel .) }}
         {{- if .Values.scout.falco.extraArgs }}
 {{ toYaml .Values.scout.falco.extraArgs | indent 12 }}
         {{- end }}{{/* if */}}

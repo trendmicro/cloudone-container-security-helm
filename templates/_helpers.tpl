@@ -1028,6 +1028,34 @@ Usage:
 {{- end -}}
 
 {{/*
+Return the Falco arguments for container runtime's sockets
+Usage:
+{{ include "containerRuntime.sock.falco.args" .Values.scout.falco }}
+*/}}
+{{- define "containerRuntime.sock.falco.args" -}}
+{{- if and .docker .docker.enabled }} 
+- -o
+- container_engines.cri.sockets[]=/var/run/docker.sock
+{{- end }}{{/* if */}}
+{{- if and .cri .cri.enabled }}
+- -o
+- container_engines.cri.sockets[]=/run/cri/cri.sock
+{{- end }}{{/* if */}}
+{{- if and .dockershim .dockershim.enabled }}
+- -o
+- container_engines.cri.sockets[]=/run/dockershim.sock
+{{- end }}{{/* if */}}
+{{- if and .k0s .k0s.enabled }}
+- -o
+- container_engines.cri.sockets[]=/run/k0s/containerd.sock
+{{- end }}{{/* if */}}
+{{- if and .k3s .k3s.enabled }}
+- -o
+- container_engines.cri.sockets[]=/run/k3s/containerd/containerd.sock
+{{- end }}{{/* if */}}
+{{- end -}}
+
+{{/*
 Return the volume mounts for container runtime's sockets
 Usage:
 {{ include "containerRuntime.sock.volumeMounts" ( list "path-prefix" .Values.scout.falco ) }}

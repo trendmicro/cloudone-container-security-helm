@@ -35,7 +35,7 @@
 # "first match wins" principle. However, enabling the `all` matching option may result
 # in a performance penalty. We recommend carefully testing this alternative setting
 # before deploying it in production. Read more under the `rule_matching` configuration.
-rules_file:
+rules_files:
   - /etc/falco/default_rules.yaml
   - /etc/scout/rules.d/tm_falco_rules.yaml
   - /etc/scout/rules.d/tm_override_rules.yaml
@@ -108,22 +108,47 @@ priority: debug
 # output mechanism. By default, buffering is disabled (false).
 buffered_outputs: false
 
-# [Stable] `outputs`
+# [Incubating] `rule_matching`
 #
-# A throttling mechanism implemented as a token bucket limits the
-# rate of falco notifications. This throttling is controlled by the following configuration
-# options:
-#  - rate: the number of tokens (i.e. right to send a notification)
-#    gained per second. Defaults to 1.
-#  - max_burst: the maximum number of tokens outstanding. Defaults to 1000.
+# The `rule_matching` configuration key's values are:
+#  - `first`: Falco stops checking conditions of rules against upcoming event
+#    at the first matching rule
+#  - `all`: Falco will continue checking conditions of rules even if a matching
+#    one was already found
 #
-# With these defaults, falco could send up to 1000 notifications after
-# an initial quiet period, and then up to 1 notification per second
-# afterward. It would gain the full burst back after 1000 seconds of
-# no activity.
-outputs:
-  rate: 100
-  max_burst: 1000
+# Rules conditions are evaluated in the order they are defined in the rules files.
+# For this reason, when using `first` as value, only the first defined rule will
+# trigger, possibly shadowing other rules.
+# In case `all` is used as value, rules still trigger in the order they were
+# defined.
+#
+# Effectively, with this setting, it is now possible to apply multiple rules that match
+# the same event type. This eliminates concerns about rule prioritization based on the
+# "first match wins" principle. However, enabling the `all` matching option may result in
+# a performance penalty. We recommend carefully testing this alternative setting before
+# deploying it in production.
+rule_matching: first
+
+# [Stable] `outputs_queue`
+#
+# Falco utilizes tbb::concurrent_bounded_queue for handling outputs, and this parameter
+# allows you to customize the queue capacity. Please refer to the official documentation:
+# https://uxlfoundation.github.io/oneTBB/main/tbb_userguide/Concurrent_Queue_Classes.html.
+# On a healthy system with optimized Falco rules, the queue should not fill up.
+# If it does, it is most likely happening due to the entire event flow being too slow,
+# indicating that the server is under heavy load.
+#
+# `capacity`: the maximum number of items allowed in the queue is determined by this value.
+# Setting the value to 0 (which is the default) is equivalent to keeping the queue unbounded.
+# In other words, when this configuration is set to 0, the number of allowed items is
+# effectively set to the largest possible long value, disabling this setting.
+#
+# In the case of an unbounded queue, if the available memory on the system is consumed,
+# the Falco process would be OOM killed. When using this option and setting the capacity,
+# the current event would be dropped, and the event loop would continue. This behavior mirrors
+# kernel-side event drops when the buffer between kernel space and user space is full.
+outputs_queue:
+  capacity: 0
 
 ##############################################################################
 # Falco logging / alerting / metrics related to software functioning (basic) #
@@ -397,34 +422,6 @@ metrics:
   convert_memory_to_mb: true
   include_empty_values: false
 
-#################################################
-# Falco cloud orchestration systems integration #
-#################################################
-
-# [Stable] `metadata_download`
-#
-# When connected to an orchestrator like Kubernetes, Falco has the capability to
-# collect metadata and enrich system call events with contextual data. The
-# parameters mentioned here control the downloading process of this metadata.
-#
-# Please note that support for Mesos is deprecated, so these parameters
-# currently apply only to Kubernetes. When using Falco with Kubernetes, you can
-# enable this functionality by using the `-k` or `-K` command-line flag.
-#
-# However, it's worth mentioning that for important Kubernetes metadata fields
-# such as namespace or pod name, these fields are automatically extracted from
-# the container runtime, providing the necessary enrichment for common use cases
-# of syscall-based threat detection.
-#
-# In summary, the `-k` flag is typically not required for most scenarios involving
-# Kubernetes workload owner enrichment. The `-k` flag is primarily used when
-# additional metadata is required beyond the standard fields, catering to more
-# specific use cases, see https://falco.org/docs/reference/rules/supported-fields/#field-class-k8s.
-metadata_download:
-  max_mb: 100
-  chunk_wait_us: 1000
-  watch_freq_sec: 1
-
 #########################
 # Falco outputs channels #
 ##########################
@@ -488,3 +485,45 @@ engine:
     cpus_for_each_buffer: 2
     buf_size_preset: 4
     drop_failed_exit: false
+
+###########################
+# Falco Container Engines #
+###########################
+
+# This option allows you to explicitly enable or disable API lookups against container
+# runtime sockets for each supported container runtime.
+# Access to these sockets enables Falco to retrieve container and Kubernetes fields,
+# helping identify workload owners in modern containerized environments.
+# Refer to the fields docs:
+#
+# - [Kubernetes fields](https://falco.org/docs/reference/rules/supported-fields/#field-class-k8s)
+# - [Container fields](https://falco.org/docs/reference/rules/supported-fields/#container)
+#
+# Additionally, Falco can use container events as a data source for alerting (evt.type = container).
+#
+# For most container engines, you can solely enable or disable them, and Falco will search the
+# default (hard-coded) container runtime socket paths, such as `/var/run/docker.sock` for Docker.
+#
+# However, for Kubernetes settings, you can customize the CRI socket paths:
+#
+# - `container_engines.cri.sockets`: Pass a list of container runtime sockets.
+# - `container_engines.cri.disable_async`: Since API lookups may not always be quick or
+# perfect, resulting in empty fields for container metadata, you can use this option option
+# to disable asynchronous fetching. Note that missing fields may still occasionally occur.
+#
+# The equivalent (stable) CLI args are `--cri` or `--disable-cri-async`.
+container_engines:
+  docker:
+    enabled: true
+  cri:
+    enabled: true
+    sockets: ["/run/containerd/containerd.sock", "/run/crio/crio.sock", "/run/k3s/containerd/containerd.sock"]
+    disable_async: false
+  podman:
+    enabled: true
+  lxc:
+    enabled: true
+  libvirt_lxc:
+    enabled: true
+  bpm:
+    enabled: true
