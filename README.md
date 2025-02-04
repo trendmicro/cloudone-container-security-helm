@@ -51,7 +51,14 @@ By default, Container Security Continuous Compliance will create a Kubernetes ne
 
 **Warning**: The network policy with matchLabels `trendmicro-cloud-one: isolate` must exist in each application namespaces in order to perform proper isolation mitigation.
 
-### Getting a Cloud One API Key
+### Registering Cluster with Trend Micro Container Security
+
+There are two methods to register a cluster with Trend Micro Container Security:
+
+1. [**Manual Registration**](#getting-a-container-security-api-key): Create a cluster in the Trend Micro Container Security console and obtain an API key or use the Public API to create a cluster and obtain an API key.
+2. [**Automated Registration**](#using-automated-cluster-registration): Use the Vision One API key to automatically register all clusters with Trend Micro Container Security.
+
+### Getting a Container Security API Key
 
 To use the Trend Micro Cloud One Container Security components with your Kubernetes cluster an API key is required to be able to communicate with _Trend Micro Cloud One Container Security_.
 
@@ -64,9 +71,37 @@ To obtain an API key:
 
 4. Copy your API key, as it will be used during the installation process.
 
+5. It is recommended to create a api key secret as outlined in the [Use Existing Secrets for API Key](#use-existing-secrets-for-api-key) section.
+
+### Use Existing Secrets for API Key and Proxy Credentials
+
+#### Use Existing Secrets for API Key
+
+By default, the helm chart expects the api key to be provided through the `cloudOne.APIKey` helm value in the `overrides.yaml` file. This method creates an API key secret in the same namespace where the Container Security components are installed but can expose the API key in helm values. 
+
+It is recommended to use the `useExistingSecrets.containerSecurityAuth: true` option and create a secret in the same namespace where the Container Security components will be installed. The secret should be named `trendmicro-container-security-auth` with the key `api.key` set to the API key value. This will also allow automation of the api key secret creation and management.
+
+```sh
+kubectl create secret generic trendmicro-container-security-auth --from-literal
+api.key=<container-security-api-key> --namespace <trendmicro-namespace>
+```
+
+Then, set the `useExistingSecrets.containerSecurityAuth: true` in the `overrides.yaml` file.
+```yaml
+useExistingSecrets:
+  containerSecurityAuth: true
+```
+
+#### Use Existing Secrets for Proxy Credentials
+
+For more details on configuring a proxy, see the [Configure Container Security to use a proxy](#configure-container-security-to-use-a-proxy) section.
+
+If you are outbound proxy for the Container Security components, you can also set the `useExistingSecrets.outboundProxy: true` in the `overrides.yaml` file and create a secret in the same namespace as chart installation. The secret should be named `trendmicro-container-security-outbound-proxy-credentials`. For secret format, see the [Proxy Credentials Secret Template](./templates/outbound-proxy.yaml).
+
 ### Using automated cluster registration
 
-Instead of individually registering each cluster, Trend Vision One Container Security users can configure automated cluster registration.
+Trend Vision One Container Security users can configure automated cluster registration
+to automate the management of cluster lifecycle. This feature enables clusters to be automatically registered clusters with Trend Vision One Container Security when the Container Security is installed and unregistered when the Container Security is uninstalled. This also allows users to register multiple clusters with a single Vision One API key instead of manually registering each cluster.
 
 To use automated cluster registration:
 1. Navigate to the _Trend Micro Vision One_ console using https://portal.xdr.trendmicro.com/
