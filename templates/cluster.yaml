@@ -1,4 +1,4 @@
-{{if eq true .Values.cloudOne.clusterRegistrationKey}}
+{{- if or (.Values.cloudOne.clusterRegistrationKey) (eq (include "container.security.isVisionOneEndpoint" .) "true") }}
 apiVersion: visionone.trendmicro.com/v1alpha1
 kind: Cluster
 metadata:

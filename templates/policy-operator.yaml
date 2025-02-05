@@ -1,4 +1,4 @@
-{{- if or (eq true .Values.cloudOne.policyOperator.enabled) (.Values.cloudOne.clusterRegistrationKey) }}
+{{- if or (eq true .Values.cloudOne.policyOperator.enabled) (.Values.cloudOne.clusterRegistrationKey) (eq (include "container.security.isVisionOneEndpoint" .) "true") }}
 {{- include "validateClusterInput" . -}}
 apiVersion: apps/v1
 kind: Deployment
@@ -67,6 +67,7 @@ spec:
         - --namespace={{ .Release.Namespace }}
         - --auth-name={{ template "container.security.fullname" . }}-auth
         - --auto-register={{ default "false" .Values.cloudOne.clusterRegistrationKey }}
+        - --enable-token-rotation={{ include "container.security.isVisionOneEndpoint" . }}
         command:
         - /app/policy-operator
         env:

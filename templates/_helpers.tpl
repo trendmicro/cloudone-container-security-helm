@@ -1128,3 +1128,15 @@ Usage:
     path: {{ $context.k3s.socket | default $defaultk3spath }}
 {{- end }}{{/* if */}}
 {{- end -}}
+
+{{/*
+Check if the cloudOne.endpoint points to Vision One
+*/}}
+{{- define "container.security.isVisionOneEndpoint" -}}
+{{- $endpoint := include "container.security.endpoint" . -}}
+{{- if contains "trendmicro.com/external" $endpoint -}}
+true
+{{- else -}}
+false
+{{- end -}}
+{{- end -}}
