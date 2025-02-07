@@ -148,7 +148,7 @@ spec:
 {{- toYaml . | nindent 8 }}
 {{- end }}
       labels:
-        {{- include "workloadOperator.selectorLabels" . | nindent 8 }}
+        {{- include "workloadOperator.labels" . | nindent 8 }}
     spec:
       serviceAccountName: workload-images-remover-service-account
 {{- $securityContextEnabled := .Values.securityContext.enabled }}
