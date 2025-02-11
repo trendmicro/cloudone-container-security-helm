@@ -79,7 +79,7 @@ spec:
         {{- if .Values.cloudOne.malwareScanning.enabled }}
         - --enable-malware-scanning
         - --scanner-endpoint={{ printf "%s:%d" (include "malwareScanner.svc.url" .) 50051 }}
-        - --malware-exclude-namespaces={{ .Values.cloudOne.exclusion.namespaces | join "," }}
+        - --malware-exclude-namespaces={{ (include "namespaceExclusions" .) }}
           {{- $excludedPaths := (default (list) .Values.cloudOne.malwareScanning.excludedPaths) }}
           {{- $combinedListPath := .Values.malwareScanner.defaultExcludedPaths }}
           {{- range $excludedPaths }}

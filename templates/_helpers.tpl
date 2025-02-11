@@ -1140,3 +1140,27 @@ true
 false
 {{- end -}}
 {{- end -}}
+
+
+{{/*
+Automatically adds any namespace with prefix to excluded namespace list for openshift
+*/}}
+{{- define "namespaceExclusions" -}}
+{{- $excludedNamespaces := .Values.cloudOne.exclusion.namespaces | default list -}}
+{{- $osNsPrefixes := .Values.cloudOne.exclusion.osNsPrefixes | default list -}}
+
+{{- if .Capabilities.APIVersions.Has "security.openshift.io/v1" -}}
+  {{- $namespaceList := lookup "v1" "Namespace" "" "" -}}
+  {{- if $namespaceList -}}
+    {{- range $index, $namespace := $namespaceList.items -}}
+      {{- range $prefix := $osNsPrefixes -}}
+        {{- if hasPrefix $prefix $namespace.metadata.name -}}
+          {{- $excludedNamespaces = append $excludedNamespaces $namespace.metadata.name -}}
+          {{- break -}}
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- join "," $excludedNamespaces -}}
+{{- end -}}

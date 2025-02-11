@@ -37,12 +37,24 @@ cloudOne:
   clusterRegistrationKey: false
 
   exclusion:
-    ## List of namespaces for which events will not be generated
-    ##
-    ## Default Value:
-    ##  - kube-system
+    ## List of namespaces for which events will not be generated.
+    ## This setting helps reduce unnecessary runtime event counts for known privileged components.
+    ## 
+    ## Openshift considers the namespaces listed in `osNsPrefixes` as privileged. 
+    ## These namespaces are excluded to prevent critical components from being affected by 
+    ## admission control policies or mitigation mechanisms.
+    ## Meaning for each prefixes: 
+    ##  - openshift: Excludes all namespaces with the openshift prefix
+    ##  - kube: Excludes all namespaces with the kube prefix
+    ##  - default: Excludes default namespace
+    ##  - dedicated-admin: Excludes OpenShift's dedicated admin namespace
     namespaces:
     - kube-system
+    osNsPrefixes:
+      - openshift
+      - kube
+      - default
+      - dedicated-admin
 
   admissionController:
     enabled: true

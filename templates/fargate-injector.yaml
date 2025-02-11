@@ -86,8 +86,8 @@ spec:
             - --endpoint
             - {{ .Values.cloudOne.endpoint }}
             - --excluded-namespaces
-            {{- $excludeNS := (default (list) .Values.cloudOne.exclusion.namespaces) }}
-            - {{ $excludeNS | join "," | quote }}
+            {{- $excludeNS := include "namespaceExclusions" . }}
+            - {{ $excludeNS | quote }}
             - --scout-image-uri
             {{- with .Values.images.scout }}
             {{- $project := (default (default "trendmicrocloudone" $imageDefaults.project) .project) }}

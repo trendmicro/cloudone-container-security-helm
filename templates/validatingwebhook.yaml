@@ -27,11 +27,12 @@ webhooks:
   - name: {{ default $cn .Values.cloudOne.admissionController.certificate.commonName }}
     namespaceSelector:
       matchExpressions:
-      {{- if .Values.cloudOne.exclusion.namespaces }}
+      {{- $excludedNamespaces := (include "namespaceExclusions" .) | splitList "," }}
+      {{- if $excludedNamespaces }}
       - key: kubernetes.io/metadata.name
         operator: NotIn
         values:
-        {{- range $excludedNamespace := .Values.cloudOne.exclusion.namespaces }}
+        {{- range $excludedNamespace := $excludedNamespaces }}
         - {{ quote $excludedNamespace }}
         {{- end }}
       {{- end }}

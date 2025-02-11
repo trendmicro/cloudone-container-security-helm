@@ -83,8 +83,8 @@ spec:
         - --job-template-path=/etc/config/compliance-scan-job-template.yaml
         - --exclude-kubernetes-service-host-from-proxy={{ default "false" .Values.proxy.excludeKubernetesServiceHost }}
         - --excluded-namespaces
-        {{- $excludeNS := (default (list) .Values.cloudOne.exclusion.namespaces) }}
-        - {{ $excludeNS | join "," | quote }}
+        {{- $excludeNS := include "namespaceExclusions" . }}
+        - {{ $excludeNS | quote }}
         - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
         - --network-policy-label={{ default "trendmicro" .Release.Name }}
         - --application-version=$(APPLICATION_VERSION)

@@ -1,8 +1,8 @@
 {{- if and (or (eq true .Values.cloudOne.vulnerabilityScanning.enabled) (eq true .Values.cloudOne.malwareScanning.enabled)) .Values.securityContextConstraints.create (.Capabilities.APIVersions.Has "security.openshift.io/v1") }}
-{{- $excludedNamespaces := .Values.cloudOne.exclusion.namespaces }}
+{{- $excludedNamespaces := (include "namespaceExclusions" .) | splitList "," }}
 
 {{- if .Values.serviceAccount.create }}
-{{- range $index, $namespace := (lookup "v1" "Namespace" "" "").items }}
+{{- range $index, $namespace := (lookup "v1" "Namespace" "" "").items }} 
 {{- if not (has $namespace.metadata.name $excludedNamespaces) }}
 apiVersion: v1
 kind: ServiceAccount
@@ -11,8 +11,6 @@ metadata:
   namespace: {{ $namespace.metadata.name | quote }}
   labels:
     {{- include "scanner.labels" $ | nindent 4 }}
-  annotations:
-    helm.sh/resource-policy: keep
   {{- with $.Values.serviceAccount.scanJob.annotations }}
     {{- toYaml . | nindent 4 }}
   {{- end }}
@@ -43,8 +41,6 @@ metadata:
   name: scan-job-rolebinding
   labels:
     {{- include "scanner.labels" . | nindent 4 }}
-  annotations:
-    helm.sh/resource-policy: keep
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole

@@ -71,8 +71,8 @@ spec:
         - --zap-time-encoding={{ default "rfc3339" .Values.logConfig.timeEncoding }}
         - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
         - --excluded-namespaces
-        {{- $excludeNS := (default (list) .Values.cloudOne.exclusion.namespaces) }}
-        - {{ $excludeNS | join "," | quote }}
+        {{- $excludeNS := (include "namespaceExclusions" .) }}
+        - {{ $excludeNS | quote }}
         - --workload-controller-instance-name={{ .Release.Name }}
         - --rescan-interval
         - 30m
