@@ -1044,7 +1044,7 @@ images:
 
   falco:
     repository: falco
-    digest: sha256:104ddc5e69d95d05cba2a358b19607874f40c998f7791f3995a8eeeff8725f8b
+    digest: sha256:6365813919f4d99e0b50c7a64fcb4e80a7cef64f5789c5fabbc2268c912b6e76
 
   scout:
     repository: scout
