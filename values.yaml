@@ -1013,7 +1013,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.6.0
+    tag: 2.6.1
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -1032,11 +1032,11 @@ images:
 
   oversight:
     repository: oversight-controller
-    digest: sha256:701638b09cff1b97b48bdc6273fb197f7886c87f7f3e37f6643698c4e44704fd
+    digest: sha256:73bffafc8f4dccb8ff521dd6f18f5014404509c1f0d476664aef3b6090c0206f
 
   usage:
     repository: usage-controller
-    digest: sha256:995ae83939feaebd1a387f267d5db92587cda5f51591d2ecc6c868e0ba2d1966
+    digest: sha256:fd9039984ca59857a4cbb5f57e726821bcc48fa83f30314f0634103f7222d849
 
   rbacProxy:
     repository: rbac-proxy
@@ -1052,7 +1052,7 @@ images:
 
   scanManager:
     repository: scan-manager
-    digest: sha256:29786b9beb2ab3c76e49b8fb0d96d8e80ff2107b8f06bdfe009f298293d80768
+    digest: sha256:fa63a91dd775fd18be76f82ef3f755d95a6d959566fa0ac956afdb10701370b2
 
   scanJob:
     repository: scan-job
@@ -1060,11 +1060,11 @@ images:
 
   complianceScanJob:
     repository: compliance-scan-job
-    digest: sha256:b933d74cb05b222d23e3cf91f423c3e13b5fed387c12226f126f8aa3ca0de76f
+    digest: sha256:3bb9c332c2ba2a17c9454524ed6e6f50d033298ad2c9e83e9cca79a1f3d4d7c8
 
   workloadOperator:
     repository: workload-operator
-    digest: sha256:72247060fcfc7ddb401ac882704f21546b8af31b0291e0143e648e4eb9019d99
+    digest: sha256:30062696e0dde0849e55bab5f0844d017607db2cc8544c55825875a1eeebb864
 
   fargateInjector:
     repository: fargate-tool
@@ -1084,7 +1084,7 @@ images:
 
   malwareScanner:
     repository: malware-scanner
-    digest: sha256:0f354c2c7fa25494f2e214a70e87d6304dae15e9986b724fce900ff509a58410
+    digest: sha256:7d4789b4cffc9208784c53b81ed2731eca9aa788848efe5ce1dda19667dd0b4e
 
 ##
 ## Determine whether to use existing secrets in the target namespace rather than
