@@ -331,6 +331,7 @@ spec:
             {{- end}}
 {{- include "containerRuntime.sock.args" ( list "cri" "" .Values.scout.falco ) | trim | nindent 12 }}
             - --malware-scanning={{ default "false" .Values.cloudOne.malwareScanning.enabled }}
+            - --malware-event-count={{ .Values.cloudOne.malwareScanning.maximumEventCount}}
             - --runtime-security={{ default "false" .Values.cloudOne.runtimeSecurity.enabled }}
             {{- if .Values.cloudOne.malwareScanning.enabled }}
             - --malware-scanner-url

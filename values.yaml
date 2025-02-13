@@ -294,6 +294,10 @@ cloudOne:
     excludedPaths: []
     scanTimeoutSeconds: 300
 
+    # maximum real-time scan events in scout
+    # Note: increasing this event count may increase memory usage in the Scout DaemonSet
+    maximumEventCount: 10000
+
     scanner:
       ## scanner is a section that controls the malware scanner engine.
       enableScanCache: false
@@ -309,7 +313,7 @@ cloudOne:
       readinessProbe:
         tcpSocket:
           port: 50051
-        initialDelaySeconds: 300
+        initialDelaySeconds: 10
 
   policyOperator:
     ## enable the cluster-managed policy feature
