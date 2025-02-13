@@ -73,6 +73,7 @@ spec:
         {{- end }}
         - --scan-config-path=/etc/config
         - --job-active-deadline={{ printf "%ds" (int .Values.cloudOne.scanManager.activeDeadlineSeconds) }}
+        - --malware-scan-job-active-deadline={{ printf "%ds" (int .Values.cloudOne.scanManager.malwareScanActiveDeadlineSeconds) }}
         {{- if .Values.cloudOne.vulnerabilityScanning.enabled }}
         - --enable-vulnerability-scanning
         {{- end }}

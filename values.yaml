@@ -168,9 +168,15 @@ cloudOne:
     maxJobCount: 5
     ## activeDeadlineSeconds is the maximum duration a scan job can run before timing out.
     ##
+    ## Default value: 300
+    ##
+    activeDeadlineSeconds: 300
+
+    ## malwareScanActiveDeadlineSeconds is the maximum duration a malware scan job can run before timing out.
+    ##
     ## Default value: 3600
     ##
-    activeDeadlineSeconds: 3600
+    malwareScanActiveDeadlineSeconds: 3600
 
     ## logLevel sets the log verbosity level. Supported values are debug, info, and error
     ##
