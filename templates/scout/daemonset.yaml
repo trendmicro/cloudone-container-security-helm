@@ -39,12 +39,18 @@ spec:
 {{- if not (eq "" $classname) }}
       priorityClassName: "{{ $classname }}"
 {{- end }}{{/* if */}}
+{{- if or .Values.nodeSelector.defaults .Values.nodeSelector.scout }}
       nodeSelector:
 {{ toYaml (default .Values.nodeSelector.defaults .Values.nodeSelector.scout) | indent 8 }}
-      affinity:
-{{ toYaml (default .Values.affinity.defaults .Values.affinity.scout) | indent 8 }}
+{{- end }}
+{{- if or .Values.tolerations.defaults .Values.tolerations.scout }}
       tolerations:
 {{ toYaml (default .Values.tolerations.defaults .Values.tolerations.scout) | indent 8 }}
+{{- end }}
+{{- if or .Values.affinity.defaults .Values.affinity.scout }}
+      affinity:
+{{ toYaml (default .Values.affinity.defaults .Values.affinity.scout) | indent 8 }}
+{{- end }}
       {{- $imageDefaults := .Values.images.defaults }}
       {{- with .Values.images.falco }}
       {{- $secret := (default (default "" $imageDefaults.imagePullSecret) .imagePullSecret) }}
@@ -376,7 +382,6 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.nodeName
-
 {{- if $securityContextEnabled }}
           securityContext:
 {{ toYaml $scoutSecurityContext | indent 12 }}

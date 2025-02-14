@@ -712,15 +712,15 @@ resources:
       cpu: 100m
       memory: 256Mi
     limits:
-      cpu: 1000m
-      memory: 1024Mi
+      cpu: "1"
+      memory: 1Gi
   falco:
     requests:
       cpu: 100m
       memory: 512Mi
     limits:
-      cpu: 1000m
-      memory: 1024Mi
+      cpu: "1"
+      memory: 1Gi
   scanManager:
     requests:
       cpu: 100m
@@ -733,8 +733,8 @@ resources:
       cpu: 100m
       memory: 512Mi
     limits:
-      cpu: 1000m
-      memory: 1024Mi
+      cpu: "1"
+      memory: 1Gi
   scanner:
     requests:
       cpu: 50m
@@ -747,7 +747,7 @@ resources:
       cpu: 100m
       memory: 256Mi
     limits:
-      cpu: 1000m
+      cpu: "1"
       memory: 512Mi
   complianceScanner:
     requests:
@@ -761,21 +761,21 @@ resources:
       cpu: 100m
       memory: 128Mi
     limits:
-      cpu: 1000m
-      memory: 1024Mi
+      cpu: "1"
+      memory: 1Gi
   policyOperator:
     requests:
       cpu: 100m
       memory: 128Mi
     limits:
-      cpu: 1000m
-      memory: 1024Mi
+      cpu: "1"
+      memory: 1Gi
   malwareScanner:
     requests:
       cpu: 100m
       memory: 1Gi
     limits:
-      cpu: 1000m
+      cpu: "1"
       memory: 2Gi
 
 nodeSelector:

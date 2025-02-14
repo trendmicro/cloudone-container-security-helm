@@ -130,12 +130,18 @@ spec:
 {{ toYaml (default .Values.resources.defaults .Values.resources.oversight) | indent 12 }}
       - {{ include "rbacProxy" (dict "securityContext" .Values.securityContext "images" .Values.images "resources" .Values.resources "customSecurityContext" .Values.securityContext.oversight "tlsConfig" .Values.tlsConfig ) | nindent 8 | trim }}
       terminationGracePeriodSeconds: 10
+{{- if or .Values.nodeSelector.defaults .Values.nodeSelector.oversight }}
       nodeSelector:
 {{ toYaml (default .Values.nodeSelector.defaults .Values.nodeSelector.oversight) | indent 8 }}
+{{- end }}
+{{- if or .Values.tolerations.defaults .Values.tolerations.oversight }}
       tolerations:
 {{ toYaml (default .Values.tolerations.defaults .Values.tolerations.oversight) | indent 8 }}
+{{- end }}
+{{- if or .Values.affinity.defaults .Values.affinity.oversight }}
       affinity:
 {{ toYaml (default .Values.affinity.defaults .Values.affinity.oversight) | indent 8 }}
+{{- end }}
 {{- $classname := (default (default "" .Values.priorityClassName.default ) .Values.priorityClassName.oversight) }}
 {{- if not (eq "" $classname) }}
       priorityClassName: "{{ $classname }}"

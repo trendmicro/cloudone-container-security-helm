@@ -90,12 +90,18 @@ spec:
           secret:
             secretName: {{ template "kubeRbacProxy.fullname" . }}-tls-certificate
       terminationGracePeriodSeconds: 10
+{{- if or .Values.nodeSelector.defaults .Values.nodeSelector.usage }}
       nodeSelector:
 {{ toYaml (default .Values.nodeSelector.defaults .Values.nodeSelector.usage) | indent 8 }}
+{{- end }}
+{{- if or .Values.tolerations.defaults .Values.tolerations.usage }}
       tolerations:
 {{ toYaml (default .Values.tolerations.defaults .Values.tolerations.usage) | indent 8 }}
+{{- end }}
+{{- if or .Values.affinity.defaults .Values.affinity.usage }}
       affinity:
 {{ toYaml (default .Values.affinity.defaults .Values.affinity.usage) | indent 8 }}
+{{- end }}
 {{- $classname := (default (default "" .Values.priorityClassName.default ) .Values.priorityClassName.usage) }}
 {{- if not (eq "" $classname) }}
       priorityClassName: "{{ $classname }}"

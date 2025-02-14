@@ -135,12 +135,18 @@ spec:
           secret:
             secretName: {{ template "k8sMetaCollector.fullname" . }}-tls-certificate
 {{- end }}
+{{- if or .Values.nodeSelector.defaults .Values.nodeSelector.k8sMetaCollector }}
       nodeSelector:
 {{ toYaml (default .Values.nodeSelector.defaults .Values.nodeSelector.k8sMetaCollector) | indent 8 }}
-      affinity:
-{{ toYaml (default .Values.affinity.defaults .Values.affinity.admissionController) | indent 8 }}
+{{- end }}
+{{- if or .Values.tolerations.defaults .Values.tolerations.k8sMetaCollector }}
       tolerations:
-{{ toYaml (default .Values.tolerations.defaults .Values.tolerations.admissionController) | indent 8 }}
+{{ toYaml (default .Values.tolerations.defaults .Values.tolerations.k8sMetaCollector) | indent 8 }}
+{{- end }}
+{{- if or .Values.affinity.defaults .Values.affinity.k8sMetaCollector }}
+      affinity:
+{{ toYaml (default .Values.affinity.defaults .Values.affinity.k8sMetaCollector) | indent 8 }}
+{{- end }}
 
 ---
 {{ if .Values.serviceAccount.create }}

@@ -163,12 +163,18 @@ spec:
             - key: publicKey
               path: key.pem
         {{- end }}{{/* .Values.telemetry.publicKey */}}
+{{- if or .Values.nodeSelector.defaults .Values.nodeSelector.admissionController }}
       nodeSelector:
 {{ toYaml (default .Values.nodeSelector.defaults .Values.nodeSelector.admissionController) | indent 8 }}
+{{- end }}
+{{- if or .Values.tolerations.defaults .Values.tolerations.admissionController }}
       tolerations:
 {{ toYaml (default .Values.tolerations.defaults .Values.tolerations.admissionController) | indent 8 }}
+{{- end }}
+{{- if or .Values.affinity.defaults .Values.affinity.admissionController }}
       affinity:
 {{ toYaml (default .Values.affinity.defaults .Values.affinity.admissionController) | indent 8 }}
+{{- end }}
 {{- $classname := (default (default "" .Values.priorityClassName.default ) .Values.priorityClassName.admissionController) }}
 {{- if not (eq "" $classname) }}
       priorityClassName: "{{ $classname }}"

@@ -130,12 +130,18 @@ spec:
           secret:
             secretName: trendmicro-scan-manager-tls-certificate
       terminationGracePeriodSeconds: 10
+{{- if or .Values.nodeSelector.defaults .Values.nodeSelector.scanManager }}
       nodeSelector:
 {{ toYaml (default .Values.nodeSelector.defaults .Values.nodeSelector.scanManager) | indent 8 }}
+{{- end }}
+{{- if or .Values.tolerations.defaults .Values.tolerations.scanManager }}
       tolerations:
 {{ toYaml (default .Values.tolerations.defaults .Values.tolerations.scanManager) | indent 8 }}
+{{- end }}
+{{- if or .Values.affinity.defaults .Values.affinity.scanManager }}
       affinity:
 {{ toYaml (default .Values.affinity.defaults .Values.affinity.scanManager) | indent 8 }}
+{{- end }}
 {{- $classname := (default (default "" .Values.priorityClassName.default ) .Values.priorityClassName.scanManager) }}
 {{- if not (eq "" $classname) }}
       priorityClassName: "{{ $classname }}"

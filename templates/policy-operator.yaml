@@ -94,12 +94,18 @@ spec:
             secretName: {{ template "container.security.fullname" . }}-registration-key
         {{- end }}
       terminationGracePeriodSeconds: 10
+{{- if or .Values.nodeSelector.defaults .Values.nodeSelector.policyOperator }}
       nodeSelector:
 {{ toYaml (default .Values.nodeSelector.defaults .Values.nodeSelector.policyOperator) | indent 8 }}
+{{- end }}
+{{- if or .Values.tolerations.defaults .Values.tolerations.policyOperator }}
       tolerations:
 {{ toYaml (default .Values.tolerations.defaults .Values.tolerations.policyOperator) | indent 8 }}
+{{- end }}
+{{- if or .Values.affinity.defaults .Values.affinity.policyOperator }}
       affinity:
 {{ toYaml (default .Values.affinity.defaults .Values.affinity.policyOperator) | indent 8 }}
+{{- end }}
 {{- $classname := (default (default "" .Values.priorityClassName.default ) .Values.priorityClassName.policyOperator) }}
 {{- if not (eq "" $classname) }}
       priorityClassName: "{{ $classname }}"

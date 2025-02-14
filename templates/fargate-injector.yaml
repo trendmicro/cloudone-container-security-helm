@@ -152,12 +152,18 @@ spec:
         - name: webhook-certs
           secret:
             secretName: {{ template "fargateInjector.fullname" . }}-tls-certificate
+{{- if or .Values.nodeSelector.defaults .Values.nodeSelector.fargateInjector }}
       nodeSelector:
 {{ toYaml (default .Values.nodeSelector.defaults .Values.nodeSelector.fargateInjector) | indent 8 }}
+{{- end }}
+{{- if or .Values.tolerations.defaults .Values.tolerations.fargateInjector }}
       tolerations:
 {{ toYaml (default .Values.tolerations.defaults .Values.tolerations.fargateInjector) | indent 8 }}
+{{- end }}
+{{- if or .Values.affinity.defaults .Values.affinity.fargateInjector }}
       affinity:
 {{ toYaml (default .Values.affinity.defaults .Values.affinity.fargateInjector) | indent 8 }}
+{{- end }}
 {{- $classname := (default (default "" .Values.priorityClassName.default ) .Values.priorityClassName.fargateInjector) }}
 {{- if not (eq "" $classname) }}
       priorityClassName: "{{ $classname }}"

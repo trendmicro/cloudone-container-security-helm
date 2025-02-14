@@ -104,12 +104,18 @@ spec:
           secret:
             secretName: {{ template "container.security.fullname" . }}-auth
       terminationGracePeriodSeconds: 10
+{{- if or .Values.nodeSelector.defaults .Values.nodeSelector.workloadOperator }}
       nodeSelector:
 {{ toYaml (default .Values.nodeSelector.defaults .Values.nodeSelector.workloadOperator) | indent 8 }}
+{{- end }}
+{{- if or .Values.tolerations.defaults .Values.tolerations.workloadOperator }}
       tolerations:
 {{ toYaml (default .Values.tolerations.defaults .Values.tolerations.workloadOperator) | indent 8 }}
+{{- end }}
+{{- if or .Values.affinity.defaults .Values.affinity.workloadOperator }}
       affinity:
 {{ toYaml (default .Values.affinity.defaults .Values.affinity.workloadOperator) | indent 8 }}
+{{- end }}
 {{- $classname := (default (default "" .Values.priorityClassName.default ) .Values.priorityClassName.workloadOperator) }}
 {{- if not (eq "" $classname) }}
       priorityClassName: "{{ $classname }}"
@@ -191,12 +197,18 @@ spec:
           - /app/workload-operator
           args:
           - --cleanup-mode
+{{- if or .Values.nodeSelector.defaults .Values.nodeSelector.workloadOperator }}
       nodeSelector:
 {{ toYaml (default .Values.nodeSelector.defaults .Values.nodeSelector.workloadOperator) | indent 8 }}
+{{- end }}
+{{- if or .Values.tolerations.defaults .Values.tolerations.workloadOperator }}
       tolerations:
 {{ toYaml (default .Values.tolerations.defaults .Values.tolerations.workloadOperator) | indent 8 }}
+{{- end }}
+{{- if or .Values.affinity.defaults .Values.affinity.workloadOperator }}
       affinity:
 {{ toYaml (default .Values.affinity.defaults .Values.affinity.workloadOperator) | indent 8 }}
+{{- end }}
 {{- $classname := (default (default "" .Values.priorityClassName.default ) .Values.priorityClassName.workloadOperator) }}
 {{- if not (eq "" $classname) }}
       priorityClassName: "{{ $classname }}"
