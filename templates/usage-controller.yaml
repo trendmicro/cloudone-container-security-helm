@@ -53,7 +53,9 @@ spec:
         - --health-probe-bind-address=:8081
         - --metrics-bind-address=127.0.0.1:8080
         - --exclude-kubernetes-service-host-from-proxy={{ default "false" .Values.proxy.excludeKubernetesServiceHost }}
+        {{- if gt (int .Values.replicas.usage) 1 }}
         - --leader-elect
+        {{- end }}
         - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
         - --application-version={{ .Chart.AppVersion }}
         command:

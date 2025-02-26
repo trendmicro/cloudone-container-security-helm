@@ -74,7 +74,9 @@ spec:
         - --health-probe-bind-address=:8081
         - --metrics-bind-address=127.0.0.1:8080
         - --compliance-scan-bind-address=:8070
+        {{- if gt (int .Values.replicas.oversight) 1 }}
         - --leader-elect
+        {{- end }}
         - --mitigation-handler-buffer-size={{ default 50 .Values.cloudOne.oversight.mitigationHandlerBufferSize }}
         - --page-size={{ default 100 .Values.cloudOne.oversight.pageSize }}
         - --sync-period={{ default "3600s" .Values.cloudOne.oversight.syncPeriod }}

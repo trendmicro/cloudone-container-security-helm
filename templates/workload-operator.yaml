@@ -84,6 +84,9 @@ spec:
         - --runtime-security={{ default "false" .Values.cloudOne.runtimeSecurity.enabled }}
         - --malware-scanning={{ default "false" .Values.cloudOne.malwareScanning.enabled }}
         - --trusted-images={{ include "digest" . }}
+        {{- if gt (int .Values.replicas.workloadOperator) 1 }}
+        - --leader-elect
+        {{- end }}
         command:
         - /app/workload-operator
         env:
