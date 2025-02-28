@@ -51,10 +51,10 @@ cloudOne:
     namespaces:
     - kube-system
     osNsPrefixes:
-      - openshift
-      - kube
-      - default
-      - dedicated-admin
+    - openshift
+    - kube
+    - default
+    - dedicated-admin
 
   admissionController:
     enabled: true
@@ -712,14 +712,14 @@ resources:
       cpu: 100m
       memory: 256Mi
     limits:
-      cpu: "1"
+      cpu: '1'
       memory: 1Gi
   falco:
     requests:
       cpu: 100m
       memory: 512Mi
     limits:
-      cpu: "1"
+      cpu: '1'
       memory: 1Gi
   scanManager:
     requests:
@@ -733,7 +733,7 @@ resources:
       cpu: 100m
       memory: 512Mi
     limits:
-      cpu: "1"
+      cpu: '1'
       memory: 1Gi
   scanner:
     requests:
@@ -747,7 +747,7 @@ resources:
       cpu: 100m
       memory: 256Mi
     limits:
-      cpu: "1"
+      cpu: '1'
       memory: 512Mi
   complianceScanner:
     requests:
@@ -761,21 +761,21 @@ resources:
       cpu: 100m
       memory: 128Mi
     limits:
-      cpu: "1"
+      cpu: '1'
       memory: 1Gi
   policyOperator:
     requests:
       cpu: 100m
       memory: 128Mi
     limits:
-      cpu: "1"
+      cpu: '1'
       memory: 1Gi
   malwareScanner:
     requests:
       cpu: 100m
       memory: 1Gi
     limits:
-      cpu: "1"
+      cpu: '1'
       memory: 2Gi
 
 nodeSelector:
@@ -1035,7 +1035,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.6.1
+    tag: 2.6.2
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -1050,15 +1050,15 @@ images:
     # imagePullSecret:
   admissionController:
     repository: admission-controller
-    digest: sha256:9a57b7f1692501485cb5d828cb3d1c263c692b9bf5ef66834d1456ea700c8ed7
+    digest: sha256:efc547123c19e04df1302faad2fbd5332782cf513a782a290809621ba5f6c3ef
 
   oversight:
     repository: oversight-controller
-    digest: sha256:73bffafc8f4dccb8ff521dd6f18f5014404509c1f0d476664aef3b6090c0206f
+    digest: sha256:f64213e3a2fc70fd078c25e88141f78e30dd45ac0e43cd44459727097fc1969e
 
   usage:
     repository: usage-controller
-    digest: sha256:fd9039984ca59857a4cbb5f57e726821bcc48fa83f30314f0634103f7222d849
+    digest: sha256:32e32051f68f1596f60d0167f77354eead3649c43858dd43123c6a7a5dfd94ee
 
   rbacProxy:
     repository: rbac-proxy
@@ -1070,23 +1070,23 @@ images:
 
   scout:
     repository: scout
-    digest: sha256:5656553719fb327c85b8d2390f1a5d7f70287b51f6b9fc69d7ae44cd3f7b6c82
+    digest: sha256:05822df6e92b7d69e06fb9d749d1a4da0a462b2810e625e0a37f3fe7c861ef84
 
   scanManager:
     repository: scan-manager
-    digest: sha256:fa63a91dd775fd18be76f82ef3f755d95a6d959566fa0ac956afdb10701370b2
+    digest: sha256:bd4d77198b174db281f64abf8157c677774c2b56a6da5daa4bc5c520bbe4b53f
 
   scanJob:
     repository: scan-job
-    digest: sha256:d43205c92b0661a4b252009a8e7030029c89d30c30e0c2f694ae3474bc246a2c
+    digest: sha256:8d95a4ff34dea46fa165c720b7b757e33a586364daed0b8fdc45b5ff6943d80d
 
   complianceScanJob:
     repository: compliance-scan-job
-    digest: sha256:3bb9c332c2ba2a17c9454524ed6e6f50d033298ad2c9e83e9cca79a1f3d4d7c8
+    digest: sha256:3317fc5cd352e710e4b408557192efe952cbe3a69a3e2c432e16f60647bacce3
 
   workloadOperator:
     repository: workload-operator
-    digest: sha256:30062696e0dde0849e55bab5f0844d017607db2cc8544c55825875a1eeebb864
+    digest: sha256:76551f9615bf6872e90e671616a238b096ec96157acaa701f54fab87887c3c93
 
   fargateInjector:
     repository: fargate-tool
@@ -1102,7 +1102,7 @@ images:
 
   policyOperator:
     repository: policy-operator
-    digest: sha256:68d015a0aef0d5f1244389e38926d1438fda55d47d800d333c125b1be4f8efbc
+    digest: sha256:c734d1bd82d99e9ede2b86875e3c72c0b86a4a81d6d9f179b07db9e6a57949c3
 
   malwareScanner:
     repository: malware-scanner
