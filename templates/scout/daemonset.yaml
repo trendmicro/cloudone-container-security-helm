@@ -322,7 +322,7 @@ spec:
             {{- if .Values.scout.excludeSameNamespace }}
                 {{- $excludeNS = append $excludeNS .Release.Namespace }}
             {{- end}}{{/* if */}}
-            - {{ $excludeNS | quote }}
+            - {{ $excludeNS | join "," | quote }}
             - --falco-event-max-diff
             - 90s
             {{- if ne (len .Values.scout.scout.falcoInternalEvent) 0 }}
