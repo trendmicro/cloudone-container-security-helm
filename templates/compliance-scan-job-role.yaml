@@ -38,6 +38,8 @@ rules:
   - configmaps
   - serviceaccounts
   - namespaces
+  - limitranges
+  - resourcequotas
   verbs:
   - list
   - get
