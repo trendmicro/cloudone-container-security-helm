@@ -1,63 +1,45 @@
+{{- if or (eq true .Values.cloudOne.policyOperator.enabled) (.Values.cloudOne.clusterRegistrationKey) (eq (include "container.security.isVisionOneEndpoint" .) "true") }}
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
+kind: Role
 metadata:
-  creationTimestamp: null
   name: policy-operator-role
+  namespace: {{ .Release.Namespace }}
   labels:
     {{- include "policyOperator.labels" . | nindent 4 }}
 rules:
 - apiGroups:
-  - visionone.trendmicro.com
+  - ""
   resources:
-  - clusterpolicies
-  - runtimerulesets
-  - clusters
+  - secrets
   verbs:
-  - get
-  - list
-  - watch
-  - update
-  - patch
-- apiGroups:
-    - visionone.trendmicro.com
-  resources:
-    - clusterpolicies/status
-    - runtimerulesets/status
-    - clusters/status
-  verbs:
-    - get
-    - update
-- apiGroups:
-  - coordination.k8s.io
-  resources:
-  - leases
-  verbs:
-  - get
-  - list
-  - watch
   - create
+  - get
+  - list
+  - watch
   - update
-  - patch
-  - delete
 - apiGroups:
   - ""
   resources:
-  - events
+  - configmaps
+  resourceNames:
+  - {{ template "container.security.name" . }}-policy-config
   verbs:
-  - create
-  - patch
+  - get
+  - update
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
+kind: RoleBinding
 metadata:
-  name: policy-operator-rolebinding
+  name: policy-operator-role-rolebinding
+  namespace: {{ .Release.Namespace }}
   labels:
     {{- include "policyOperator.labels" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
+  kind: Role
   name: policy-operator-role
 subjects:
 - kind: ServiceAccount
   name: {{ include "policyOperator.serviceAccountName" . }}
   namespace: {{ .Release.Namespace }}
+{{- end }}

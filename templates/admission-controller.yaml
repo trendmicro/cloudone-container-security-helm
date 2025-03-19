@@ -104,6 +104,8 @@ spec:
             - name: telemetry-secret
               mountPath: /telemetry
             {{- end }}{{/* .Values.telemetry.publicKey */}}
+            - name: policy-config
+              mountPath: /etc/config
           args:
             - --zap-devel={{ default "false" .Values.logConfig.devel }}
             - --zap-log-level={{ include "logLevel" (list .Values.cloudOne.admissionController.logLevel .) }}
@@ -132,6 +134,9 @@ spec:
             {{- end }}{{/* .Values.telemetry.publicKey */}}
             {{- end }}{{/* .Values.telemetry.enabled */}}
             - --trusted-images={{ include "digest" . }}
+            {{- if .Values.cloudOne.admissionController.signatureVerification }}
+            - --vision-one-feature-gate=true
+            {{- end }}
             - 2>&1
           env:
             {{- include "container.security.proxy.env" . | nindent 12 }}
@@ -163,6 +168,11 @@ spec:
             - key: publicKey
               path: key.pem
         {{- end }}{{/* .Values.telemetry.publicKey */}}
+        - name: policy-config # Use projected volume to mount all policy config files in a single volume (ie. policy, rulesets)
+          projected:
+            sources:
+              - configMap:
+                  name: {{ template "container.security.name" . }}-policy-config
 {{- if or .Values.nodeSelector.defaults .Values.nodeSelector.admissionController }}
       nodeSelector:
 {{ toYaml (default .Values.nodeSelector.defaults .Values.nodeSelector.admissionController) | indent 8 }}

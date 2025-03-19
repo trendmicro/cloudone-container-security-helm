@@ -1,4 +1,4 @@
-{{- if or (eq true .Values.cloudOne.policyOperator.enabled) (.Values.cloudOne.clusterRegistrationKey) (eq (include "container.security.isVisionOneEndpoint" .) "true") }}
+{{- if or (eq true .Values.cloudOne.policyOperator.enabled) (.Values.cloudOne.clusterRegistrationKey) (.Values.cloudOne.admissionController.signatureVerification) (eq (include "container.security.isVisionOneEndpoint" .) "true") }}
 {{- include "validateClusterInput" . -}}
 apiVersion: apps/v1
 kind: Deployment
@@ -68,15 +68,22 @@ spec:
         - --auth-name={{ template "container.security.fullname" . }}-auth
         - --auto-register={{ default "false" .Values.cloudOne.clusterRegistrationKey }}
         - --enable-token-rotation={{ include "container.security.isVisionOneEndpoint" . }}
+        - --policy-config-name={{ template "container.security.name" . }}-policy-config
         command:
         - /app/policy-operator
         env:
-        - name: NAMESPACE
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
         {{- include "container.security.proxy.env" . | nindent 8 }}
         volumeMounts:
+        - mountPath: /var/policy-operator
+          name: workdir
         - mountPath: /secrets
           name: api-key
         {{- if .Values.cloudOne.clusterRegistrationKey }}
@@ -84,6 +91,9 @@ spec:
           name: registration-key
         {{- end }}
       volumes:
+        - name: workdir
+          emptyDir:
+            sizeLimit: 50Mi
         - name: api-key
           secret:
             secretName: {{ template "container.security.fullname" . }}-auth
@@ -125,3 +135,23 @@ metadata:
   {{- end }}
 {{- end }}
 {{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "container.security.name" . }}-policy-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "policyOperator.labels" . | nindent 4 }}
+data:
+  cluster.policy: "{}"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "container.security.name" . }}-ruleset-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "policyOperator.labels" . | nindent 4 }}
+data:
+  runtime.rulesets: "{}"

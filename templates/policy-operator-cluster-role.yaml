@@ -1,0 +1,63 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: policy-operator-cluster-role
+  labels:
+    {{- include "policyOperator.labels" . | nindent 4 }}
+rules:
+- apiGroups:
+  - visionone.trendmicro.com
+  resources:
+  - clusterpolicies
+  - runtimerulesets
+  - clusters
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+  - patch
+- apiGroups:
+    - visionone.trendmicro.com
+  resources:
+    - clusterpolicies/status
+    - runtimerulesets/status
+    - clusters/status
+  verbs:
+    - get
+    - update
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: policy-operator-cluster-role-rolebinding
+  labels:
+    {{- include "policyOperator.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: policy-operator-cluster-role
+subjects:
+- kind: ServiceAccount
+  name: {{ include "policyOperator.serviceAccountName" . }}
+  namespace: {{ .Release.Namespace }}

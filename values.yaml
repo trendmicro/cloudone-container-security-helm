@@ -59,6 +59,11 @@ cloudOne:
   admissionController:
     enabled: true
 
+    ## signatureVerification is a flag to enable or disable image signature verification in the admission controller webhook.
+    ##
+    ## Default value: false
+    signatureVerification: false
+
     ## validationNamespaceSelector is the namespace selector defined for the validating webhook configuration
     ##
     ## For more information about namespace selectors, please see
