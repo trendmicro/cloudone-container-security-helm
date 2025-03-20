@@ -40,10 +40,18 @@ rules:
   - namespaces
   - limitranges
   - resourcequotas
+  - services
   verbs:
   - list
   - get
   - watch
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses
+  verbs:
+  - list
+  - get
 - apiGroups:
   - ""
   resources:

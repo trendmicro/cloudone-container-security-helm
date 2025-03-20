@@ -324,9 +324,6 @@ data:
               - name: lib-systemd
                 mountPath: /lib/systemd/
                 readOnly: true
-              - name: srv-kubernetes
-                mountPath: /srv/kubernetes/
-                readOnly: true
                 # /usr/local/mount-from-host/bin is mounted to access kubectl / kubelet, for auto-detecting the Kubernetes version.
                 # You can omit this mount if you specify --version as part of the command.
               - name: usr-bin
@@ -396,10 +393,6 @@ data:
             - name: lib-systemd
               hostPath:
                 path: "/lib/systemd"
-                type: DirectoryOrCreate
-            - name: srv-kubernetes
-              hostPath:
-                path: "/srv/kubernetes"
                 type: DirectoryOrCreate
             - name: usr-bin
               hostPath:
