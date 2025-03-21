@@ -68,7 +68,9 @@ spec:
         - --auth-name={{ template "container.security.fullname" . }}-auth
         - --auto-register={{ default "false" .Values.cloudOne.clusterRegistrationKey }}
         - --enable-token-rotation={{ include "container.security.isVisionOneEndpoint" . }}
+        {{- if .Values.cloudOne.admissionController.signatureVerification }}
         - --policy-config-name={{ template "container.security.name" . }}-policy-config
+        {{- end }}
         command:
         - /app/policy-operator
         env:
