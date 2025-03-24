@@ -9,6 +9,11 @@ Trend Micro Cloud One Container Security components use the `helm` package manag
 Helm 3 or later is supported when installing Trend Micro Cloud One - Container Security components.
 To get started, see the [Helm installation guide](https://helm.sh/docs/intro/install/).
 
+> [!NOTE]
+> - Clusters deployed using Helm chart versions older than **2.3.25** will no longer receive new rule updates.
+>  - Clusters that use unsupported Helm chart versions retain protection from their last applied policy but may create error logs in Scout due to failures downloading newer rules.
+> - To ensure continued rule updates, upgrade Helm chart to the latest version. See [Upgrade a Trend Micro Cloud One Container Security deployment](#upgrade-a-trend-micro-cloud-one-container-security-deployment).
+
 ### Kubernetes Network Policies with Container Security Continuous Compliance
 
 Container Security Continuous Compliance enforces policies by leveraging [Kubernetes network policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/) to perform isolation mitigation. Network policies are implemented by the [network plugin](https://kubernetes.io/docs/concepts/extend-kubernetes/compute-storage-net/network-plugins/).
