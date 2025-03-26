@@ -134,7 +134,7 @@ spec:
             {{- end }}{{/* .Values.telemetry.publicKey */}}
             {{- end }}{{/* .Values.telemetry.enabled */}}
             - --trusted-images={{ include "digest" . }}
-            {{- if .Values.cloudOne.admissionController.signatureVerification }}
+            {{- if .Values.visionOneFeatureGate }}
             - --vision-one-feature-gate=true
             {{- end }}
             - 2>&1
