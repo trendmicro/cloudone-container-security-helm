@@ -70,6 +70,7 @@ spec:
         - --enable-token-rotation={{ include "container.security.isVisionOneEndpoint" . }}
         {{- if .Values.visionOneFeatureGate }}
         - --policy-config-name={{ template "container.security.name" . }}-policy-config
+        - --vision-one-feature-gate=true
         {{- end }}
         command:
         - /app/policy-operator
