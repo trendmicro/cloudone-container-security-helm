@@ -85,6 +85,13 @@ spec:
             - {{ .Values.cloudOne.fargateInjector.logLevel }}
             - --endpoint
             - {{ .Values.cloudOne.endpoint }}
+            - --auth-secret-name
+            - {{ template "container.security.fullname" . }}-auth
+            - --zap-devel={{ default "false" .Values.logConfig.devel }}
+            - --zap-log-level={{ include "logLevel" (list .Values.cloudOne.fargateInjector.logLevel .) }}
+            - --zap-encoder={{ default "json" .Values.logConfig.encoder }}
+            - --zap-stacktrace-level={{ default "error" .Values.logConfig.stacktraceLevel }}
+            - --zap-time-encoding={{ default "rfc3339" .Values.logConfig.timeEncoding }}
             - --excluded-namespaces
             {{- $excludeNS := include "namespaceExclusions" . }}
             - {{ $excludeNS | quote }}
