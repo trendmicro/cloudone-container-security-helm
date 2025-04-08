@@ -137,10 +137,9 @@ spec:
               value: "true"
             - name: TZ
               value:
-          {{- range $key, $value := .Values.scout.falco.env }}
-            - name: "{{ $key }}"
-              value: "{{ $value }}"
-          {{- end }}{{/* range */}}
+          {{- if .Values.scout.falco.env }}
+{{ .Values.scout.falco.env | toYaml | indent 12 }}
+          {{- end }}
             - name: NODE_NAME
               valueFrom:
                 fieldRef:
@@ -198,61 +197,35 @@ spec:
 {{- end }}{{/* if */}}
 {{- end }}{{/* if $securityContextEnabled */}}
           args:
-            - /usr/bin/falco
-            - -c
-            - /etc/falco/falco-customrules.yaml
-{{- include "containerRuntime.sock.falco.args" .Values.scout.falco | trim | nindent 12 }}
-            - -p
-            - >
-              container.id=%container.id
-              container.image.digest=%container.image.digest
-              container.image.repository=%container.image.repository
-              container.image.tag=%container.image.tag
-              container.name=%container.name
-              evt.arg.filename=%evt.arg.filename
-              evt.arg.mode=%evt.arg.mode
-              evt.arg.name=%evt.arg.name
-              evt.category=%evt.category
-              evt.num=%evt.num
-              evt.rawtime=%evt.rawtime
-              evt.type=%evt.type
-              k8s.ns.name=%k8s.ns.name
-              k8s.pod.id=%k8s.pod.id
-              k8s.pod.labels=%k8s.pod.labels
-              k8s.pod.name=%k8s.pod.name
-              proc.args=%proc.args
-              proc.cmdline=%proc.cmdline
-              proc.exe=%proc.exe
-              proc.exeline=%proc.exeline
-              proc.name=%proc.name
-              proc.pcmdline=%proc.pcmdline
-              proc.pid=%proc.pid
-              proc.pname=%proc.pname
-              proc.ppid=%proc.ppid
-              user.loginuid=%user.loginuid
-              user.name=%user.name
-            - -o
-            - stdout_output.enabled={{ default "false" .Values.scout.falco.stdout_enabled }}
-            - -o
-            - syslog_output.enabled={{ default "false" .Values.scout.falco.syslog_enabled }}
-            - -o
-            - log_level={{ include "logLevel" (list .Values.scout.falco.logLevel .) }}
-        {{- if .Values.scout.falco.extraArgs }}
-{{ toYaml .Values.scout.falco.extraArgs | indent 12 }}
-        {{- end }}{{/* if */}}
+            - /usr/wrappers/falco-customrules-wrapper.sh
           env:
             - name: SKIP_DRIVER_LOADER
               value: "true"
             - name: TZ
               value:
-          {{- range $key, $value := .Values.scout.falco.env }}
-            - name: "{{ $key }}"
-              value: "{{ $value }}"
+          {{- if .Values.scout.falco.env }}
+{{ .Values.scout.falco.env | toYaml | indent 12 }}
+          {{- end }}
+          {{- range $idx, $val := .Values.scout.falco.env }}
+            {{- if hasKey $val "valueFrom" }}
+              {{- if hasKey $val.valueFrom "secretKeyRef" }}
+                {{- if not ( lookup "v1" "Secret" $.Release.Namespace $val.valueFrom.secretKeyRef.name ) -}}
+                  {{- fail ( printf "secret %s is missing from namespace %s, with key '%s', required by .Values.scout.falco.env '%s'"
+                          $val.valueFrom.secretKeyRef.name
+                          $.Release.Namespace
+                          $val.valueFrom.secretKeyRef.key
+                          $val.name
+                  ) -}}
+                {{- end}}
+              {{- end }}
+            {{- end }}
           {{- end }}{{/* range */}}
             - name: NODE_NAME
               valueFrom:
                 fieldRef:
                   fieldPath: spec.nodeName
+            - name: HEC_CLIENT_PARAMS
+              value: "{{ include "hec_client_params_as_env_var" .Values.cloudOne.runtimeSecurity.customRules.output.splunk }}"
           {{- if .Values.cloudOne.runtimeSecurity.customRules.output.splunk.hecTokenSecretName }}
           {{- if not ( lookup "v1" "Secret" .Release.Namespace .Values.cloudOne.runtimeSecurity.customRules.output.splunk.hecTokenSecretName ) -}}{{- fail (
               printf "secret %s is expected in namespace %s, with key 'hec_secret' containing Splunk HEC token"
@@ -264,6 +237,20 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.cloudOne.runtimeSecurity.customRules.output.splunk.hecTokenSecretName }}
                   key: hec_secret
+          {{- end }}{{/* .Values.cloudOne.runtimeSecurity.customRules.output.splunk.hecTokenSecretName */}}
+          {{- if .Values.cloudOne.runtimeSecurity.customRules.ociRepository.enabled }}
+            {{- with .Values.cloudOne.runtimeSecurity.customRules.ociRepository.basicAuthTokenSecretName }}
+              {{- if not ( lookup "v1" "Secret" $.Release.Namespace . ) -}}{{- fail (
+                  printf "secret %s is expected in namespace %s, with key 'falcoctl' containing basic auth as for FALCOCTL_REGISTRY_AUTH_BASIC"
+                    .
+                    $.Release.Namespace
+                  ) -}}{{- end}}
+            - name: FALCOCTL_REGISTRY_AUTH_BASIC
+              valueFrom:
+                secretKeyRef:
+                  name: {{ . }}
+                  key: falcoctl
+            {{- end }}
           {{- end }}
           volumeMounts:
 {{- include "containerRuntime.sock.volumeMounts" ( list "/host" .Values.scout.falco ) | trim | nindent 12 }}
@@ -290,6 +277,29 @@ spec:
             - mountPath: /etc/falco
               name: config-volume
               readOnly: true
+            - mountPath: /usr/wrappers
+              name: customrules-wrappers
+              readOnly: true
+{{- if .Values.cloudOne.runtimeSecurity.customRules.ociRepository.enabled }}
+            - mountPath: {{ .Values.scout.falco.ociRepository.artifacts_dir }}
+              name: oci-repository-artifacts-dir
+              readOnly: false
+            - mountPath: /etc/falcoctl-config-volume
+              name: falcoctl-config-volume
+              readOnly: true
+            - mountPath: /root/.docker
+              name: falcoctl-credentials
+              readOnly: false
+            - mountPath: {{ .Values.scout.falco.falcoctl.pipes_dir }}
+              name: falcoctl-pipes
+              readOnly: false
+            - mountPath: /root/.sigstore
+              name: falcoctl-sigstore
+              readOnly: false
+            - mountPath: /tmp
+              name: falcoctl-tmpfs
+              readOnly: false
+{{- end }}
             - mountPath: /etc/falco/rules.d
               name: customrules-volume
               readOnly: true
@@ -547,6 +557,15 @@ spec:
 {{- end }}
               - key: default_rules.yaml
                 path: default_rules.yaml
+{{- if .Values.cloudOne.runtimeSecurity.customRules.enabled }}
+        - name: customrules-wrappers
+          configMap:
+            name: {{ template "container.security.name" . }}-customrules-falco-config
+            items:
+              - key: falco-customrules-wrapper.sh
+                path: falco-customrules-wrapper.sh
+                mode: 0555
+{{- end }}
         - name: grpc-socket-dir
           emptyDir:
             sizeLimit: 10Mi
@@ -557,6 +576,29 @@ spec:
         - name: customrules-volume
           configMap:
             name: {{ template "container.security.name" . }}-customrules
+  {{- if .Values.cloudOne.runtimeSecurity.customRules.ociRepository.enabled }}
+        - name: oci-repository-artifacts-dir
+          emptyDir:
+            sizeLimit: 10Mi
+        - name: falcoctl-config-volume
+          configMap:
+            name: {{ template "container.security.name" . }}-customrules-falco-config
+            items:
+              - key: falcoctl.yaml
+                path: falcoctl.yaml
+        - name: falcoctl-tmpfs
+          emptyDir:
+            sizeLimit: 50Mi
+        - name: falcoctl-credentials
+          emptyDir:
+            sizeLimit: 1Mi
+        - name: falcoctl-sigstore
+          emptyDir:
+            sizeLimit: 50Mi
+        - name: falcoctl-pipes
+          emptyDir:
+            sizeLimit: 50Mi
+  {{- end }}
 {{- end }}
         - name: scout-workdir
           emptyDir:

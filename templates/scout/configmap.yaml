@@ -19,10 +19,20 @@ data:
 {{- end }}
 {{- if .Values.cloudOne.runtimeSecurity.customRules.enabled }}
 {{ (.Files.Glob "config/falco-customrules.yaml").AsConfig | indent 2 }}
+    rules_files:
+      - /etc/falco/default_rules.yaml
+      - /etc/falco/rules.d
+    {{- if .Values.cloudOne.runtimeSecurity.customRules.ociRepository.enabled }}
+      {{- range .Values.cloudOne.runtimeSecurity.customRules.ociRepository.ruleFiles }}
+      - {{ $.Values.scout.falco.ociRepository.artifacts_dir }}/{{- . -}}
+      {{- end }}
+    {{- end }}
     json_output: {{.Values.cloudOne.runtimeSecurity.customRules.output.json}}
+  {{ if .Values.cloudOne.runtimeSecurity.customRules.output.splunk.url }}
     http_output:
-      enabled: {{ default "false" .Values.cloudOne.runtimeSecurity.customRules.enabled }}
-      url: {{ default "http://some.url" .Values.cloudOne.runtimeSecurity.customRules.output.splunk.url }}
+      enabled: true
+      url: {{ .Values.cloudOne.runtimeSecurity.customRules.output.splunk.url }}
+      {{ if .Values.cloudOne.runtimeSecurity.customRules.output.splunk.headers }}
       custom_headers:
         {{- range .Values.cloudOne.runtimeSecurity.customRules.output.splunk.headers}}
         {{- if contains "Authorization:" . }}
@@ -34,8 +44,39 @@ data:
         {{- if $.Values.cloudOne.runtimeSecurity.customRules.output.splunk.hecTokenSecretName }}
         - "Authorization: Splunk ${SPLUNK_HEC_TOKEN}"
         {{- end }}
+      {{- end }}
       ca_path: "/etc/ssl/certs"
       ca_cert: "/etc/ssl/certs/ca-certificates.crt"
+  {{- end }}
+  {{- if and .Values.cloudOne.runtimeSecurity.customRules.ociRepository.enabled }}
+    # falcoctl queries version via http
+    webserver:
+      enabled: true
+      # When the `threadiness` value is set to 0, Falco will automatically determine
+      # the appropriate number of threads based on the number of online cores in the system.
+      threadiness: 0
+      listen_port: {{ .Values.scout.falco.falcoctl.web_server_port }}
+      # faloctl runs in the same container, localhost is fine
+      # connections from other hosts are not accepted
+      listen_address: 127.0.0.1
+      k8s_healthz_endpoint: /healthz
+      # [Incubating] `prometheus_metrics_enabled`
+      #
+      # Enable the metrics endpoint providing Prometheus values
+      # It will only have an effect if metrics.enabled is set to true as well.
+      prometheus_metrics_enabled: false
+      ssl_enabled: false
+      ssl_certificate: /etc/falco/falco.pem
+    # rulesfiles may be updated by falcoctl
+    watch_config_files: true
+    # logs are monitored, need debug level to determine falco state properly
+    log_level: {{ .Values.scout.falco.ociRepository.logLevel | quote }}
+  {{ else }}
+    # no changes to rulesfiles are expected
+    watch_config_files: false
+    # logs just informational
+    log_level: {{ .Values.scout.falco.logLevel | quote }}
+  {{ end }}
 {{- end }}
 ---
 {{- if .Values.cloudOne.runtimeSecurity.customRules.enabled }}

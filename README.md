@@ -399,6 +399,11 @@ Note: Enabling stdout output will cause large amounts of logs to be generated. E
 
 To learn more about configuring the Splunk HEC token for falco custom rules, see the Splunk HEC Secret docs [here](./docs/falco-splunk-hec-secret.md).
 
+### Configuring OCI repository artifacts for Falco Custom Rules
+
+To learn more about configuring OCI repository artifacts for falco custom rules, see the OCI repo docs [here](./docs/oci-artifact-with-falcoctl.md).
+Note that this feature is subject to breaking changes in the future.
+
 ### Least Privileged mode
 
 Falco runs in full privileged mode by default. For the sake of security, you can enable `least_privileged` to make Falco to run in the least privileged mode. In this case, Falco will be non-privileged container with minimum capabilities added.

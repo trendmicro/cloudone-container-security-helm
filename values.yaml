@@ -194,6 +194,14 @@ cloudOne:
           headers:
           - ''
           hecTokenSecretName: ''
+      ociRepository:
+        # These fields are subject to change
+        enabled: false
+        ruleFiles: []
+        artifactUrls: []
+        basicAuthTokenSecretName: ''
+      params:
+        clusterName: ''
 
   complianceScan:
     enabled: true
@@ -875,7 +883,7 @@ scout:
     ## env, if set will apply additional environment variables to the falco container
     ##
     ## Default Value: []
-    env: {}
+    env: []
 
     ## extra configs applied to falco container
     config: {}
@@ -945,6 +953,22 @@ scout:
     ##
     ## Default value: info
     logLevel: info
+
+    ociRepository:
+      # These fields are subject to change
+      # this directory is shared between falco and falcoctl ( when enabled )
+      # falcoctl installs OCI artifacts into
+      artifacts_dir: /etc/falco/rules.d.oci
+      # falco-customrules uses this log level when ociRepository also enabled
+      logLevel: debug
+
+    falcoctl:
+      # These fields are subject to change
+      # webserver for versions/healthz endpoints
+      # disabled by default, enabled together falcoctl
+      # always listens on 127.0.0.1:{web_server_port}
+      web_server_port: 8765
+      pipes_dir: /pipes
 
   scout:
     ## falcoInternalEvent, determines how to deal with falco internal event

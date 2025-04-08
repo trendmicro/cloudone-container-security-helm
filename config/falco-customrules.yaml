@@ -35,9 +35,10 @@
 # "first match wins" principle. However, enabling the `all` matching option may result
 # in a performance penalty. We recommend carefully testing this alternative setting
 # before deploying it in production. Read more under the `rule_matching` configuration.
-rules_files:
-  - /etc/falco/default_rules.yaml
-  - /etc/falco/rules.d
+# WARNING: this whole section is moved to configmap.yaml to conditionally add oci-artifact files
+#rules_files:
+#  - /etc/falco/default_rules.yaml
+#  - /etc/falco/rules.d
 
 #################
 # Falco plugins #
@@ -75,7 +76,9 @@ plugins:
 # changes to the configuration or rules of Falco without interrupting its
 # operation or losing its state. For more information about Falco's state
 # engine, please refer to the `base_syscalls` section.
-watch_config_files: false
+#
+# WARNING: this whole section is moved to configmap.yaml to conditionally enable watch of oci-artifact files
+#watch_config_files: false
 
 ##########################
 # Falco outputs settings #
@@ -186,7 +189,8 @@ log_syslog: true
 # verbosity of Falco's operational logs. Only logs of a certain severity level
 # or higher will be emitted. Supported levels: "emergency", "alert", "critical",
 # "error", "warning", "notice", "info", "debug".
-log_level: info
+# WARNING: this whole section is moved to configmap.yaml to enable watch files when oci-artifact is enabled
+#log_level: info
 
 # [Stable] `libs_logger`
 #
