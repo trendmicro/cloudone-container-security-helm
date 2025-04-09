@@ -48,7 +48,7 @@ data:
       ca_path: "/etc/ssl/certs"
       ca_cert: "/etc/ssl/certs/ca-certificates.crt"
   {{- end }}
-  {{- if and .Values.cloudOne.runtimeSecurity.customRules.ociRepository.enabled }}
+  {{- if .Values.cloudOne.runtimeSecurity.customRules.ociRepository.enabled }}
     # falcoctl queries version via http
     webserver:
       enabled: true
