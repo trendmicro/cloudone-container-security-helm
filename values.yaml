@@ -1059,7 +1059,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.6.4
+    tag: 2.6.5
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -1074,7 +1074,7 @@ images:
     # imagePullSecret:
   admissionController:
     repository: admission-controller
-    digest: sha256:38c33a3ca2763f50c4c0709e31b605011137243ebac5c8b7591ed8a36599a119
+    digest: sha256:ef8e4bc6e330d353e775f8f1b34455521780477394b6f274a2ea27dfda36842d
 
   oversight:
     repository: oversight-controller
@@ -1090,11 +1090,11 @@ images:
 
   falco:
     repository: falco
-    digest: sha256:6365813919f4d99e0b50c7a64fcb4e80a7cef64f5789c5fabbc2268c912b6e76
+    digest: sha256:fac4c0071f6271cbc656ede50fef20b1f14bb127d0386765cd82929cc4422525
 
   scout:
     repository: scout
-    digest: sha256:639f78f2ab8ddbf1abcbc9e0866d11eb3b787bba9ff51150bfe3b29b1542233e
+    digest: sha256:bca3e8b51984c503889493d737c2320657199dff2532bf3e826f8910f5a55c7f
 
   scanManager:
     repository: scan-manager
@@ -1106,7 +1106,7 @@ images:
 
   complianceScanJob:
     repository: compliance-scan-job
-    digest: sha256:931a788c1d27bee3791fc6751f145a5e133bdb5a4cabc33028e0612b95b0b1a6
+    digest: sha256:eeb63ec2f69b40e2ed6dce4f2691a68420d04298e82a02dc0d8a319521c15716
 
   workloadOperator:
     repository: workload-operator
@@ -1114,11 +1114,11 @@ images:
 
   fargateInjector:
     repository: fargate-tool
-    digest: sha256:1ee41680f781040912d5be8473bfe3195e13de90889315434b7e7e20e68562d3
+    digest: sha256:05be847d08f548ea79eb0570bdd7208efd8d5fc3f83f99522a094e025ca80c09
 
   pdig:
     repository: pdig
-    digest: sha256:0d203a83a1a753717161368b5a858ab316e56c75d4c6307a5c8eaccddb4f7a8c
+    digest: sha256:3b024bc583fb5e23cb699e2149099fe2e2f8c4424e8b2eaefb96d3bd6a327253
 
   k8sMetaCollector:
     repository: k8s-metacollector
@@ -1126,7 +1126,7 @@ images:
 
   policyOperator:
     repository: policy-operator
-    digest: sha256:061a09ccf3612fd0a415b999d88eed9c06d7eed51c9750649d3e0377474930e4
+    digest: sha256:4ab32530f15f6233da334acecacb2a9f9589894055db9a8754ad49996a29e13a
 
   malwareScanner:
     repository: malware-scanner
