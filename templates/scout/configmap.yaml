@@ -17,6 +17,7 @@ data:
 {{- if .Values.scout.falco.config }}
 {{ toYaml .Values.scout.falco.config | indent 4 }}
 {{- end }}
+{{- include "falco.sanitier.ouput" . | indent 4 }}
 {{- if .Values.cloudOne.runtimeSecurity.customRules.enabled }}
 {{ (.Files.Glob "config/falco-customrules.yaml").AsConfig | indent 2 }}
     rules_files:
@@ -77,6 +78,7 @@ data:
     # logs just informational
     log_level: {{ .Values.scout.falco.logLevel | quote }}
   {{ end }}
+{{- include "falco.sanitier.ouput" . | indent 4 }}
 {{- end }}
 ---
 {{- if .Values.cloudOne.runtimeSecurity.customRules.enabled }}

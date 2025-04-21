@@ -888,6 +888,18 @@ scout:
     ## extra configs applied to falco container
     config: {}
 
+    sanitizer_output:
+      ## enabled, determines if the output sanitizer feature is enabled
+      ##
+      ## Default value: false
+      enabled: false
+      ## At least one pattern is required if enabled is true.
+      ##
+      ## Expecting key value pairs whose key is falco output fields and value is the regex pattern to be used for matching parts of the output to be redacted.
+      ##
+      ## example: proc.pcmdline: (?<=--process\s)\s?(\S+)|(?<=--root\s)\s?(\S+)
+      patterns:
+
     docker:
       ## Determines if the docker socket is mounted in the falco container.
       ## Required for docker based runtimes

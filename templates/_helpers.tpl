@@ -1174,3 +1174,18 @@ Automatically adds any namespace with prefix to excluded namespace list for open
     {{- printf " -H \\\"%s\\\"" "Authorization: Splunk $(echo ${SPLUNK_HEC_TOKEN})" -}}
   {{- end -}}
 {{- end -}}
+
+{{- define "falco.sanitier.ouput" -}}
+{{- if .Values.scout.falco.sanitizer_output.enabled }}
+{{- if .Values.scout.falco.sanitizer_output.patterns }}
+sanitizer_output:
+  enabled: true
+  patterns:
+    {{- range $key, $value := .Values.scout.falco.sanitizer_output.patterns }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+{{- else }}
+{{- fail "Redaction pattern is required if output sanitizer is enabled." }}
+{{- end }}
+{{- end }}
+{{- end -}}
