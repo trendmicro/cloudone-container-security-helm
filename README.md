@@ -414,6 +414,12 @@ scout:
     least_privileged: true
 ```
 
+### Argo CD Uninstallation Guide
+
+For Argo CD deployments, we provide a cleanup script to help with the uninstallation process. We recommend running this script during or after uninstallation to ensure complete removal of all components.
+
+For detailed instructions on using the Argo CD cleanup script, please refer to the [Argo CD cleanup script documentation](./scripts/argocd-cleanup.md).
+
 ## Falco Version Matrix 
 
 The following matrix shows the Falco version that is bundled with each Helm chart version:

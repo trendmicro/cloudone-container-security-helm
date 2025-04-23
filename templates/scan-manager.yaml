@@ -64,6 +64,12 @@ spec:
         - --cloud-one-scan-job-image=$(SCAN_JOB_IMAGE)
         - --cloud-one-endpoint={{ include "container.security.endpoint" . }}
         - --exclude-kubernetes-service-host-from-proxy={{ default "false" .Values.proxy.excludeKubernetesServiceHost }}
+        - --excluded-namespaces
+        {{- $excludeNS := (include "namespaceExclusions" .) }}
+        - {{ $excludeNS | quote }}
+        - --release-service={{ .Release.Service }}
+        - --release-name={{ .Release.Name }}
+        - --container-security-name={{ include "container.security.name" . }}
         - --max-job-count={{ default 5 .Values.cloudOne.scanManager.maxJobCount }}
         {{- with .Values.images.scanManager }}
         {{- $secret := (default (default "" $imageDefaults.imagePullSecret) .imagePullSecret) }}
@@ -246,4 +252,119 @@ data:
   cert.pem: {{ $cert.Cert | b64enc | quote }}
   ca-cert.pem: {{ $ca.Cert | b64enc | quote }}
 
+{{- end }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: scan-manager-secrets-remover-service-account
+  labels:
+    {{- include "scanManager.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: post-delete
+    helm.sh/hook-delete-policy: hook-succeeded,hook-failed,before-hook-creation
+    helm.sh/hook-weight: "-10"
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: trendmicro-scan-manager-secrets-remover
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "scanManager.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: post-delete
+    helm.sh/hook-delete-policy: hook-succeeded,hook-failed
+spec:
+  backoffLimit: 2
+  activeDeadlineSeconds: 90
+  ttlSecondsAfterFinished: 60
+  template:
+    metadata:
+      annotations:
+{{- with (default .Values.podAnnotations.defaults .Values.podAnnotations.scanManager) }}
+{{- toYaml . | nindent 8 }}
+{{- end }}
+      labels:
+        {{- include "scanManager.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: scan-manager-secrets-remover-service-account
+{{- $securityContextEnabled := .Values.securityContext.enabled }}
+{{- $securityContext := default .Values.securityContext.default .Values.securityContext.scanManager }}
+{{- $podSecurityContext := default .Values.securityContext.default.pod $securityContext.pod }}
+{{- $containerSecurityContext := default .Values.securityContext.default.container $securityContext.container.scanManager }}
+{{- if $securityContextEnabled }}
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+{{- end }}
+      {{- $imageDefaults := .Values.images.defaults }}
+      {{- with .Values.images.scanManager }}
+      {{- $secret := (default (default "" $imageDefaults.imagePullSecret) .imagePullSecret) }}
+      {{- if not (eq "" $secret) }}
+      imagePullSecrets:
+        - name: {{ $secret | quote }}
+      {{- end }}
+      restartPolicy: Never
+      containers:
+        - name: trendmicro-scan-manager-secrets-remover
+{{- if $securityContextEnabled }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+{{- end }}
+        {{- $project := (default (default "trendmicrocloudone" $imageDefaults.project) .project) }}
+        {{- $repository := printf "%s/%s" $project (required ".repository is required!" .repository) }}
+        {{- $tag := (default $imageDefaults.tag .tag) }}
+          image: {{ include "image.source" (dict "repository" $repository "registry" .registry "tag" $tag "imageDefaults" $imageDefaults "digest" .digest) }}
+          imagePullPolicy: {{ default (default "Always" $imageDefaults.pullPolicy) .pullPolicy }}
+        {{- end }}
+          workingDir: /var/scanmanager
+          args:
+          - --cleanup-mode
+          - --excluded-namespaces
+          {{- $excludeNS := (include "namespaceExclusions" .) }}
+          - {{ $excludeNS | quote }}
+          - --release-service={{ .Release.Service }}
+          - --release-name={{ .Release.Name }}
+          - --container-security-name={{ include "container.security.name" . }}
+          {{- with .Values.images.scanManager }}
+          {{- $secret := (default (default "" $imageDefaults.imagePullSecret) .imagePullSecret) }}
+          {{- if not (eq "" $secret) }}
+          - --image-pull-secret-name={{ $secret }}
+          {{- end }}
+          {{- end }}
+          env:
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          volumeMounts:
+          - mountPath: /var/scanmanager
+            name: scanmanager-workdir
+      volumes:
+      - name: scanmanager-workdir
+        emptyDir:
+          sizeLimit: 50Mi
+{{- if or .Values.nodeSelector.defaults .Values.nodeSelector.scanManager }}
+      nodeSelector:
+{{ toYaml (default .Values.nodeSelector.defaults .Values.nodeSelector.scanManager) | indent 8 }}
+{{- end }}
+{{- if or .Values.tolerations.defaults .Values.tolerations.scanManager }}
+      tolerations:
+{{ toYaml (default .Values.tolerations.defaults .Values.tolerations.scanManager) | indent 8 }}
+{{- end }}
+{{- if or .Values.affinity.defaults .Values.affinity.scanManager }}
+      affinity:
+{{ toYaml (default .Values.affinity.defaults .Values.affinity.scanManager) | indent 8 }}
+{{- end }}
+{{- $classname := (default (default "" .Values.priorityClassName.default ) .Values.priorityClassName.scanManager) }}
+{{- if not (eq "" $classname) }}
+      priorityClassName: "{{ $classname }}"
 {{- end }}
