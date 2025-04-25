@@ -28,6 +28,8 @@ data:
         {{- with (default .Values.podAnnotations.defaults .Values.podAnnotations.scanner) }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+        argocd.argoproj.io/sync-options: Prune=false
+        argocd.argoproj.io/compare-options: IgnoreExtraneous
     spec:
       backoffLimit: 2
       activeDeadlineSeconds: {{ .Values.cloudOne.scanManager.activeDeadlineSeconds }}
@@ -42,6 +44,8 @@ data:
             {{- with (default .Values.podAnnotations.defaults .Values.podAnnotations.scanner) }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
+            argocd.argoproj.io/sync-options: Prune=false
+            argocd.argoproj.io/compare-options: IgnoreExtraneous
         spec:
 {{- $securityContextEnabled := .Values.securityContext.enabled }}
 {{- $securityContext := default .Values.securityContext.default .Values.securityContext.scanner }}
