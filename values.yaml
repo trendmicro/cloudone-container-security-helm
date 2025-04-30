@@ -326,10 +326,16 @@ cloudOne:
   policyOperator:
     ## enable the cluster-managed policy feature
     enabled: false
-
+    
+    ## reconciliationPeriod is the time interval at which policy operator will reconcile the custom resources
     ## Minimum value: 5m
     ## Maximum value: 1h
     reconciliationPeriod: 5m
+
+    ## policySyncInterval is the time interval at which policy operator will sync the policy config from vision one
+    ## Minimum value: 1m
+    ## Maximum value: 1h
+    policySyncInterval: 5m
 
     ## clusterPolicyName is the name of the policy that will be reconciled by the policy operator
     ## Only one policy can be reconciled by the policy operator and applied to the cluster
@@ -343,6 +349,15 @@ cloudOne:
     ##
     ## Default value: info
     logLevel: info
+
+spc:
+  ## enable the container security mode for Vision One Sovereign Private Cloud
+  enabled: false
+
+  ## policySyncInterval is the time interval at which policy operator will sync the policy config from vision one
+  ## Minimum value: 10s
+  ## Maximum value: 5m
+  policySyncInterval: 1m
 
 securityContextConstraints:
   # enable the Security Context Constraints creation in Openshift

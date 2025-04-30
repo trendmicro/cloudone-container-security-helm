@@ -1,4 +1,4 @@
-{{- if or (eq true .Values.cloudOne.policyOperator.enabled) (.Values.cloudOne.clusterRegistrationKey) (eq (include "container.security.isVisionOneEndpoint" .) "true") }}
+{{- if or (eq true .Values.cloudOne.policyOperator.enabled) (.Values.cloudOne.clusterRegistrationKey) (.Values.visionOneFeatureGate) (eq (include "container.security.isVisionOneEndpoint" .) "true") }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -21,10 +21,10 @@ rules:
   - ""
   resources:
   - configmaps
-  resourceNames:
-  - {{ template "container.security.name" . }}-policy-config
   verbs:
   - get
+  - list
+  - watch
   - update
 ---
 apiVersion: rbac.authorization.k8s.io/v1

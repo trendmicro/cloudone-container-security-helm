@@ -69,7 +69,12 @@ spec:
         - --auto-register={{ default "false" .Values.cloudOne.clusterRegistrationKey }}
         - --enable-token-rotation={{ include "container.security.isVisionOneEndpoint" . }}
         {{- if .Values.visionOneFeatureGate }}
+        - --spc-mode={{ default "false" .Values.spc.enabled }}
+        - --policy-sync-interval={{ include "policyOperator.policy.sync.interval" . }}
         - --policy-config-name={{ template "container.security.name" . }}-policy-config
+        - --runtime-rulesets-config-name={{ template "container.security.name" . }}-runtime-rulesets-config
+        - --runtime-rules-config-name={{ template "container.security.name" . }}-runtime-rules-config
+        - --runtime-policy-config-name={{ template "container.security.name" . }}-runtime-policy-config
         - --vision-one-feature-gate=true
         {{- end }}
         command:
@@ -145,16 +150,36 @@ metadata:
   name: {{ template "container.security.name" . }}-policy-config
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "policyOperator.labels" . | nindent 4 }}
+    {{- include "container.security.labels" . | nindent 4 }}
 data:
   cluster.policy: "{}"
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "container.security.name" . }}-ruleset-config
+  name: {{ template "container.security.name" . }}-runtime-rulesets-config
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "policyOperator.labels" . | nindent 4 }}
+    {{- include "container.security.labels" . | nindent 4 }}
 data:
   runtime.rulesets: "{}"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "container.security.name" . }}-runtime-rules-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "container.security.labels" . | nindent 4 }}
+data:
+  runtime.rules: ""
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "container.security.name" . }}-runtime-policy-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "container.security.labels" . | nindent 4 }}
+data:
+  runtime.policy: "{}"

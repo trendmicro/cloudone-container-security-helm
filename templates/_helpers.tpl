@@ -1175,6 +1175,9 @@ Automatically adds any namespace with prefix to excluded namespace list for open
   {{- end -}}
 {{- end -}}
 
+{{/*
+Return the sanitizer output configuration
+*/}}
 {{- define "falco.sanitier.ouput" -}}
 {{- if .Values.scout.falco.sanitizer_output.enabled }}
 {{- if .Values.scout.falco.sanitizer_output.patterns }}
@@ -1187,5 +1190,16 @@ sanitizer_output:
 {{- else }}
 {{- fail "Redaction pattern is required if output sanitizer is enabled." }}
 {{- end }}
+{{- end }}
+{{- end -}}
+
+{{/*
+Return the policy sync interval for the policy operator
+*/}}
+{{- define "policyOperator.policy.sync.interval" -}}
+{{- if .Values.spc.enabled }}
+{{- .Values.spc.policySyncInterval }}
+{{- else }}
+{{- .Values.cloudOne.policyOperator.policySyncInterval }}
 {{- end }}
 {{- end -}}
