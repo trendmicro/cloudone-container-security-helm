@@ -61,6 +61,31 @@ rules:
   verbs: 
   - get
   - list
+- apiGroups:
+  - security.openshift.io
+  resources:
+  - securitycontextconstraints
+  verbs:
+  - use
+- apiGroups:
+  - ""
+  resources:
+  - serviceaccounts
+  verbs:
+  - get
+  - list
+  - create
+  - update
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - clusterroles
+  - clusterrolebindings
+  verbs:
+  - get
+  - list
+  - create
+  - update
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -80,7 +105,7 @@ subjects:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: scan-manager-secrets-remover-role
+  name: scan-manager-cleanup-resources-role
   labels:
     {{- include "scanManager.labels" . | nindent 4 }}
   annotations:
@@ -89,16 +114,19 @@ metadata:
     helm.sh/hook-weight: "-9"
 rules:
 - apiGroups: [""]
-  resources: ["secrets"]
+  resources: ["secrets", "serviceaccounts"]
   verbs: ["get", "list", "delete"]
 - apiGroups: [""]
   resources: ["namespaces"]
   verbs: ["get", "list"]
+- apiGroups: ["rbac.authorization.k8s.io"]
+  resources: ["clusterroles", "clusterrolebindings"]
+  verbs: ["get", "list", "delete"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: scan-manager-secrets-remover-rolebinding
+  name: scan-manager-cleanup-resources-rolebinding
   labels:
     {{- include "scanManager.labels" . | nindent 4 }}
   annotations:
@@ -108,9 +136,9 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: scan-manager-secrets-remover-role
+  name: scan-manager-cleanup-resources-role
 subjects:
 - kind: ServiceAccount
-  name: scan-manager-secrets-remover-service-account
+  name: scan-manager-cleanup-resources-service-account
   namespace: {{ .Release.Namespace }}
 {{- end }}

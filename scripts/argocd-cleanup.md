@@ -31,7 +31,6 @@ The script handles deletion of Trend Micro Container Security resources includin
 
 1. Review and modify the variables at the top of the script if needed (default values mentioned below)
 ```bash
-RELEASE_NAME=${RELEASE_NAME:-"trendmicro-container-security"}
 RELEASE_SERVICE=${RELEASE_SERVICE:-"Helm"}
 CONTAINER_SECURITY_NAME=${CONTAINER_SECURITY_NAME:-"container-security"}
 SOURCE_NAMESPACE=${SOURCE_NAMESPACE:-"trendmicro-system"}

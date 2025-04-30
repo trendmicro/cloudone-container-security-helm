@@ -2,9 +2,8 @@
 
 # Default values for script execution
 # These variables can be changed based on customer environment settings
-RELEASE_NAME=${RELEASE_NAME:-"trendmicro-container-security"}
 RELEASE_SERVICE=${RELEASE_SERVICE:-"Helm"}
-CONTAINER_SECURITY_NAME=${CONTAINER_SECURITY_NAME:-"container-security"}
+CONTAINER_SECURITY_NAME=${CONTAINER_SECURITY_NAME:-"trendmicro-container-security"}
 SOURCE_NAMESPACE=${SOURCE_NAMESPACE:-"trendmicro-system"}
 ARGOCD_NAMESPACE="argocd"
 
@@ -26,7 +25,7 @@ check_namespace_exists() {
 has_post_delete_finalizers() {
   local app_name="$1"
 
-  local finalizers=$(kubectl get application "${app_name}" -n argocd -o jsonpath='{.metadata.finalizers}' 2>/dev/null)
+  local finalizers=$(kubectl get application "${app_name}" -n $ARGOCD_NAMESPACE -o jsonpath='{.metadata.finalizers}' 2>/dev/null)
   
   if [[ "$finalizers" == *"post-delete-finalizer"* ]]; then
     return 0
@@ -38,7 +37,7 @@ has_post_delete_finalizers() {
 cleanup_image_pull_secrets() {
   local success=true
 
-  local label_selector="app.kubernetes.io/managed-by=$RELEASE_SERVICE,app.kubernetes.io/name=$CONTAINER_SECURITY_NAME,app.kubernetes.io/instance=$RELEASE_NAME"
+  local label_selector="app.kubernetes.io/managed-by=$RELEASE_SERVICE,app.kubernetes.io/name=$CONTAINER_SECURITY_NAME"
   
   local namespaces
   namespaces=$(kubectl get namespaces -o jsonpath='{.items[*].metadata.name}')
@@ -75,15 +74,15 @@ cleanup_image_pull_secrets() {
 }
 
 cleanup_post_delete_resources() {
-  local annotation_selector="helm.sh/hook=post-delete"
   local success=true
+  local label_selector="app.kubernetes.io/part-of=trendmicro-container-security"
 
   if ! check_namespace_exists "$SOURCE_NAMESPACE"; then
     echo "Source namespace $SOURCE_NAMESPACE does not exist, nothing to delete"
     return 0
   fi
 
-  local sa_list=$(kubectl get serviceaccounts -n "$SOURCE_NAMESPACE" -o jsonpath="{.items[?(@.metadata.annotations['helm\\.sh/hook']=='post-delete')].metadata.name}" 2>/dev/null)
+  local sa_list=$(kubectl get serviceaccounts -n "$SOURCE_NAMESPACE" -l "$label_selector" -o jsonpath="{.items[*].metadata.name}" 2>/dev/null)
 
   if [ -n "$sa_list" ]; then
     for sa in $sa_list; do
@@ -99,7 +98,7 @@ cleanup_post_delete_resources() {
     echo "[ServiceAccount] No service accounts found in namespace $SOURCE_NAMESPACE, nothing to delete"
   fi
 
-  local crb_list=$(kubectl get clusterrolebinding -o jsonpath="{.items[?(@.metadata.annotations['helm\\.sh/hook']=='post-delete')].metadata.name}" 2>/dev/null)
+  local crb_list=$(kubectl get clusterrolebinding -l "$label_selector" -o jsonpath="{.items[*].metadata.name}" 2>/dev/null)
 
   if [ -n "$crb_list" ]; then
     for crb in $crb_list; do
@@ -112,10 +111,10 @@ cleanup_post_delete_resources() {
       fi
     done
   else
-    echo "[ClusterRoleBinding] No cluster role bindings found in namespace $SOURCE_NAMESPACE, nothing to delete"
+    echo "[ClusterRoleBinding] No cluster role bindings found, nothing to delete"
   fi
 
-  local cr_list=$(kubectl get clusterrole -o jsonpath="{.items[?(@.metadata.annotations['helm\\.sh/hook']=='post-delete')].metadata.name}" 2>/dev/null)
+  local cr_list=$(kubectl get clusterrole -l "$label_selector" -o jsonpath="{.items[*].metadata.name}" 2>/dev/null)
 
   if [ -n "$cr_list" ]; then
     for cr in $cr_list; do
@@ -128,7 +127,7 @@ cleanup_post_delete_resources() {
       fi
     done
   else
-    echo "[ClusterRole] No cluster roles found in namespace $SOURCE_NAMESPACE, nothing to delete"
+    echo "[ClusterRole] No cluster roles found, nothing to delete"
   fi
 
   if [ "$success" = true ]; then
@@ -192,7 +191,7 @@ cleanup_jobs() {
 if check_namespace_exists "$ARGOCD_NAMESPACE"; then
   echo "ArgoCD namespace found. Checking if applications are stuck in deleting state..."
   
-  app_names=($(kubectl get applications -n argocd -o jsonpath='{.items[*].metadata.name}'))
+  app_names=($(kubectl get applications -n $ARGOCD_NAMESPACE -o jsonpath='{.items[*].metadata.name}'))
   
   if [ ${#app_names[@]} -eq 0 ]; then
     echo "No ArgoCD applications found."
@@ -200,9 +199,9 @@ if check_namespace_exists "$ARGOCD_NAMESPACE"; then
     for app_name in "${app_names[@]}"; do
       if has_post_delete_finalizers "$app_name"; then
         
-        finalizers=$(kubectl get application "$app_name" -n argocd -o jsonpath='{.metadata.finalizers}')
+        finalizers=$(kubectl get application "$app_name" -n $ARGOCD_NAMESPACE -o jsonpath='{.metadata.finalizers}')
         
-        deletion_timestamp=$(kubectl get application "$app_name" -n argocd -o jsonpath='{.metadata.deletionTimestamp}' 2>/dev/null)
+        deletion_timestamp=$(kubectl get application "$app_name" -n $ARGOCD_NAMESPACE -o jsonpath='{.metadata.deletionTimestamp}' 2>/dev/null)
         
         if [ -n "$deletion_timestamp" ]; then
           echo -e "\nThe application is stuck in deletion state (has deletionTimestamp)."
@@ -210,7 +209,7 @@ if check_namespace_exists "$ARGOCD_NAMESPACE"; then
           read proceed
           
           if [[ "$proceed" =~ ^[Yy]$ ]]; then
-            kubectl patch application "$app_name" -n argocd -p '{"metadata":{"finalizers":null}}' --type=merge
+            kubectl patch application "$app_name" -n $ARGOCD_NAMESPACE -p '{"metadata":{"finalizers":null}}' --type=merge
             
             if [ $? -eq 0 ]; then
               echo "Successfully removed finalizers from $app_name"

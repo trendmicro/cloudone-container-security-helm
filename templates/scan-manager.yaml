@@ -95,6 +95,15 @@ spec:
         - --malware-exclude-paths={{ $combinedListPath | join "," }}
         - --mqtt-config-file-path=/app/scanmanager.yaml
         {{- end }}
+        {{- if and (.Capabilities.APIVersions.Has "security.openshift.io/v1") (or (eq true .Values.cloudOne.vulnerabilityScanning.enabled) (eq true .Values.cloudOne.malwareScanning.enabled)) }}
+        - --openshift-service-account-name={{ include "scanJob.serviceAccountName" . }}
+        {{- $labels := include "scanner.labels" $ }}
+        - --openshift-service-account-labels={{ $labels | replace "\n" "," | replace " " "" }}
+        {{- if $.Values.serviceAccount.scanJob.annotations }}
+        {{- $annotations := toYaml $.Values.serviceAccount.scanJob.annotations }}
+        - --openshift-service-account-annotations={{ $annotations | replace "\n" "," | replace " " "" }}
+        {{- end }}
+        {{- end }}
         env:
         {{- include "container.security.proxy.env" . | nindent 8 }}
         {{- $scanJobImageDefaults := .Values.images.defaults }}
@@ -257,7 +266,7 @@ data:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: scan-manager-secrets-remover-service-account
+  name: scan-manager-cleanup-resources-service-account
   labels:
     {{- include "scanManager.labels" . | nindent 4 }}
   annotations:
@@ -268,7 +277,7 @@ metadata:
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: trendmicro-scan-manager-secrets-remover
+  name: trendmicro-scan-manager-cleanup-resources
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "scanManager.labels" . | nindent 4 }}
@@ -288,7 +297,7 @@ spec:
       labels:
         {{- include "scanManager.labels" . | nindent 8 }}
     spec:
-      serviceAccountName: scan-manager-secrets-remover-service-account
+      serviceAccountName: scan-manager-cleanup-resources-service-account
 {{- $securityContextEnabled := .Values.securityContext.enabled }}
 {{- $securityContext := default .Values.securityContext.default .Values.securityContext.scanManager }}
 {{- $podSecurityContext := default .Values.securityContext.default.pod $securityContext.pod }}
@@ -308,7 +317,7 @@ spec:
       {{- end }}
       restartPolicy: Never
       containers:
-        - name: trendmicro-scan-manager-secrets-remover
+        - name: trendmicro-scan-manager-cleanup-resources
 {{- if $securityContextEnabled }}
           securityContext:
             allowPrivilegeEscalation: false
@@ -331,6 +340,10 @@ spec:
           - --excluded-namespaces
           {{- $excludeNS := (include "namespaceExclusions" .) }}
           - {{ $excludeNS | quote }}
+          {{- if and (.Capabilities.APIVersions.Has "security.openshift.io/v1") (or (eq true .Values.cloudOne.vulnerabilityScanning.enabled) (eq true .Values.cloudOne.malwareScanning.enabled)) }}
+          {{- $labels := include "scanner.labels" $ }}
+          - --openshift-service-account-labels={{ $labels | replace "\n" "," | replace " " "" }}
+          {{- end }}
           - --release-service={{ .Release.Service }}
           - --release-name={{ .Release.Name }}
           - --container-security-name={{ include "container.security.name" . }}
