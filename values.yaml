@@ -326,7 +326,7 @@ cloudOne:
   policyOperator:
     ## enable the cluster-managed policy feature
     enabled: false
-    
+
     ## reconciliationPeriod is the time interval at which policy operator will reconcile the custom resources
     ## Minimum value: 5m
     ## Maximum value: 1h
@@ -1086,7 +1086,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.6.5
+    tag: 2.6.6
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -1101,11 +1101,11 @@ images:
     # imagePullSecret:
   admissionController:
     repository: admission-controller
-    digest: sha256:ef8e4bc6e330d353e775f8f1b34455521780477394b6f274a2ea27dfda36842d
+    digest: sha256:e19a67dd2dab4af8a7087dc7d87b80024d907706acaa1e939db96e842b12a933
 
   oversight:
     repository: oversight-controller
-    digest: sha256:39deb50db5d0c58edcf16d58cbe2d08ba1dd5009ec464dfe7198e846cee4eee2
+    digest: sha256:8948f0cfcb22d5451efaec62e510280739f0013d54003b3d76d1a620992fd373
 
   usage:
     repository: usage-controller
@@ -1117,23 +1117,23 @@ images:
 
   falco:
     repository: falco
-    digest: sha256:fac4c0071f6271cbc656ede50fef20b1f14bb127d0386765cd82929cc4422525
+    digest: sha256:47a6b044241aef6fcf99f4989dd59cb2e00431c6eb9c4a34482d6dbae80d4b1e
 
   scout:
     repository: scout
-    digest: sha256:bca3e8b51984c503889493d737c2320657199dff2532bf3e826f8910f5a55c7f
+    digest: sha256:d6b4b6d0e8a80a094859d0752915370d17f1d4227e7193205d1f96320a2a12a2
 
   scanManager:
     repository: scan-manager
-    digest: sha256:29e120552dbe46c6582e05976fda77033de3420f20d3f8fd32d7e15a360aaf56
+    digest: sha256:703c848c938ff39121ff11ff98c8ab166b8704844bf256404e9451146914b68e
 
   scanJob:
     repository: scan-job
-    digest: sha256:3b0e950940740c0066c9d5a7738d49e5b47219454c12268c017b1932fe92f3ea
+    digest: sha256:119db09df41638ae2d83f0ccc4ede53f2ea7880b2b0edcb47379f31cd36cea28
 
   complianceScanJob:
     repository: compliance-scan-job
-    digest: sha256:eeb63ec2f69b40e2ed6dce4f2691a68420d04298e82a02dc0d8a319521c15716
+    digest: sha256:e52fe354f716cfb908a08550dcaafbe4fb319d9f39a4c0009b7ce8e94ed9bd26
 
   workloadOperator:
     repository: workload-operator
@@ -1153,7 +1153,7 @@ images:
 
   policyOperator:
     repository: policy-operator
-    digest: sha256:4ab32530f15f6233da334acecacb2a9f9589894055db9a8754ad49996a29e13a
+    digest: sha256:30e1cb21565b8e8457f8f6b300b98b9603d5492e0eba469fe9e62e21b151841d
 
   malwareScanner:
     repository: malware-scanner
