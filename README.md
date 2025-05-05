@@ -394,6 +394,27 @@ scout:
 
 Note: Enabling stdout output will cause large amounts of logs to be generated. Enable these if the events are being consumed from the respective channel. Container security will only consume the events from the grpc channel.
 
+### Falco event outputs sensitive data redaction
+
+To hide sensitive fields for runtime security events, add `scout.falco.sanitizer_output` to the `overrides.yaml` file.
+The `scout.falco.sanitizer_output.patterns` field uses the key-value pairs that have a Falco event field as the key and a regular expression as the value. Note the regular expression shall follow pcre2 syntax.
+(See [the fields supported by Falco](https://falco.org/docs/reference/rules/supported-fields/) for more information.) The regular expression determines if the string matching the pattern should be hidden in the event output. The redaction occurs in both output and output_fields in a Falco event. For example:
+
+```yaml
+scout:
+    falco:
+        sanitizer_output:
+            enabled: true
+            patterns:
+                proc.pcmdline: (?<=--password\s)\s?(\S+)
+                fd.sip: (?<=169\.254\.)(\S+)
+```
+
+In your Falco event and V1CS UI you will see:
+
+```
+proc.pcmdline=sampleProgram --password ********
+```
 
 ### Configuring Splunk HEC token for Falco Custom Rules
 
