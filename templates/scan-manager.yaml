@@ -94,6 +94,7 @@ spec:
           {{- end }}{{/* range */}}
         - --malware-exclude-paths={{ $combinedListPath | join "," }}
         - --mqtt-config-file-path=/app/scanmanager.yaml
+        - --vision-one-feature-gate={{ default "false" .Values.visionOneFeatureGate }}
         {{- end }}
         {{- if and (.Capabilities.APIVersions.Has "security.openshift.io/v1") (or (eq true .Values.cloudOne.vulnerabilityScanning.enabled) (eq true .Values.cloudOne.malwareScanning.enabled)) }}
         - --openshift-service-account-name={{ include "scanJob.serviceAccountName" . }}
