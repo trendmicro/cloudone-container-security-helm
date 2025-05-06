@@ -1105,7 +1105,7 @@ images:
 
   oversight:
     repository: oversight-controller
-    digest: sha256:8948f0cfcb22d5451efaec62e510280739f0013d54003b3d76d1a620992fd373
+    digest: sha256:58d3901b8b9d979435b6dd8b216c56058c822ef15cec3431c7f551f551b79840
 
   usage:
     repository: usage-controller
@@ -1125,7 +1125,7 @@ images:
 
   scanManager:
     repository: scan-manager
-    digest: sha256:703c848c938ff39121ff11ff98c8ab166b8704844bf256404e9451146914b68e
+    digest: sha256:58dffbe09ef63e9ce811bf9b4d560ca28cf2f57cff80a9b63d655e541cd79673
 
   scanJob:
     repository: scan-job
