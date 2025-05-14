@@ -81,6 +81,7 @@ spec:
         volumeMounts:
           - mountPath: /secrets
             name: api-key
+          {{- include "proxy.selfSignedCertificates.volumeMounts" . | nindent 10 }}
         resources:
 {{ toYaml (default .Values.resources.defaults .Values.resources.usage) | indent 12 }}
       - {{ include "rbacProxy" (dict "securityContext" .Values.securityContext "images" .Values.images "resources" .Values.resources "customSecurityContext" .Values.securityContext.usage "tlsConfig" .Values.tlsConfig ) | nindent 8 | trim }}
@@ -91,6 +92,7 @@ spec:
         - name: rbac-proxy-certs
           secret:
             secretName: {{ template "kubeRbacProxy.fullname" . }}-tls-certificate
+        {{- include "proxy.selfSignedCertificates.volumes" . | nindent 8 }}
       terminationGracePeriodSeconds: 10
 {{- if or .Values.nodeSelector.defaults .Values.nodeSelector.usage }}
       nodeSelector:

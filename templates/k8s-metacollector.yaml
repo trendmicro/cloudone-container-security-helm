@@ -121,12 +121,13 @@ spec:
             timeoutSeconds: 5
             # -- periodSeconds specifies the interval at which the readiness probe will be repeated.
             periodSeconds: 15
-{{- if eq "tls" .Values.cloudOne.k8sMetaCollector.grpcAuth.type }}
           volumeMounts:
+{{- if eq "tls" .Values.cloudOne.k8sMetaCollector.grpcAuth.type }}
             - name: grpc-certs
               mountPath: /etc/metacollector/certs
               readOnly: true
 {{- end }}
+            {{- include "proxy.selfSignedCertificates.volumeMounts" . | nindent 12 }}
           resources:
 {{ toYaml (default .Values.resources.defaults .Values.resources.k8sMetaCollector) | indent 12 }}
       volumes:
@@ -135,6 +136,7 @@ spec:
           secret:
             secretName: {{ template "k8sMetaCollector.fullname" . }}-tls-certificate
 {{- end }}
+        {{- include "proxy.selfSignedCertificates.volumes" . | nindent 8 }}
 {{- if or .Values.nodeSelector.defaults .Values.nodeSelector.k8sMetaCollector }}
       nodeSelector:
 {{ toYaml (default .Values.nodeSelector.defaults .Values.nodeSelector.k8sMetaCollector) | indent 8 }}

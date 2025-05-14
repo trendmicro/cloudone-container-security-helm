@@ -658,6 +658,27 @@ proxy:
   ## Default value: true
   excludeKubernetesServiceHost: true
 
+  ## self signed certificates, if set, the self signed certificates will be add the in-cluster component's /etc/ssl/certs/ folder
+  ##
+  ## Default value: (none)
+  selfSignedCertificates:
+    # Mount a single file from the host node into the container
+    # - name: host-file-cert             # Unique volume name
+    #   type: hostPath                   # Use "hostPath" to mount a file or directory from the host
+    #   path: /root/host-path.crt        # Absolute path to the certificate file or directory on the host
+
+    # Mount a specific key from a Kubernetes Secret as a file into the container
+    # - name: secret-cert                # Unique volume name
+    #   type: secret                     # Use "secret" to reference a Kubernetes Secret
+    #   secretName: my-cert-secret       # Name of the Kubernetes Secret
+    #   key: secret.crt                  # Key in the Secret to mount (mounted as /etc/ssl/certs/secret.crt)
+
+    # Mount a specific key from a ConfigMap as a file into the container
+    # - name: config-map-cert            # Unique volume name
+    #   type: configMap                  # Use "configMap" to reference a Kubernetes ConfigMap
+    #   configMapName: my-cert-config    # Name of the Kubernetes ConfigMap
+    #   key: config-map.crt              # Key in the ConfigMap to mount (mounted as /etc/ssl/certs/config-map.crt)
+
 
 logConfig:
   ## devel sets the log mode defaults to development mode if set to true

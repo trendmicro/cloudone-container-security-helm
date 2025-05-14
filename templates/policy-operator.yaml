@@ -98,6 +98,7 @@ spec:
         - mountPath: /reg-secrets
           name: registration-key
         {{- end }}
+        {{- include "proxy.selfSignedCertificates.volumeMounts" . | nindent 8 }}
       volumes:
         - name: workdir
           emptyDir:
@@ -111,6 +112,7 @@ spec:
           secret:
             secretName: {{ template "container.security.fullname" . }}-registration-key
         {{- end }}
+        {{- include "proxy.selfSignedCertificates.volumes" . | nindent 8 }}
       terminationGracePeriodSeconds: 10
 {{- if or .Values.nodeSelector.defaults .Values.nodeSelector.policyOperator }}
       nodeSelector:

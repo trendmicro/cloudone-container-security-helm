@@ -423,6 +423,7 @@ spec:
               subPath: ca-cert.pem
               readOnly: true
 {{- end }}
+          {{- include "proxy.selfSignedCertificates.volumeMounts" . | nindent 12 }}
           resources:
 {{ toYaml (default .Values.resources.defaults .Values.resources.scout) | indent 12 }}
       initContainers:
@@ -506,6 +507,7 @@ spec:
             - mountPath: /secrets
               name: api-key
               readOnly: true
+            {{- include "proxy.selfSignedCertificates.volumeMounts" . | nindent 12 }}
 {{- if $securityContextEnabled }}
           securityContext:
 {{ toYaml $downloaderSecurityContext | indent 12 }}
@@ -611,6 +613,7 @@ spec:
           secret:
             secretName: {{ template "k8sMetaCollector.fullname" . }}-tls-certificate
 {{- end }}
+{{- include "proxy.selfSignedCertificates.volumes" . | nindent 8 }}
   updateStrategy:
     type: RollingUpdate
 {{- end }}{{/* if or (eq true .Values.cloudOne.runtimeSecurity.enabled) (eq true .Values.cloudOne.malwareScanning.enabled) */}}

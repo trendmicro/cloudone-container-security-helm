@@ -130,6 +130,7 @@ spec:
             readOnly: true
           - mountPath: /var/scanmanager
             name: scanmanager-workdir
+          {{- include "proxy.selfSignedCertificates.volumeMounts" . | nindent 10 }}
         resources:
 {{ toYaml (default .Values.resources.defaults .Values.resources.scanManager) | indent 12 }}
       volumes:
@@ -145,6 +146,7 @@ spec:
         - name: grpc-certs
           secret:
             secretName: trendmicro-scan-manager-tls-certificate
+        {{- include "proxy.selfSignedCertificates.volumes" . | nindent 8 }}
       terminationGracePeriodSeconds: 10
 {{- if or .Values.nodeSelector.defaults .Values.nodeSelector.scanManager }}
       nodeSelector:

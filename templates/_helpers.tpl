@@ -1203,3 +1203,41 @@ Return the policy sync interval for the policy operator
 {{- .Values.cloudOne.policyOperator.policySyncInterval }}
 {{- end }}
 {{- end -}}
+
+{{- define "proxy.selfSignedCertificates.volumes" }}
+{{- range .Values.proxy.selfSignedCertificates}}
+- name: {{ .name }}
+{{- if eq .type "secret" }}
+  secret:
+    secretName: {{ .secretName | quote }}
+{{- else if eq .type "configMap" }}
+  configMap:
+    name: {{ .configMapName | quote }}
+{{- else if eq .type "emptyDir" }}
+  emptyDir: {}
+{{- else if eq .type "hostPath" }}
+  hostPath:
+    path: {{ .path | quote }}
+    type: File
+{{- end }}
+{{- end }}
+{{- end }}
+
+
+{{- define "proxy.selfSignedCertificates.volumeMounts" }}
+{{- range .Values.proxy.selfSignedCertificates}}
+- name: {{ .name }}
+{{- if and (eq .type "secret") .key }}
+  mountPath: /etc/ssl/certs/{{ .key }}
+  subPath: {{ .key }}
+{{- else if and (eq .type "configMap") .key }}
+  mountPath: /etc/ssl/certs/{{ .key }}
+  subPath: {{ .key }}
+{{- else if eq .type "hostPath" }}
+  mountPath: /etc/ssl/certs/{{ base .path }}
+{{- else }}
+  mountPath: /etc/ssl/certs/{{ .name }}
+{{- end }}
+  readOnly: true
+{{- end }}
+{{- end }}

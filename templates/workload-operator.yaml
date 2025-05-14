@@ -100,12 +100,14 @@ spec:
         volumeMounts:
           - mountPath: /secrets
             name: api-key
+          {{- include "proxy.selfSignedCertificates.volumeMounts" . | nindent 10 }}
         resources:
 {{ toYaml (default .Values.resources.defaults .Values.resources.workloadOperator) | indent 12 }}
       volumes:
         - name: api-key
           secret:
             secretName: {{ template "container.security.fullname" . }}-auth
+        {{- include "proxy.selfSignedCertificates.volumes" . | nindent 8 }}
       terminationGracePeriodSeconds: 10
 {{- if or .Values.nodeSelector.defaults .Values.nodeSelector.workloadOperator }}
       nodeSelector:
