@@ -1,4 +1,4 @@
-{{- if or .Values.cloudOne.runtimeSecurity.enabled .Values.cloudOne.malwareScanning.enabled }}
+{{- if eq (include "scout.shouldDeploy" .) "true" }}
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -347,22 +347,31 @@ spec:
             {{- end}}
 {{- include "containerRuntime.sock.args" ( list "cri" "" .Values.scout.falco ) | trim | nindent 12 }}
             - --malware-scanning={{ default "false" .Values.cloudOne.malwareScanning.enabled }}
+            - --secret-scanning={{ default "false" .Values.cloudOne.secretScanning.enabled }}
             - --malware-event-count={{ .Values.cloudOne.malwareScanning.maximumEventCount}}
             - --runtime-security={{ default "false" .Values.cloudOne.runtimeSecurity.enabled }}
             {{- if .Values.cloudOne.malwareScanning.enabled }}
             - --malware-scanner-url
             - {{ include "malwareScanner.svc.url" . }}:{{ .Values.cloudOne.malwareScanning.scanner.port }}
-            - --excluded-scan-path
+            - --malware-default-exclude-paths
             {{- $excludedPaths := (default (list) .Values.cloudOne.malwareScanning.excludedPaths) }}
             {{- $combinedListPath := .Values.malwareScanner.defaultExcludedPaths }}
             {{- range $excludedPaths }}
             {{- $combinedListPath = append $combinedListPath . }}
             {{- end }}{{/* range */}}
             - {{ $combinedListPath | join "," | quote }}
-            - --job-status-file-path={{ printf "%s%s%s" "../.." $jobStatusMntPath "/malware_scan_job_status.json" }}
-            - --scan-worker-count
+            - --malware-job-status-file-path={{ printf "%s%s%s" "../.." $jobStatusMntPath "/malware_scan_job_status.json" }}
+            - --malware-scan-worker-count
             - "{{ .Values.malwareScanner.scanWorkerCount }}"
             {{- end }}{{/* if .Values.cloudOne.malwareScanning.enabled */}}
+
+            {{- if .Values.cloudOne.secretScanning.enabled }}
+            - --secret-default-exclude-paths={{ .Values.secretScanner.defaultExcludedPaths | join "," }}
+            - --secret-max-file-size={{ .Values.cloudOne.secretScanning.maxFileSize | int }}
+            - --secret-job-status-file-path={{ printf "%s%s%s" "../.." $jobStatusMntPath "/secret_scan_job_status.json" }}
+            - --secret-scan-worker-count={{ .Values.secretScanner.scanWorkerCount }}
+            {{- end}}
+
         {{- if .Values.scout.scout.extraArgs }}
 {{ toYaml .Values.scout.scout.extraArgs | indent 12 }}
         {{- end }}{{/* if */}}
@@ -376,6 +385,10 @@ spec:
             - name: TM_AM_SCAN_TIMEOUT_SECS
               value: "{{ .Values.cloudOne.malwareScanning.scanTimeoutSeconds }}"
           {{- end }}{{/* if */}}
+          {{- if .Values.cloudOne.secretScanning.enabled }}
+            - name: TMAS_SCAN_TIMEOUT_SECS
+              value: "{{ .Values.cloudOne.secretScanning.scanTimeoutSeconds }}"
+          {{- end }}
             - name: POD_NAME
               valueFrom:
                 fieldRef:

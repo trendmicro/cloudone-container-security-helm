@@ -1,4 +1,4 @@
-{{- if or (eq true .Values.cloudOne.vulnerabilityScanning.enabled) (eq true .Values.cloudOne.malwareScanning.enabled) }}
+{{- if or (eq true .Values.cloudOne.vulnerabilityScanning.enabled) (eq true .Values.cloudOne.malwareScanning.enabled) (eq true .Values.cloudOne.secretScanning.enabled) }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -83,10 +83,15 @@ spec:
         {{- if .Values.cloudOne.vulnerabilityScanning.enabled }}
         - --enable-vulnerability-scanning
         {{- end }}
+
+        {{- if or (eq true .Values.cloudOne.malwareScanning.enabled) (eq true .Values.cloudOne.secretScanning.enabled) }}
+        - --exclude-namespaces={{ (include "namespaceExclusions" .) }}
+        - --mqtt-config-file-path=/app/scanmanager.yaml
+        {{- end}}
+
         {{- if .Values.cloudOne.malwareScanning.enabled }}
         - --enable-malware-scanning
-        - --scanner-endpoint={{ printf "%s:%d" (include "malwareScanner.svc.url" .) 50051 }}
-        - --malware-exclude-namespaces={{ (include "namespaceExclusions" .) }}
+        - --malware-scanner-endpoint={{ printf "%s:%d" (include "malwareScanner.svc.url" .) 50051 }}
           {{- $excludedPaths := (default (list) .Values.cloudOne.malwareScanning.excludedPaths) }}
           {{- $combinedListPath := .Values.malwareScanner.defaultExcludedPaths }}
           {{- range $excludedPaths }}
@@ -105,6 +110,14 @@ spec:
         - --openshift-service-account-annotations={{ $annotations | replace "\n" "," | replace " " "" }}
         {{- end }}
         {{- end }}
+
+        {{- if .Values.cloudOne.secretScanning.enabled }}
+        - --enable-secret-scanning
+        - --secret-default-exclude-paths={{ .Values.secretScanner.defaultExcludedPaths | join "," }}
+        - --secret-max-file-size={{ .Values.cloudOne.secretScanning.maxFileSize | int }}
+        - --secret-scan-job-active-deadline={{ printf "%ds" (int .Values.cloudOne.scanManager.secretScanActiveDeadlineSeconds) }}
+        {{- end }}
+
         env:
         {{- include "container.security.proxy.env" . | nindent 8 }}
         {{- $scanJobImageDefaults := .Values.images.defaults }}
@@ -126,7 +139,7 @@ spec:
           - name: scan-manager-config
             mountPath: /etc/config/
           - name: grpc-certs
-            mountPath: /etc/malwarescan/certs
+            mountPath: /etc/scanner/certs
             readOnly: true
           - mountPath: /var/scanmanager
             name: scanmanager-workdir

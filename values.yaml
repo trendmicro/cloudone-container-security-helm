@@ -178,6 +178,12 @@ cloudOne:
     ##
     malwareScanActiveDeadlineSeconds: 3600
 
+    ## secretScanActiveDeadlineSeconds is the maximum duration a secret scan job can run before timing out.
+    ##
+    ## Default value: 3600
+    ##
+    secretScanActiveDeadlineSeconds: 3600
+
     ## logLevel sets the log verbosity level. Supported values are debug, info, and error
     ##
     ## Default value: info
@@ -322,6 +328,12 @@ cloudOne:
         tcpSocket:
           port: 50051
         initialDelaySeconds: 10
+
+  ## secretScanning is a section that controls the secret scanning feature
+  secretScanning:
+    enabled: false
+    maxFileSize: 2097152 # Bytes
+    scanTimeoutSeconds: 300
 
   policyOperator:
     ## enable the cluster-managed policy feature
@@ -1061,6 +1073,15 @@ malwareScanner:
   - /proc
   - /dev
   - /sys
+  scanWorkerCount: 5
+
+secretScanner:
+  defaultExcludedPaths:
+  - /proc/*
+  - /dev/*
+  - /sys/*
+  - /var/run/secrets/*
+  - /run/secrets/*
   scanWorkerCount: 5
 
 scanner:

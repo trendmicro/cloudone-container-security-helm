@@ -639,6 +639,21 @@ Service url of malware scanner
 {{- printf "%s.%s.svc.cluster.local" (include "malwareScanner.svc" .) .Release.Namespace -}}
 {{- end -}}
 
+
+{{/*
+Service name of secret scanner
+*/}}
+{{- define "secretScanner.svc" -}}
+{{- printf "trendmicro-secret-scanner" -}}
+{{- end -}}
+
+{{/*
+Service url of secret scanner
+*/}}
+{{- define "secretScanner.svc.url" -}}
+{{- printf "%s.%s.svc.cluster.local" (include "secretScanner.svc" .) .Release.Namespace -}}
+{{- end -}}
+
 {{/*
 Create an image source.
 */}}
@@ -1165,6 +1180,27 @@ Automatically adds any namespace with prefix to excluded namespace list for open
 {{- join "," $excludedNamespaces -}}
 {{- end -}}
 
+{{/* 
+   Determines whether Scout should be deployed based on enabled Cloud One features.
+
+   This helper centralizes the deployment condition to avoid duplication in multiple templates.
+   It returns "true" (as a string) if any of the following features are enabled:
+   - Runtime Security
+   - Malware Scanning
+   - Secret Scanning
+   Otherwise, it returns "false".
+
+   Usage:
+   {{- if eq (include "scout.shouldDeploy" .) "true" }}
+*/}}
+{{- define "scout.shouldDeploy" -}}
+{{- if or (eq true .Values.cloudOne.runtimeSecurity.enabled) (eq true .Values.cloudOne.malwareScanning.enabled) (eq true .Values.cloudOne.secretScanning.enabled) -}}
+true
+{{- else -}}
+false
+{{- end -}}
+{{- end -}}
+
 {{/* hec client command line arguments as env variable*/}}
 {{- define "hec_client_params_as_env_var" -}}
   {{- printf "-v" -}}
@@ -1186,8 +1222,7 @@ sanitizer_output:
   patterns:
     {{- range $key, $value := .Values.scout.falco.sanitizer_output.patterns }}
     {{ $key }}: {{ $value | quote }}
-    {{- end }}
-{{- else }}
+    {{- end }} {{- else }}
 {{- fail "Redaction pattern is required if output sanitizer is enabled." }}
 {{- end }}
 {{- end }}

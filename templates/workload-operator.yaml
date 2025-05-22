@@ -83,6 +83,7 @@ spec:
         - --chart-version={{ default "unknown" .Chart.AppVersion }}
         - --runtime-security={{ default "false" .Values.cloudOne.runtimeSecurity.enabled }}
         - --malware-scanning={{ default "false" .Values.cloudOne.malwareScanning.enabled }}
+        - --secret-scanning={{ default "false" .Values.cloudOne.secretScanning.enabled }}
         - --trusted-images={{ include "digest" . }}
         {{- if gt (int .Values.replicas.workloadOperator) 1 }}
         - --leader-elect

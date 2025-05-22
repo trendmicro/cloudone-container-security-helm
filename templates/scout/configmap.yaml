@@ -1,11 +1,10 @@
-{{- if or (eq true .Values.cloudOne.runtimeSecurity.enabled) (eq true .Values.cloudOne.malwareScanning.enabled) }}
+{{- if eq (include "scout.shouldDeploy" .) "true" }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ template "container.security.name" . }}-scout-config
-  labels:
-    {{- include "scout.labels" . | nindent 4 }}
+  labels: {{- include "scout.labels" . | nindent 4 }}
 data:
   default_rules.yaml: |
     - rule: Dummy rule
