@@ -56,4 +56,5 @@ volumes:
 - downwardAPI
 - emptyDir
 - secret
+- projected
 {{- end }}
