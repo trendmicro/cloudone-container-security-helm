@@ -1,3 +1,6 @@
+# ⚠️ **DEPRECATED**
+This Helm chart will no longer be updated with new features. All Vision One users should migrate to the new version: https://github.com/trendmicro/visionone-container-security-helm
+
 # Trend Micro Cloud One Container Security Helm Chart
 
 ## Getting started
@@ -82,7 +85,7 @@ To obtain an API key:
 
 #### Use Existing Secrets for API Key
 
-By default, the helm chart expects the api key to be provided through the `cloudOne.APIKey` helm value in the `overrides.yaml` file. This method creates an API key secret in the same namespace where the Container Security components are installed but can expose the API key in helm values. 
+By default, the helm chart expects the api key to be provided through the `cloudOne.APIKey` helm value in the `overrides.yaml` file. This method creates an API key secret in the same namespace where the Container Security components are installed but can expose the API key in helm values.
 
 It is recommended to use the `useExistingSecrets.containerSecurityAuth: true` option and create a secret in the same namespace where the Container Security components will be installed. The secret should be named `trendmicro-container-security-auth` with the key `api.key` set to the API key value. This will also allow automation of the api key secret creation and management.
 
@@ -441,7 +444,7 @@ For Argo CD deployments, we provide a cleanup script to help with the uninstalla
 
 For detailed instructions on using the Argo CD cleanup script, please refer to the [Argo CD cleanup script documentation](./scripts/argocd-cleanup.md).
 
-## Falco Version Matrix 
+## Falco Version Matrix
 
 The following matrix shows the Falco version that is bundled with each Helm chart version:
 
