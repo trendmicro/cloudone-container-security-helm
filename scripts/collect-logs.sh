@@ -14,9 +14,14 @@ command_exists () {
   command -v "$1" >/dev/null 2>&1
 }
 
+# Check if kubectl exists, if not, switch to oc
 if ! command_exists $KUBECTL; then
-  echo "No kubectl command found, exiting..."
-  exit 1
+  echo "No kubectl command found, switching to oc..."
+  KUBECTL=oc #For Openshift environments
+  if ! command_exists $KUBECTL; then
+    echo "Neither kubectl nor oc command found, exiting..."
+    exit 1
+  fi
 fi
 
 if ! command_exists $HELM; then
@@ -24,7 +29,7 @@ if ! command_exists $HELM; then
   exit 1
 fi
 
-CURRENT_NS=$(kubectl config view --minify --output 'jsonpath={..namespace}')
+CURRENT_NS=$($KUBECTL config view --minify --output 'jsonpath={..namespace}')
 CURRENT_NS=${CURRENT_NS:-trendmicro-system}
 NAMESPACE=${NAMESPACE:-$CURRENT_NS}
 NAMESPACE_PARAM="--namespace=$NAMESPACE"
