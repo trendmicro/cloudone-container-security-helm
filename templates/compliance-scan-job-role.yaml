@@ -56,11 +56,6 @@ rules:
   - ""
   resources:
   - namespaces
-  verbs:
-  - create
-- apiGroups:
-  - ""
-  resources:
   - pods/exec
   - pods
   verbs:
