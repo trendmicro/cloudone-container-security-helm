@@ -1128,7 +1128,7 @@ images:
 
     ## Default tag for images to pull. This can be overridden for each image
     ## by specifying the tag attribute at the image level.
-    tag: 2.6.9
+    tag: 2.6.10
 
     ## Default pull policy for images. This can be overridden for each image
     ## by specifying the pullPolicy attribute at the image level.
@@ -1169,7 +1169,7 @@ images:
   scout:
     repository: scout
     digest: 
-      sha256:70fbb775f8b2faec1bee83f3e6bc00e79764c0e548dc6ce7b8eb9e08231b7621
+      sha256:a1d5453e1bd85e657b9029d09e1ca862c1506de4e7305488d121c5df9f0dab9b
 
   scanManager:
     repository: scan-manager
@@ -1184,7 +1184,7 @@ images:
   complianceScanJob:
     repository: compliance-scan-job
     digest: 
-      sha256:e52fe354f716cfb908a08550dcaafbe4fb319d9f39a4c0009b7ce8e94ed9bd26
+      sha256:3dd48330aea2d3b065e613ba89ac350fd086869e6e2b6efbdbac14818d2a645a
 
   workloadOperator:
     repository: workload-operator
@@ -1204,7 +1204,7 @@ images:
   k8sMetaCollector:
     repository: k8s-metacollector
     digest: 
-      sha256:5f38e2846d9e64c466c0181c862baf5f668583b45ec062cb0093648e60c40e21
+      sha256:2584e5926035ab4b749897470b922440ab5d4e222c189483b8ebb96c2b3c0721
 
   policyOperator:
     repository: policy-operator
