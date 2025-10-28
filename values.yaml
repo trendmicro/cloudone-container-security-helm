@@ -1159,7 +1159,7 @@ images:
   rbacProxy:
     repository: rbac-proxy
     digest: 
-      sha256:cf702fe130af0be68b29e5abc269e0556493d0eaadd2b59d3ef0266b56d2429d
+      sha256:5c6f74769bc952f40d4b3b9bca4d5e7741a09f2cd4ff69307c5afa6e0d84f012
 
   falco:
     repository: falco
@@ -1169,7 +1169,7 @@ images:
   scout:
     repository: scout
     digest: 
-      sha256:f8db7729a5478c7185e59729efb071ae86e5b28f6e1f1ecac2044cc3d5906881
+      sha256:14c517da1250d0835c0ef13f42ac8c41dfa4149f8ee9b4f3d031568e785df8a8
 
   scanManager:
     repository: scan-manager
@@ -1189,12 +1189,12 @@ images:
   workloadOperator:
     repository: workload-operator
     digest: 
-      sha256:2ccf82f0c8cb52564218f469c62db77709f8a9b45e0865ac32abd6ed8a33f86c
+      sha256:bceb2a11c7b692c1329bb3b40062470a51a2b7af55fcf486138285410ff09082
 
   fargateInjector:
     repository: fargate-tool
     digest: 
-      sha256:05be847d08f548ea79eb0570bdd7208efd8d5fc3f83f99522a094e025ca80c09
+      sha256:127dc1e3dc00fa04d32fb88b4e95a7f9c6b0c3953ccc9f9d7aef9473fbfbc9ff
 
   pdig:
     repository: pdig
@@ -1209,7 +1209,7 @@ images:
   policyOperator:
     repository: policy-operator
     digest: 
-      sha256:958d9e0cab2d27020ce5873d405230c528faa967b7ed1ff05d299aaa60769c96
+      sha256:38fc3cf4e5f8f987de9cd18a172449a480b30476a877455f3ee6dbcb49440714
 
   malwareScanner:
     repository: malware-scanner
